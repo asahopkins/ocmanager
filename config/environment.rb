@@ -63,6 +63,7 @@ require 'localization'
 Localization::load_localized_strings
 require 'environments/user_environment'
 require 'memory_logging'
+require 'pdf/writer'
 
 class Time   
   %w(to_date to_datetime).each do |method|   
