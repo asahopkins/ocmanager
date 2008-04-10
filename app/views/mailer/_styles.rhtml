@@ -1,0 +1,149 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><style type="text/css">
+
+#OutsideBox {
+	color: #000;
+	background: #<%= stylesheet.side_bg %>;
+	margin: 0px;
+	padding: 0px;
+	width: 800px;
+	font-family: Georgia, Helvetica, Verdana, sans-serif;
+	text-align: center;
+}
+
+#MessageBox {
+	width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+}
+
+#OCMessage {
+	background: #<%= stylesheet.body_bg %>;
+}
+
+.h1_block {
+	background: #<%= stylesheet.title_bg %>;
+	text-align: <%= stylesheet.h1_align %>;
+	color: #<%= stylesheet.h1_color %>;
+	width: 96%;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 2%;
+	padding-right: 2%;
+}
+
+#OutsideBox p  {
+	color: #<%= stylesheet.p_color %>;
+	font-size: <%= stylesheet.p_size %>pt;
+	font-family: <%=  stylesheet.p_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+#OutsideBox h1 {
+	font-size: <%= stylesheet.h1_size %>pt;
+	font-weight: <%= stylesheet.h1_weight %>;
+	font-family: <%=  stylesheet.h1_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+}
+
+#OutsideBox h2 {
+	color: #<%= stylesheet.h2_color %>;
+	background: #<%= stylesheet.body_bg %>;
+	font-size: <%= stylesheet.h2_size %>pt;
+	font-weight: <%= stylesheet.h2_weight %>;
+	font-family: <%=  stylesheet.h2_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+	text-align: <%= stylesheet.h2_align %>;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#OutsideBox h3 {
+	color: #<%= stylesheet.h3_color %>;
+	font-size: <%= stylesheet.h3_size %>pt;
+	font-weight: <%= stylesheet.h3_weight %>;
+	font-family: <%=  stylesheet.h3_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+	text-align: <%= stylesheet.h3_align %>;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#OutsideBox h4 {
+	color: #<%= stylesheet.h4_color %>;
+	font-size: <%= stylesheet.h4_size %>pt;
+	font-weight: <%= stylesheet.h4_weight %>;
+	font-family: <%=  stylesheet.h4_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+	text-align: <%= stylesheet.h4_align %>;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#OutsideBox h5 {
+	color: #<%= stylesheet.h5_color %>;
+	font-size: <%= stylesheet.h5_size %>pt;
+	font-weight: <%= stylesheet.h5_weight %>;
+	font-family: <%=  stylesheet.h5_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+	text-align: <%= stylesheet.h5_align %>;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#OutsideBox a {
+	color: #<%= stylesheet.a_color %>;
+	text-decoration: <%= stylesheet.a_decoration %>;
+}
+
+#OutsideBox a:visited {
+	color: #<%= stylesheet.a_color %>;
+	text-decoration: <%= stylesheet.a_decoration %>;
+}
+
+#OutsideBox em {
+	font-weight: <%= stylesheet.em_weight %>;
+	font-style: <%= stylesheet.em_style %>;
+}
+
+#OutsideBox strong {
+	font-weight: <%= stylesheet.strong_weight %>;
+	font-style: <%= stylesheet.strong_style %>;
+}
+
+#OutsideBox ul li {
+	list-style: <%= stylesheet.ul_type %>;
+	color: #<%= stylesheet.p_color %>;
+	font-size: <%= stylesheet.p_size %>pt;
+	font-family: <%=  stylesheet.p_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;
+}
+
+#OutsideBox ol li {
+	list-style: <%= stylesheet.ol_type %>;
+	color: #<%= stylesheet.p_color %>;
+	font-size: <%= stylesheet.p_size %>pt;
+	font-family: <%=  stylesheet.p_serif? ? "Georgia, Times, serif" : "Helvetica, Verdana, sans-serif" %>;	
+}
+
+#OutsideBox hr {
+	height: <%= stylesheet.hr_height %>px;
+	width: <%= stylesheet.hr_width %>%;
+	color: #<%= stylesheet.hr_color %>;
+	background-color: #<%= stylesheet.hr_color %>;
+}
+</style>

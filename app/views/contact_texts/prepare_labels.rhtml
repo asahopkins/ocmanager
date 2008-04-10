@@ -1,0 +1,28 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><p>Please fill out the following form, then click "Create your labels".  The label file will then be available for download in the "download exports" section.</p>
+<%= form_tag :action=>"labels", :params=>{:id=>@text_id} %>
+<dl>
+<dt>Sort by:</dt><dd><%= select "labels", "sort_field", ["Name", "Zip"], :selected=>"Name" %></dd>
+<dt>File name:</dt><dd><%= text_field "labels", "filename", :value=>"Please enter a file name",:maxlength=>28 %> (Limit 28 characters. Please don't use weird characters in naming your file.)</dd>
+<dt>Household:</dt><dd><%= check_box_tag "labels[join_households]", 1, true %> Leave the box checked in order to address labels to the whole household containing MyPeople (eg. <i>The Smith Family</i>), rather than just MyPeople (eg. separate labels for <i>Mrs. Peggy Smith</i> and <i>Dr. John Smith</i>).</dd>
+</dl>
+<%= submit_tag "Create your labels" %>
+</form>

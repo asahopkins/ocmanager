@@ -1,0 +1,38 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%= error_messages_for 'campaign_event' %>
+
+<!--[form:campaign_event]-->
+<dl>
+	<dt><label for="campaign_event_name">Name</label></dt><dd><%= text_field 'campaign_event', 'name'  %></dd>
+	<dt><label for="campaign_event_start_time">Start time</label></dt><dd><%= datetime_select 'campaign_event', 'start_time',:order=>[:month, :day, :year] %></dd>
+	<dt><label for="campaign_event_end_time">End time</label><dd><%= datetime_select 'campaign_event', 'end_time',:order=>[:month, :day, :year] %></dd>
+	<dt><label for="campaign_event_location_name">Location</label></dt><dd><%= text_field 'campaign_event', 'location_name'  %></dd>
+	<dt><label for="campaign_event_addr_line1">Address</label><dd><%= text_field 'campaign_event', 'addr_line1'  %></dd>
+	<dt><label for="campaign_event_addr_line2">&nbsp;</label><dd><%= text_field 'campaign_event', 'addr_line2'  %></dd>
+	<dt><label for="campaign_event_addr_city">City</label><dd><%= text_field 'campaign_event', 'addr_city'  %></dd>
+	<dt><label for="campaign_event_addr_state">State</label></dt><dd><select id="campaign_event_addr_state" name="campaign_event[addr_state]"><%=render :partial=>'partial/states_options', :locals=>{:state=> "CA"}%></select></dd>
+	<dt><label for="campaign_event_addr_zip">ZIP</label><dd><%= text_field 'campaign_event', 'addr_zip', :size=>5, :maxlength=>10  %></dd>
+	<dt><label for="campaign_event_website">Event website</label><dd><%= text_field 'campaign_event', 'website'  %></dd>
+	<dt><label for="campaign_event_recipient_committee_id">Fundraising recipient</label><dd><%= select :campaign_event, :recipient_committee_id, @campaign.outside_committees.collect{|c| [cut_to_length(c.name, 35), c.id]}, {:include_blank=>true} %></dd>
+	<dt><label for="campaign_event_goal">Fundraising goal</label><dd><%= text_field 'campaign_event', 'goal'  %></dd>
+</dl>
+<!--[eoform:campaign_event]-->
+<br />

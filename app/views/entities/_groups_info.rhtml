@@ -1,0 +1,66 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+@campaign = @entity.campaign
+-%>
+<div class="notice" id="groups_notice"></div>
+<div id="groups_info_header_row">
+<span class="left_30">Group</span><span class="left_20">Role</span><span class="left_20">&nbsp;</span></div>
+<% @entity.group_memberships.each do |gm| 
+	group = gm.group %>
+<div class="entity_group_info">
+<span class="left_30"><%= link_to group.name, :controller=>"groups",:action=>"show",:id=>group.id, :params=>{:campaign_id=>@campaign.id} %></span><span class="left_20"><%= gm.role %>&nbsp;</span><span class="left_20"><% if can_edit_groups %><%= link_to_function "Edit","new Effect.BlindDown('group_details_and_edit_#{group.id.to_s}',{duration: 0.15});" %> | <%= link_to_remote "Remove",:url=>{:controller=>"group_memberships",:action=>"destroy",:params=>{:entity_id=>@entity.id,:group_id=>group.id}},:loading=>"Element.show('indicator_#{group.id}');"%><% end %></span><span id="indicator_<%= group.id %>" style="display:none;"><%= image_tag "indicator.gif" %></span><span class="left_15">&nbsp;</span></div>
+<% if can_edit_groups -%>
+<div id="group_details_and_edit_<%= group.id.to_s %>" style="display:none;">
+	<%= form_remote_tag :url=>{:controller=>"group_memberships", :action=>"update",:params=>{:entity_id=>@entity.id,:group_id=>group.id}},:loading=>"Element.show('indicator_#{group.id}');" %>
+	<dl>
+	<dt>Edit role:</dt><dd><%= text_field :group, :role, :value=>gm.role,:size=>15 %> <%= submit_tag "Save" %> <%= link_to_function "(cancel)", "new Effect.BlindUp('group_details_and_edit_#{group.id.to_s}',{duration: 0.15});" %> </dd>	
+	</dl>
+	</form>
+</div>
+<% end -%>
+<% end -%>
+<% if can_edit_groups 
+	possible_groups = []
+	@campaign.groups.each do |group| 
+		unless @entity.groups.include?(group) 
+			possible_groups << group
+ 		end end %>
+<% if possible_groups.length > 0 -%>
+<div id="add_to_group" class="add_box">
+	<%= form_remote_tag :url=>{:controller=>"group_memberships", :action=>"create",:params=>{:entity_id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('indicator_group_create');"%>
+		<dl>
+			<dt>Add to:</dt>
+				<dd>
+				<select name="group_id">
+				<% possible_groups.each do |group| -%>
+					<option value="<%= group.id %>"><%= group.name %></option>
+				<% end -%>
+				</select>
+				</dd>
+			<dt>Role:</dt><dd><%= text_field :group, :role, :value=>"Member",:size=>10 %></dd>				
+			<dt>&nbsp;</dt><dd><%= submit_tag "Add to Group" %><span id="indicator_group_create" style="display:none;"><%= image_tag "indicator.gif" %></span></dd>
+		</dl>
+	</form>
+</div>
+<% end -%>
+<% end -%>

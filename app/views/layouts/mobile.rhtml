@@ -1,0 +1,50 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<% if @page_title -%>
+ 	<title>Manager :: <%= @page_title %></title>
+	<% else -%>
+ 	<title>Manager :: <%= controller.controller_name.camelize %> :: <%= controller.action_name.camelize %></title>
+	<% end -%>
+	<%= stylesheet_link_merged :mobile %>
+  	<% stylesheet_link_tag 'mobile' %>
+	<meta http-equiv="Cache-Control" content="max-age=600" />
+</head>
+<body>
+<div class="header">
+<h2>Manager</h2>
+<h3>by Open Campaigns</h3>
+<hr />
+</div>
+<p style="color: green"><%= flash[:notice] %></p>
+
+<%= @content_for_layout %>
+<% if current_user -%>
+<p>You are logged in as <i><%=current_user.name%></i>.<br />
+<%= link_to "Logout", :controller=>"user", :action=>"logout"%></p>
+<% end -%>
+<div class="footer"><p>Copyright 2005-2008 Open Campaigns.  http://www.opencampaigns.net, open.campaigns@gmail.com.</p>
+	<p>Open Campaigns Manager is released under the <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU Affero General Public License, version 3</a>.  Current running code can be downloaded <a href="http://www.opencampaigns.net/manager.tar.bz2">here</a>.</p></div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+-%>
+<div id="other_entity_contributions">
+	<div class="financial_committee_name">Contributions</div>
+	<p class="notice" id='contrib_notice'><%=h flash[:contrib_notice] %></p>
+	<p class="warning" id='contrib_warning'><%=h flash[:contrib_warning] %></p>
+	<br class="brclear"/>
+	<% @entity.contributions.each do |contribution| 
+		@contribution = contribution -%>
+	<div class="contribution_summary">
+		<span class="left_30"><%=h contribution.recipient_name %></span>
+		<span class="left_20"><%=h contribution.campaign_event.name unless contribution.campaign_event.nil? %>&nbsp;</span>
+		<span class="left_20"><%= contribution.date.strftime("%m/%d/%y") %></span>
+		<span class="left_20"><%= number_to_currency(contribution.amount) %></span>
+		<span class="left_8"><a href="#" onClick="Element.show('edit_contribution_<%=contribution.id%>'); return false;">Edit</a></span>
+		<div class="edit_contribution" id="edit_contribution_<%=contribution.id%>" style="display:none;">
+			<%= form_remote_tag :update=>"other_entity_contributions", :url=>{:action=>"update_contribution", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id, :contribution_id=>contribution.id}}, :loading=>"Element.show('contribution_indic_#{contribution.id}')", :complete=>"Element.hide('contribution_box_indic_#{contribution.id}')"%>
+			<dl>
+				<dt>To</dt><dd><%= select 'contribution', :recipient_committee_id, @campaign.outside_committees.collect{|c| [cut_to_length(c.name, 30), c.id.to_s]}+[["Other",""]], :selected=>@contribution.recipient_committee_id.to_s %></dd>
+				<dt><i>(Other)</i></dt><dd><%if @contribution.recipient_committee 
+						recip_name = "" 
+					else 
+						recip_name = @contribution.recipient
+					end -%><%= text_field 'contribution', 'recipient', :size=>20, :value=>recip_name %></dd>		
+				<dt>Event</dt><dd><%= select 'contribution', :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name, 25)+t.date.strftime(' (%m/%d/%Y)'), t.id]}, {:include_blank=>true} %></dd>
+				<dt>Date</dt><dd><%= date_select 'contribution', 'date' %></dd>
+				<dt>Amount</dt><dd><%= text_field 'contribution', 'amount', :size=>5 %></dd>
+				<dt>Delete?</dt><dd><%= check_box_tag 'delete_contribution' %></dd>
+				<dt>&nbsp;<span id='contribution_indic_<%=contribution.id%>' style="display:none"><%= image_tag "indicator.gif"%></span></dt><dd><input type="Submit" value="Save report"> or <a href="#" onClick="Element.hide('edit_contribution_<%=contribution.id%>'); return false;">Cancel</a></dd>
+			</dl>	
+			</form>
+		</div>
+	</div>
+	<% end 
+	@contribution = nil -%>
+
+	<div>
+		<br class="brclear"/>
+		<div id="add_contribution" class="add_box">
+			<a href="#" onClick="Element.show('new_contribution'); Element.hide('add_contribution'); return false;">Add contribution report</a>
+		</div>
+		<div id="new_contribution" style="display:none;" class="add_box">
+			<%= form_remote_tag :update=>"other_entity_contributions", :url=>{:action=>"create_contribution", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('new_contribution_indic')", :complete=>"Element.hide('new_contribution_indic')"%>
+			<dl>
+				<dt>To</dt><dd><%= select 'contribution', :recipient_committee_id, @campaign.outside_committees.collect{|c| [cut_to_length(c.name, 30), c.id.to_s]}+[["Other",""]] %></dd>
+				<dt><i>(Other)</i></dt><dd><%= text_field 'contribution', 'recipient', :size=>20,:value=>"enter recipient name" %></dd>		
+				<dt>Event</dt><dd><%= select 'contribution', :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name, 25)+t.date.strftime(' (%m/%d/%Y)'), t.id]}, {:include_blank=>true} %></dd>
+				<dt>Date</dt><dd><%= date_select 'contribution', 'date' %></dd>
+				<dt>Amount</dt><dd><%= text_field "contribution", "amount", :size=>5, :value=>"" %></dd>
+				<dt>&nbsp;<span id='new_contribution_indic' style="display:none"><%= image_tag "indicator.gif"%></span></dt><dd><input type="Submit" value="Add report"> or <a href="#" onClick="Element.show('add_contribution'); Element.hide('new_contribution'); return false;">Cancel</a></dd>
+			</dl>	
+			</form>
+		</div>
+	</div>
+</div>

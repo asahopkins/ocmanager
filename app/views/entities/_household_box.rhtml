@@ -1,0 +1,50 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+if @entity.class==Person
+	@household = @entity.household
+	unless @household.nil?
+-%>
+<div class="data_header" onMouseOver="Element.show('edit_household_link');" onMouseOut="Element.hide('edit_household_link');">Household <% if can_edit -%><span id="edit_household_link" style="display:none;">(<a href="#" onClick="Element.hide('household'); Element.show('edit_household'); return false;">edit</a>)</span><% end -%></div>
+<div id="household">
+<dl>
+	<% @household.people.each do |person| -%>
+	<dt>&nbsp;</dt> <dd><%=link_to person.name, :controller=>"entities", :action=>"show", :id=>person.id %></dd>
+	<% end -%>
+</dl>
+</div>
+<% if can_edit -%>
+<div id="edit_household" style="display:none;"><dl>
+	<% @household.people.each do |person| -%>
+	<dt style="font-weight:normal;"><% if person.id != @entity.id -%><%= link_to_remote "Remove",:update=>"household_box",:url=>{:controller=>"entities",:action=>"remove_from_household",:params=>{:id=>person.id,:page_entity_id=>@entity.id}}, :loading=>"Element.show('household_box_indic')" %><% end -%>&nbsp;</dt> <dd><%=link_to person.name, :controller=>"entities", :action=>"show", :id=>person.id %></dd>
+	<% end -%>
+</dl>
+<div id="household_form">
+	<%= form_remote_tag :url=>{:controller=>"entities", :action=>"household_search", :params=>{:campaign_id=>@campaign.id,:household_id=>@household.id,:id=>@entity.id}},:update=>"household_search_results", :loading=>"Element.show('household_box_indic')",:complete=>"Element.hide('household_box_indic')" %>
+	<%= text_field "search", "name",:size=>20,:value=>@entity.last_name %>&nbsp;<%= submit_tag "Search" %> 
+	<span id="household_box_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span></form>
+</div>
+<div id="household_search_results">
+</div>
+<a href="#" onClick=" Element.hide('edit_household'); Element.show('household'); return false;">Close</a></div><% end -%>
+<%	end
+end-%>

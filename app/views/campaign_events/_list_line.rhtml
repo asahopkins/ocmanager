@@ -1,0 +1,32 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div class="entity_list_line" id="entity_line_<%= entity.id %>">
+	<span class="left_15"><%= link_to h(entity.name), :controller=>"entities", :action=>"show", :params=>{:id=>entity.id} %></span>
+	<span class="left_12"><%=number_to_phone(entity.primary_phone_number)%>&nbsp;</span>
+	<span class="left_20"><%= link_to_email(entity.primary_email_address)%>&nbsp;</span>
+	<span class="left_8"><%=h entity.event_invitation(@campaign_event).to_s %>&nbsp;</span>
+	<span class="left_8"><%=h entity.event_response(@campaign_event).to_s %>&nbsp;</span>
+	<span class="left_8"><%=h entity.event_attendance(@campaign_event).to_s %>&nbsp;</span>
+	<span class="left_8"><%= number_to_currency(entity.pledge_value(@campaign_event)) %>&nbsp;</span>
+	<span class="left_8"><%= number_to_currency(entity.event_contribution(@campaign_event)) %>&nbsp;</span>	
+	<span class="right_13"><%= link_to_remote "Add to MyPeople", :url=>{:controller=>"cart_items",:action=>"create", :params=>{:entity_id=>entity.id}}, :method=>"post", :loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');"%>
+	<%= link_to_remote "(Remove from event)", :url=>{ :controller=>"rsvps", :action => 'destroy', :params=>{:campaign_event_id=>@campaign_event.id, :entity_id=>entity.id, :referring_page=>"event_show"} }, :confirm => 'Are you sure?  This will remove all record tying this person to this event.', :method=>"post", :loading=>"Element.show('indicator');", :complete=>"Element.hide('indicator');" %>
+	</span>
+</div>

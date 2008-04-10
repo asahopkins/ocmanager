@@ -1,0 +1,57 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%>
+<% if @stylesheet.nil?
+	@stylesheet = stylesheet
+	end %>
+	<table width="100%">
+		<tr>
+			<td width="50%">
+<div class="basic_dl"><h3>Background colors</h3>
+<dl>
+	<dt>Side:</dt>
+	<dd><%= color_sliders :stylesheet, :side_bg, :tag=>"side_bg" %></dd>
+	<dt>Headline:</dt>
+	<dd><%= color_sliders :stylesheet, :title_bg, :tag=>"title_bg" %></dd>
+	<dt>Main body:</dt>
+	<dd><%= color_sliders :stylesheet, :body_bg, :tag=>"body_bg" %></dd>
+</dl></div>
+	</td>
+	<td width="50%">
+<div class="basic_dl"><h3>Headline</h3>
+<dl>
+	<dt>Text color:</dt>
+	<dd><%= color_sliders :stylesheet, :h1_color, :tag=>"h1" %></dd>
+	<dt>Size:</dt>
+	<dd><%= slider_field :stylesheet, :h1_size, :range=>6..36, :values=>[6,7,8,9,10,11,12,14,16,18,21,24,36], :slider_value=>@stylesheet.h1_size.to_i %></dd>
+	<dt>Serif:</dt>
+	<dd><%= select :stylesheet, :h1_serif, [["Sans-serif",false],["Serif",true]] %></dd>
+	<dt>Alignment:</dt>
+	<dd><%= select :stylesheet, :h1_align, [["Left","left"],["Center","center"],["Right","right"]] %></dd>
+	<dt>Weight:</dt>
+	<dd><%= select :stylesheet, :h1_weight, [["Normal","normal"],["Bold","bold"]] %></dd>
+</dl>	</div>
+</td>
+</tr>
+</table>
+
+<div class="spacer_clear">&nbsp;</div>
+	
+	

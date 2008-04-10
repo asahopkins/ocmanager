@@ -1,0 +1,72 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h3>Preview:</h3>
+<% if @text.stylesheet -%>
+<p><%= link_to 'Edit message', :action => 'compose', :params=>{:type=>"Email", :id => @text.id, :campaign_id=>@campaign.id} %></p>
+<div id="email">
+<dl>
+	<dt>To:</dt><dd><%= link_to "MyPeople", :controller=>"cart_items", :action=>"list" %></dd>
+	<dt>From:</dt><dd><%= @text.sender %></dd>
+	<dt>Subject:</dt><dd><%= @text.subject %></dd>
+</dl>
+<div id="preview">
+<div id="styled_body">
+	<div id="preview_styles">
+		<%= render :partial=>"mailer/styles", :locals=>{:stylesheet=>@text.stylesheet} %>
+	</div>
+
+	<div id="preview_content">
+	<center>If you cannot read the message below, please use your email program to view it in plain text.  Thank you.</center><div id="OutsideBox">
+	<div id="MessageBox">
+		<div id="OCMessage">
+			<% if @text.formatted_text %>
+			<%= @text.formatted_text %>
+			<% else %>
+			<%= blockify_h1s(BlueCloth.new(@text.text.to_s).to_html) %>
+			<% end %>
+		</div>
+	</div>
+	</div>
+	</div>
+</div>
+</div>
+</div>
+<% else -%>
+<p><%= link_to 'Edit message', :action => 'compose', :params=>{:type=>"PlainEmail", :id => @text.id, :campaign_id=>@campaign.id} %></p>
+<div id="email">
+<dl>
+	<dt>To:</dt><dd><%= link_to "MyPeople", :controller=>"cart_items", :action=>"list" %></dd>
+	<dt>From:</dt><dd><%= @text.sender %></dd>
+	<dt>Subject:</dt><dd><%= @text.subject %></dd>
+</dl>
+<div id="preview">
+<div id="preview_content">
+	<pre><%= @text.text.gsub(/(.{1,80})( +|$)\n?|(.{80})/,"\\1\\3\n") %></pre>
+</div>
+</div>
+</div>
+<% end -%>
+<hr />
+<%= form_remote_tag :update=>"test_status", :url=>{:action=>"send_test_email", :params=>{:id=>@text.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('test_indic')", :complete=>"Element.hide('test_indic')" %>
+<%= submit_tag "Send test message" %> to: <%= text_field :contact_text, :addresses, :value=>nil %><br />
+</form><br />
+<span id="test_indic" style="display:none"><%= image_tag 'indicator.gif' %></span><span id="test_status">Use commas to separate multiple email addresses.</span>
+<hr />
+<%= form_tag :action=>"send_email_to_cart", :params=>{:id=>@text.id, :campaign_id=>@campaign.id} %><%= submit_tag "Send to MyPeople" %></form>

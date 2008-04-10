@@ -1,0 +1,33 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%= error_messages_for 'campaign' %>
+
+<!--[form:campaign]-->
+<p><label for="campaign_name">Name</label><br/>
+<%= text_field 'campaign', 'name'  %></p>
+<% if @campaign.from_emails %>
+<p><label for="from_addresses">Sender email addresses, separated by commas</label><br />
+	<%= text_field 'campaign', 'from_addresses', :value=>@campaign.from_emails.join(', ')  %></p>
+<% else %>
+<p><label for="from_addresses">Sender email addresses, separated by commas</label><br />
+	<%= text_field 'campaign', 'from_addresses', :value=>""  %></p>
+<% end %>
+<!--[eoform:campaign]-->
+

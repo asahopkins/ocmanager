@@ -1,0 +1,195 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div class="column">This is a complete form for creating a detailed new entry.  <%= link_to_remote "Show quick new entry form.", :update=>"new_entity", :url=>{:action=>"load_new_entity_form", :params=>{:style=>"quick"}}, :loading=>"Element.show('loading_form')" %> <span id="loading_form" style="display:none;"><%= image_tag "indicator.gif"%></span></div>
+<div class="left_half">
+	<div class="column" id="addresses">
+		<div class="data_header">Primary Address</div>
+		<dl>
+			<dt>Label</dt><dd><%= text_field "address", "label", :size=>"20", :value=>""%></dd>
+			<dt>Line 1</dt><dd><%= text_field "address", "line_1", :size=>"20", :value=>""%></dd>
+			<dt>Line 2</dt><dd><%= text_field "address", "line_2", :size=>"20", :value=>""%></dd>
+			<dt>City</dt><dd><%= text_field "address", "city", :size=>"20", :value=>"" %></dd>
+			<dt>State</dt><dd><select id="address_state" name="address[state]"><%=render :partial=>'partial/states_options', :locals=>{:state=>"CA"}%></select></dd>
+			<dt>ZIP code</dt><dd><%= text_field "address", "zip", :value=>"", :size=>5, :maxlength=>5%>-<%= text_field "address", "zip_4", :value=>"", :size=>4, :maxlength=>4%></dd>
+		</dl>
+	</div>
+	<div class="column" id="phones">
+		<div class="data_header">Primary Phone</div>
+		<dl>
+			<dt>Label</dt><dd><%= text_field "entity", "primary_phone", :value=>"", :size=>"15"%></dd>
+			<dt>Number</dt><dd><%= text_field "phone", "number", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+	<div class="column" id="faxes">
+		<div class="data_header">Primary Fax</div>
+		<dl>
+			<dt>Label</dt><dd><%= text_field "entity", "primary_fax", :value=>"", :size=>"15"%></dd>
+			<dt>Number</dt><dd><%= text_field "fax", "number", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+	<div class="column" id="emails">
+		<div class="data_header">Primary Email</div>
+		<dl>
+			<dt>Label</dt><dd><%= text_field "entity", "primary_email", :value=>"", :size=>"15"%></dd>
+			<dt>Address</dt><dd><%= text_field "email", "address", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+	<div class="column" id="website">
+		<div class="data_header">Website</div>
+		<dl>
+			<dt>Address</dt><dd><%= text_field "entity", "website", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+<div class="column" id="contact_box">
+	<div class="data_header">Contact</div>
+	<div id="form_contact_flags">
+			<dl>
+		<dt>Phone OK?</dt> <dd><%= select "entity", "receive_phone", [["No","false"],["Yes","true"]], { :include_blank=>true}%></dd>
+		<dt>Email OK?</dt> <dd><%= select "entity", "receive_email", [["No","false"],["Yes","true"]], {:include_blank=>true } %></dd>
+		<dt>Best time to reach</dt><dd><%= text_field "entity", "time_to_reach", :size=>20 %></dd>
+		</dl>
+	</div>
+</div>
+<div class="column" id="custom_fields_box">
+	<div class="data_header">Custom Fields</div>
+	<div id="form_custom_info">
+		<dl>
+			<% @campaign.custom_fields.each { |field|
+				unless field.hidden? 
+					value = ""
+				-%>
+			<dt><%= field.name %></dt>
+			<% if field.field_type.nil? or field.field_type=="Num" or field.field_type=="Text" -%>
+			<dd><%= text_field "custom_field", "value", :size=>20, :value=>value.to_s, :index=>field.id %></dd>
+			<% elsif field.field_type=="Bool" -%>
+			<dd><select id="custom_field_<%=field.id%>_value" name="custom_field[<%=field.id%>][value]">
+				<option value="" <% if value.to_s == ""%>selected<%end%>>&nbsp;</option>
+				<option value="false" <% if value.to_s == "false"%>selected<%end%>>No</option>
+				<option value="true" <% if value.to_s == "true"%>selected<%end%>>Yes</option>			
+				</select></dd>
+			<% elsif field.field_type=="Select" -%>
+			<dd><select id="custom_field_<%=field.id%>_value" name="custom_field[<%=field.id%>][value]">
+				<option value="" selected></option>
+				<%= options_for_select field.select_options, value %>
+				</select></dd>
+			<% end end -%>
+			<% } -%>
+		</dl>
+	</div>
+</div>
+
+
+</div>
+
+<div class="right_half">
+	<div class="column">
+		You will have the opportunity to add more information (such as multiple phone numbers) on the following page.
+	</div>
+	<div class="column" id="voter_info_box">
+		<div class="data_header">Voter Information</div>
+		<div id="form_voter_info">
+				<dl>
+			<dt>Party</dt> <dd><%= select "entity", "registered_party", ["Democratic", "Decline to State", "Republican", "Green", "Peace & Freedom", "Natural Law","American Independent"], { :include_blank=>true, :selected=>@entity.registered_party }%></dd>
+			<dt>Voter ID</dt> <dd><%= text_field "entity", "voter_ID", :size=>20 %></dd>
+			<dt>Precinct</dt><dd><%= text_field "entity", "precinct", :size=>20 %></dd>
+			</dl>
+		</div>
+	</div>
+	<div class="column" id="committee_info_box" style="display:none;">
+		<div class="data_header">Committee Information</div>
+		<div id="form_committee_info">
+				<dl>
+			<dt>Federal ID</dt> <dd><%= text_field "entity", "federal_ID", :size=>20 %></dd>
+			<dt>State ID</dt><dd><%= text_field "entity", "state_ID", :size=>20 %></dd>
+			<dt>Political Party</dt> <dd><%= select "entity", "party", [["No","false"],["Yes","true"]] %></dd>
+			</dl>
+		</div>
+	</div>
+	<div class="column" id="other_info_box">
+		<div class="data_header">Other Information</div>
+		<div id="form_other_info">
+				<dl>
+			<span id="person_other_fields">
+				<dt>Occupation</dt> <dd><%= text_field "entity", "occupation", :size=>20 %></dd>
+				<dt>Employer</dt> <dd><%= text_field "entity", "employer", :size=>20 %></dd>
+			</span>
+			<dt>Referred by</dt> <dd><%= text_field "entity", "referred_by", :size=>20 %></dd>
+			<dt>Tags</dt> <dd><%= text_area "entity", "tags", :rows=>5, :cols=>20, :value=>edit_tags(@entity) %></dd>
+			<dt>Comments</dt><dd><%= text_area "entity", "comments", :rows=>5, :cols=>20 %></dd>
+			</dl>
+		</div>
+	</div>
+</div>
+
+<div class="volunteering_block" id="volunteering_block">
+	<div class="entity_subhead_banner">
+		<span id="volunteer_plus" class="entity_subhead">&nbsp;Volunteering</span>
+	</div>
+	<div id="volunteer_info">
+		<div id="form_volunteer_interests" class="wide_column">
+			<dl>
+				<dt>Interests</dt>
+				<dd><select id="entity_volunteer_interests" name="entity[volunteer_interests][]" multiple size="<%=@campaign.volunteer_tasks.length>6 ? 6.to_s : @campaign.volunteer_tasks.length %>">
+					<% @campaign.volunteer_tasks.each do |task| -%>
+					<option value="<%=task.id%>"><%=task.name%></option>
+					<% end -%>
+					</select>
+				</dd>
+				<dt>Skills</dt>
+				<dd><%= text_field "entity", "skills", :size=>20%></dd>
+				<dt>Languages</dt>
+				<dd><%= text_field "entity", "languages", :size=>20%></dd>
+		</div>
+	</div>
+</div>
+<!-- this is currently not implemented, and isn't really necessary-->
+<div class="financial_block" style="display:none">
+	<div class="entity_subhead_banner">
+		<span id="financial_plus" class="entity_subhead">&nbsp;Financial</span>
+	</div>
+	<div class="wide_column" id="financial_info">
+		<% @campaign.committees.each do |committee| -%>
+		<div class="data_header"><%= committee.name %></div>
+		<div>
+		<dl>
+			<dt><b>NOTE:</b></dt><dd>For almost all new entities, you should leave this blank.  Use it if there have been synchronization problems between <i>Treasurer</i> and <i>Manager</i>.
+			<dt><i>Treasurer</i> id</dt> <dd><%= text_field "treasurer", "id", :size=>4, :index=>committee.id, :value=>"" %></dd>
+		</dl>
+		</div>
+		<% end -%>
+		
+	</div>
+</div>
+
+<div class="groups_block">
+	<div class="entity_subhead_banner">
+		<span id="groups_plus" class="entity_subhead">&nbsp;Groups</span>
+	</div>
+	<div class="wide_column" id="groups_info">
+		<% @campaign.groups.each do |group| -%>
+		<div class="data_header"><%= group.name %></div>
+		<div>
+		<dl>
+			<dt>Role in group:</dt> <dd><%= text_field "group", "role", :size=>10, :index=>group.id, :value=>"" %> (leave blank for no membership in <%= group.name %>)</dd>
+		</dl>
+		</div>
+		<% end -%>
+	</div>
+</div>

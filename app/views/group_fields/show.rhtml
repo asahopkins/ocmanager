@@ -1,0 +1,8 @@
+<% for column in GroupField.content_columns %>
+<p>
+  <b><%= column.human_name %>:</b> <%=h @group_field.send(column.name) %>
+</p>
+<% end %>
+
+<%= link_to 'Edit', :action => 'edit', :id => @group_field %> |
+<%= link_to 'Back', :action => 'list' %>

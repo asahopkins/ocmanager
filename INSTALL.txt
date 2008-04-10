@@ -1,0 +1,57 @@
+INSTALLATION INSTRUCTIONS
+
+Download the most recent snapshot, and expand the compressed archive, or checkout the most recent release from the Subversion repository.
+
+Follow the installation instructions at http://www.rubyonrails.org/down
+-- Install ruby (already installed on many servers, as well as Mac OS X)
+-- Install rubygems
+
+NOTE: Open Campaigns Manager runs on Rails version 1.2.6.  This version of rails is included in the distribution of Manager, in the vendor/rails folder, so you don't have to install this version separately through rubygems if you don't want it.
+
+Make sure that the following gems are installed:
+pdf-writer
+BlueCloth
+fastercsv
+mongrel
+rubypants
+
+Edit three files:
+config/database.yml
+	Copy database.example.yml to database.yml, editing to configure for your database connection.
+
+config/email_config.rb
+	Copy email_config.example.rb to email_config.rb, editing to setup your email accounts:
+	SERVER_NAME: domain name for your mail service
+	BOUNCE_ADDRESS: email address you want bounced emails to be returned to (IMAP)
+	BOUNCE_PASSWORD: password for this account
+	EMAIL_FROM: Email address that emails to users will be sent from
+	ADMIN_EMAIL: Destination email for user system errors
+	APP_URL: URL to your application
+
+config/server_config.rb
+	Copy email_config.example.rb to email_config.rb, editing to setup your email accounts:
+		TRIGGER_FILE is a path to a file that tells the application you are running in your secure production environment
+		REMOTE_PROTOCOL set to https:// for secure connections, http:// for insecure (look elsewhere for info on setting up a secure server, SSL, etc)
+		LOCAL_PROTOCOL should almost always be set to http:// -- this is for local development
+		REMOTE_DOWNLOAD_PATH: edit the leading part of this path for your remote/production server to point to the exported_files folder in the application
+		LOCAL_DOWNLOAD_PATH: sim. but for local/development machine
+		
+Run "rake db:schema:load" from the top directory of your copy of Manager
+
+Run ./script/server from the top directory of Manager
+
+Direct your web browser to http://localhost:3010/manager
+
+First, we need to set up the "superuser" account first.  Enter the email address, first and last name of this user.
+
+Log in with that email address and the emailed password.  The first screen won't make any sense.
+Enter the following location in your web browser: http://localhost:3010/manager/campaigns/new
+Enter the name of the campaign, and the email address you want to send email from for this campaign; click "Create".
+
+Click "Edit Account" under the admin account's name in the left-hand navigation column.  Enter a new password (twice) in the appropriate spots on the form, and then click "Change password".
+
+Click "logout" in the left-hand navigation column, and login with the email address and password you just set.
+
+
+
+

@@ -1,0 +1,59 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+-%>
+<div id="primary_fax">
+	<div class="plus_minus">
+		<%= plus_minus("fax_plus", "fax_minus", "all_faxes") %>
+	</div>
+	<div class="shifted_block">
+		<b>Fax:</b> <%= number_to_phone(@entity.primary_fax_number) %><% unless @entity.primary_fax.nil? -%> (<%=@entity.primary_fax%>)<% end -%>
+	</div>
+</div>
+<div class="expanded_list" id="all_faxes" style="display: none;">
+	<ul>
+		<% unless @entity.faxes.nil?
+		@entity.faxes.each { |label, number| -%>
+<li><span id="show_<%=label%>_fax" onMouseOver="Element.show('edit_<%=label%>_fax')" onMouseOut="Element.hide('edit_<%=label%>_fax')"><b><%=label%><% if label==@entity.primary_fax -%> (primary)<% end -%></b><% if can_edit -%> <span id="edit_<%=label%>_fax" style="display: none;">(<%=link_to_function "edit", "Element.show('form_#{label}_fax'); Element.hide('show_#{label}_fax')" %>)</span><% end -%><br /><%=number_to_phone(number)%></span>
+	<span id="form_<%=label%>_fax" style="display: none;"><%= form_remote_tag :update=>"faxes", :url=>{:controller=>"entities", :action=>"update_faxes", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('fax_indic_#{label}')", :complete=>"Element.hide('fax_indic_#{label}')"%>
+		<dl>
+			<dt>Label</dt><dd><%= text_field "entity", "label", :value=>label, :size=>"15"%></dd>
+			<dt>Number</dt><dd><%= text_field "entity", "number", :value=>number_to_phone(number), :size=>"15"%></dd>
+			<% if label!=@entity.primary_fax -%>
+			<dt>Primary</dt><dd><select id="entity_primary" name="entity[primary]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+			<% end %>
+			<dt>&nbsp;<% if can_edit -%><span id="fax_indic_<%=label%>" style="display:none;"><%= image_tag 'indicator.gif' %></span></dt><dd><input type="submit" value="Save changes" name="save_fax"> or <%=link_to_function "Cancel", "Element.hide('form_#{label}_fax'); Element.show('show_#{label}_fax')"%></dd>
+			<dt>&nbsp;</dt><dd><%=link_to_remote "Delete this fax", :update=>"faxes", :confirm=>"Are you sure you want to delete this fax?", :url=>{:controller=>"entities", :action=>"delete_fax",:params=>{:id=>@entity.id, :campaign_id=>@campaign.id, :fax=>label}}, :loading=>"Element.show('fax_indic_#{label}')", :complete=>"Element.hide('fax_indic_#{label}')"%></dd>
+		</dl><%= hidden_field "entity", "previous_label", :value=>label%></form>
+		</span><% end -%></li>
+		<% } end -%>
+	<% if can_edit -%>
+	<li><span id="add_fax_link"><%= link_to_function "Add fax", "Element.show('add_fax_form'); Element.hide('add_fax_link')" %></span>
+		<span id="add_fax_form" style="display: none;"><%= form_remote_tag :update=>"faxes", :url=>{:controller=>"entities", :action=>"add_fax", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('add_fax_indic')", :complete=>"Element.hide('add_fax_indic')"%>
+			<dl>
+				<dt>Label</dt><dd><%= text_field "entity", "label", :value=>"", :size=>"15"%></dd>
+				<dt>Number</dt><dd><%= text_field "entity", "number", :value=>"", :size=>"15"%></dd>
+				<dt>Primary</dt><dd><select id="entity_primary" name="entity[primary]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+				<dt>&nbsp;<span id="add_fax_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span></dt><dd><input type="submit" value="Save" name="save_fax"> or <%=link_to_function "Cancel", "Element.hide('add_fax_form'); Element.show('add_fax_link')"%></dd>
+			</dl></form></span></li><% end -%>
+</ul>
+</div>

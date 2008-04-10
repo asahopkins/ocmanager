@@ -1,0 +1,5 @@
+if @reload_cart
+  page.remove "cart_line_#{@id}"
+end
+page.replace_html 'cart_items_number', @cart.number.to_s
+page.visual_effect :highlight, 'cart_list'

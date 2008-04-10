@@ -1,0 +1,85 @@
+*** TO DO ***
+
+in-Manager contributions to Mail merge output
+
+?? email: one only to each address, unless it's been "individualized"
+
+remove follow_up by date -- put it in the memo field
+
+"quick create" entities/new form
+
+Contributions and pledged contributions => decimal, not float (need to check Rails version for support)
+
+"export everything" command -- the "get me out of here" option
+CSV file with every entity column, volunteer_tasks, groups, tags, emails, addresses, contributions, contact_texts?
+
+Data/Reports section: select fields to export as CSV (have simple defined sets?)
+
+think about file download not going through Mongrel
+http://www.ruby-forum.com/topic/123638
+
+caching: 
+	* put user, role, and cur models in memcached
+
+"crumb bar" at the top of the page Campaign > Committees > List (or just in page title?)
+
+*** Mobile Access ***
+
+My cell phone's User-Agent = "HTC-3100/1.2 Mozilla/4.0 (compatible; MSIE 5.5; Windows CE; Smartphone; 240x320)"
+
+uentities/show/:id
+
+*** role and permissions ***
+add role-checking into display of edit panes on entities/show
+	see voter_info_box for ideas
+	add campaign to local variables passed to show partials, so that each one doesn't have to look it up again
+	campaigns: roles check, cur create on campaign create
+	users: roles on campaigns
+	
+update permissions for volunteer_events and contact_events	
+	
+create checking functions for each used combination
+
+roles:
+	1 SuperUser
+	2 Manager
+	3 Edit finances & Groups
+	4 Edit Groups
+	5 Edit only entity properties
+	6 Read Only
+	7 Sign In/out only
+	8 Inactive
+
+*** entities ***
+
+* Treasurer mapping
+* Field mapping
+
+*** SEARCH ***
+add searching on contact history (including campaign events), (group membership with role?)
+
+save queries easily, probably an ez_where conditions object (check out Ambition)
+create complex queries
+	* store hash/array version of the most recent advanced search in session
+		h = {:phone=>[:includes,"626"], :email_ok=>[:matches,"Yes"]} etc
+	* display search parameters (based on the search_hash)
+		link to "refine search"
+		advanced_search view opens and sets values for search_hash if "refine==1"
+	* search financial information
+		-- contributions stored locally
+		-- query Treasurer
+
+*** features to add *** 
+
+Household add and remove: change to POST from GET
+
+SORT for Mail Merge, Labels: by zip code?
+
+groups: custom fields? -- if demanded, it's there in the db structure (group_field)
+
+*** feature requests ***
+	* send attachments to email list
+
+*** useful code ***
+onfocus="if (this.value == 'Display name') {this.value='';}" onblur="if(this.value == '') this.value='Display name';"
+:onfocus=>"if (this.value == 'Enter name here') {this.value='';}", :onblur=>"if(this.value == '') this.value='Enter name here';"

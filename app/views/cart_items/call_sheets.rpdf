@@ -1,0 +1,201 @@
+def number_to_phone(number)
+  number.to_s.gsub(/([0-9]{3})([0-9]{3})([0-9]{4})/,"(\\1) \\2#{"-"}\\3")
+end
+
+def number_with_precision(number, precision=3)
+  sprintf("%01.#{precision}f", number)
+end
+
+def number_with_delimiter(number, delimiter=",")
+  number.to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1#{delimiter}")
+end
+
+def number_to_currency(number, options = {})
+  options = options.stringify_keys
+  precision, unit, separator, delimiter = options.delete("precision") { 2 }, options.delete("unit") { "$" }, options.delete("separator") { "." }, options.delete("delimiter") { "," }
+  separator = "" unless precision > 0
+  begin
+    parts = number_with_precision(number, precision).split('.')
+    unit + number_with_delimiter(parts[0], delimiter) + separator + parts[1].to_s
+  rescue
+    number
+  end
+end
+
+def cut_to_length(string, length)
+  length = length.to_i
+  if string.length > length
+    return string[0..length-4]+"..."
+  else
+    return string
+  end
+end
+
+FONT_TR = "Times-Roman"
+FONT_HEL = "Helvetica"
+FONT_8=8
+FONT_10=10
+FONT_12=12
+FONT_14=14
+FONT_18=18
+FONT_24=24
+FONT_36=36
+
+MARG_X = pdf.in2pts 0.19
+MARG_Y = pdf.in2pts 0.5
+
+pdf.select_font(FONT_HEL)
+pdf.margins_pt(36)
+
+pages = @entities.length
+count = 1
+@entities.each do |entity|
+  start = count
+
+  name_x = pdf.absolute_left_margin
+  name_y = pdf.absolute_top_margin-FONT_36
+  pdf.add_text(name_x,name_y,entity.mailing_name, FONT_36)
+
+  # Address
+  address_x = pdf.absolute_left_margin
+  address_0_y = name_y-10-FONT_36
+  pdf.add_text(address_x,address_0_y,"<b>#{entity.primary_address.label}</b>", FONT_14)
+  address_1_y = address_0_y-5-FONT_14
+  pdf.add_text(address_x,address_1_y,entity.primary_address.line_1.gsub(/ñ/,"n").gsub(/Ñ/,"N"), FONT_14)
+  address_2_y = address_1_y-FONT_14
+  if entity.primary_address.line_2.to_s != ""
+    pdf.add_text(address_x,address_2_y,entity.primary_address.line_2.gsub(/ñ/,"n").gsub(/Ñ/,"N"), FONT_14)
+    address_3_y = address_2_y-FONT_14
+    pdf.add_text(address_x,address_3_y,"#{entity.primary_address.city.gsub(/ñ/,"n").gsub(/Ñ/,"N")}, #{entity.primary_address.state} #{entity.primary_address.zip}", FONT_14)
+  else
+    pdf.add_text(address_x,address_2_y,"#{entity.primary_address.city.gsub(/ñ/,"n").gsub(/Ñ/,"N")}, #{entity.primary_address.state} #{entity.primary_address.zip}", FONT_14)    
+  end
+
+  # Phone #
+  phone_x = pdf.in2pts 4.25
+  phone_0_y = address_0_y
+  pdf.add_text(phone_x,phone_0_y,"<b>Phone:</b>", FONT_14)
+  phone_1_y = phone_0_y-5-FONT_14
+  pdf.add_text(phone_x,phone_1_y,"<b>#{entity.primary_phone}:</b> "+number_to_phone(entity.primary_phone_number), FONT_14)
+  if entity.phones.length > 1
+    other_phones = entity.phones.dup
+    other_phones.delete(entity.primary_phone)
+    phone_2 = other_phones.to_a[0]
+    phone_2_y = phone_1_y-FONT_14
+    pdf.add_text(phone_x,phone_2_y,"<b>#{phone_2[0]}:</b> "+number_to_phone(phone_2[1]), FONT_14)
+    if entity.phones.length > 2
+      phone_3 = other_phones.to_a[1]
+      phone_3_y = phone_2_y-FONT_14
+      pdf.add_text(phone_x,phone_3_y,"<b>#{phone_3[0]}:</b> "+number_to_phone(phone_3[1]), FONT_14)
+    end
+  end
+
+  # Email address
+  email_x = pdf.in2pts 4.25
+  email_0_y = phone_0_y-75
+  pdf.add_text(email_x,email_0_y,"<b>Email:</b>", FONT_14)
+  email_1_y = email_0_y-5-FONT_14
+  pdf.add_text(email_x,email_1_y,"<b>#{entity.primary_email.label}:</b> "+entity.primary_email_address.to_s, FONT_14)
+  if entity.email_addresses.length > 1
+    other_emails = entity.email_addresses.dup
+    other_emails.delete(entity.primary_email)
+    email_2 = other_emails[0]
+    email_2_y = email_1_y-FONT_14
+    pdf.add_text(email_x,email_2_y,"<b>#{email_2.label}:</b> "+email_2.address, FONT_14)
+    if entity.email_addresses.length > 2
+      email_3 = other_emails[1]
+      email_3_y = email_2_y-FONT_14
+      pdf.add_text(email_x,email_3_y,"<b>#{email_3.label}:</b> "+email_3.address, FONT_14)
+    end
+  end
+
+  # Household
+  hh = entity.household
+  hh_members = hh.people.dup
+  hh_members.delete(entity)
+  hh_members = hh_members[0,3]
+  household_x = pdf.absolute_left_margin
+  household_0_y = address_0_y-75
+  pdf.add_text(household_x,household_0_y,"<b>Household:</b>", FONT_14)
+  household_y = household_0_y-5-FONT_14
+  pdf.add_text(household_x,household_y,entity.name, FONT_14)
+  hh_members.each do |member|
+    household_y = household_y-FONT_14-1
+    pdf.add_text(household_x,household_y,member.name, FONT_14)    
+  end
+
+  contrib_history_start = 502
+  # Contribution history table
+  pdf.move_to(pdf.absolute_left_margin, contrib_history_start+23).line_to(pdf.absolute_right_margin, contrib_history_start+23)
+  pdf.add_text(36,502,"<b>Contributions</b>", FONT_18)  
+  pdf.move_to(pdf.absolute_left_margin, contrib_history_start-12).line_to(pdf.absolute_right_margin, contrib_history_start-12)
+  pdf.add_text(36,contrib_history_start-29,"<b>Recent contributions</b>", FONT_14)
+  pdf.add_text(36,contrib_history_start-47,"<b>Date</b>", FONT_14)
+  pdf.add_text(105,contrib_history_start-47,"<b>Recipient</b>", FONT_14)
+  pdf.add_text(380,contrib_history_start-47,"<b>Amount</b>", FONT_14)
+  pdf.add_text(450,contrib_history_start-47,"<b>Event</b>", FONT_14) #Event/Letter/Script/Email
+  pdf.move_to(pdf.absolute_left_margin, contrib_history_start-55).line_to(pdf.absolute_right_margin, contrib_history_start-55)
+  contribs = entity.recent_contributions(5)
+  first_contrib_row = contrib_history_start-72
+  row_count = 0
+  contribs.each do |contribution|
+    pdf.add_text(36,first_contrib_row-row_count*15,contribution.date.strftime("%m/%d/%Y"), FONT_12)
+    pdf.add_text(105,first_contrib_row-row_count*15,cut_to_length(contribution.recipient_name,45), FONT_12)
+    pdf.add_text(380,first_contrib_row-row_count*15,number_to_currency(contribution.amount), FONT_12)
+    if contribution.campaign_event
+      pdf.add_text(450,first_contrib_row-row_count*15,cut_to_length(contribution.campaign_event.name, 20), FONT_12)
+      # elsif contribution.contact_text
+    end
+    row_count +=1
+  end
+  
+  # contribution totals: top 5 recipients
+  recipient_top = contrib_history_start - 159
+  pdf.move_to(pdf.absolute_left_margin, recipient_top+17).line_to(pdf.absolute_right_margin, recipient_top+17)
+  pdf.add_text(36,recipient_top,"<b>Contribution totals</b>", FONT_14)
+  pdf.add_text(36,recipient_top-18,"<b>Recipient</b>", FONT_14)
+  pdf.add_text(380,recipient_top-18,"<b>Total</b>", FONT_14)
+  pdf.move_to(pdf.absolute_left_margin, recipient_top-26).line_to(pdf.absolute_right_margin, recipient_top-26)
+  recipients = entity.top_recent_recipients(5)
+  row_count = 0
+  recipients.each do |recipient|
+    pdf.add_text(36,recipient_top-43-row_count*15,cut_to_length(recipient[0], 45), FONT_12)
+    pdf.add_text(380,recipient_top-43-row_count*15,number_to_currency(recipient[1]), FONT_12)
+    row_count+=1
+  end
+
+  # pledged contributions?
+
+  # Event status (past and future) (next 3 and past 3?)
+  start_events = contrib_history_start-295
+  pdf.move_to(pdf.absolute_left_margin, start_events+23).line_to(pdf.absolute_right_margin, start_events+23)
+  pdf.add_text(36,start_events,"<b>Events</b>", FONT_18)  
+  pdf.move_to(pdf.absolute_left_margin, start_events-12).line_to(pdf.absolute_right_margin, start_events-12)
+  pdf.add_text(36,start_events-29,"<b>Date</b>", FONT_14)
+  pdf.add_text(105,start_events-29,"<b>Event</b>", FONT_14)
+  pdf.add_text(300,start_events-29,"<b>Inv.</b>", FONT_14)
+  pdf.add_text(340,start_events-29,"<b>Resp.</b>", FONT_14)
+  pdf.add_text(380,start_events-29,"<b>Attend</b>", FONT_14)
+  pdf.add_text(430,start_events-29,"<b>Pledge</b>", FONT_14)
+  pdf.add_text(500,start_events-29,"<b>Contrib.</b>", FONT_14)
+  pdf.move_to(pdf.absolute_left_margin, start_events-37).line_to(pdf.absolute_right_margin, start_events-37)
+  first_event_row = start_events-54
+  row_count = 0
+  entity.campaign_events.each do |event|
+    pdf.add_text(36,first_event_row-row_count*15,event.start_time.strftime("%m/%d/%Y"), FONT_12)
+    pdf.add_text(105,first_event_row-row_count*15,cut_to_length(event.name,30), FONT_12)
+    pdf.add_text(300,first_event_row-row_count*15,entity.event_invitation(event).to_s, FONT_12)
+    pdf.add_text(340,first_event_row-row_count*15,entity.event_response(event).to_s, FONT_12)
+    pdf.add_text(380,first_event_row-row_count*15,entity.event_attendance(event).to_s, FONT_12)
+    pdf.add_text(430,first_event_row-row_count*15,number_to_currency(entity.pledge_value(event)), FONT_12)
+    pdf.add_text(500,first_event_row-row_count*15,number_to_currency(entity.event_contribution(event)), FONT_12)
+    row_count += 1
+  end
+
+  pdf.move_to(pdf.absolute_left_margin, first_event_row-70).line_to(pdf.absolute_right_margin, first_event_row-70)
+
+  pdf.stroke
+
+  pdf.new_page unless count == pages
+  count += 1
+end

@@ -1,0 +1,73 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1>Contacting Supporters</h1>
+
+<h2>Email</h2>
+
+<p><b>Step 1.</b> Prepare a new email text: <%= link_to "HTML formatted", :controller=>"contact_texts", :action=>"compose", :params=>{:type=>"Email", :campaign_id=>@campaign.id} %> or <%= link_to "plain text", :controller=>"contact_texts", :action=>"compose", :params=>{:type=>"PlainEmail", :campaign_id=>@campaign.id} %>.</p>
+
+<p><b>Step 2.</b> Put all the desired recipients of the email in MyPeople.</p>
+
+<p><b>Step 3.</b> Send a prepared email to MyPeople:
+<span id="draft_emails">
+<%= render :partial=>"draft_emails_table" %>
+</span>
+<% @draft_emails.each do |draft| %>
+		<% key_name = "bulk_email_key_"+draft.id.to_s
+		if MiddleMan[key_name.to_sym] -%>
+			<%= periodically_call_remote :url=>{:controller=>'contact_texts',:action=>'check_email_progress',:id=>draft.id}, :frequency=>60 %><% end -%>
+<% end %>
+</p>
+<p><b>Recently sent emails:</b>
+<span id="sent_emails">
+<%= render :partial=>"sent_emails_table" %>
+</span></p>
+<h2>Mail</h2>
+
+<p><b>Step 1.</b> <%= link_to "Enter the text of a letter", :controller=>"contact_texts", :action=>"compose", :params=>{:type=>"Letter", :campaign_id=>@campaign.id} %>.</p>
+
+<p><b>Step 2.</b> Put all the desired recipients of the letter in MyPeople.</p>
+<p><b>Step 3a.</b> Select fields and download mail merge file for MyPeople.<br />
+<b>Step 3b.</b> Download and print mailing labels for MyPeople.</p>
+
+<p>Select an unsent letter:
+<span id="draft_letters">
+<%= render :partial=>"draft_letters_table" %>
+</span></p>
+
+<p><b>Recently sent letters:</b>
+<span id="sent_letters">
+<%= render :partial=>"sent_letters_table" %>
+</span></p>
+
+<blockquote>Or, forget all this tracking of letters, and just download a quick basic <%= link_to 'mail merge file', :action => 'download_mail_file', :params=>{:id => "mypeople", :campaign_id=>@campaign.id} %> or <%= link_to 'mailing labels', :action => 'prepare_labels', :params=>{:id => "mypeople"} %> for MyPeople.</blockquote>
+
+<h2>Phone scripts</h2>
+
+<p><b>Step 1.</b> <%= link_to "Enter the text of a phone script", :controller=>"contact_texts", :action=>"compose", :params=>{:type=>"Script", :campaign_id=>@campaign.id} %>.</p>
+	
+<p><b>Step 2.</b> Put all the people you want to call in MyPeople.</p>
+
+<p><b>Step 3.</b> Download and print a <%= link_to "bulk call sheet",:controller=>'cart_items',:action=>'cart_phone_list' %> (many per page) or <%= link_to "fundraising call sheet",:controller=>'cart_items',:action=>'call_sheets' %> (PDF; one per page) for MyPeople.</p>
+
+<p><b>Recently created phone scripts:</b>
+<span id="scripts">
+<%= render :partial=>"scripts_table" %>
+</span></p>

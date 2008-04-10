@@ -1,0 +1,27 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h3>Is this you?</h3>
+
+<% @entities.each do |entity|%>
+<b><%= link_to_remote entity.name, :url=>{:action=>"simple_show_for_sign_in", :id=>entity.id} %></b><br />
+<%= entity.primary_address.line_1.to_s+"<br />" unless entity.primary_address.line_1.to_s == ""%>
+<%= entity.primary_address.line_2.to_s+"<br />" unless entity.primary_address.line_2.to_s == ""%>
+<%= entity.primary_address.city %>, <%= entity.primary_address.state %> <%= entity.primary_address.zip %><br /><br />	
+<% end %>

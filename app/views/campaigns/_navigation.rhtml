@@ -1,0 +1,49 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%   if current_user.active_campaigns.empty? or current_user.current_campaign.nil?
+    @campaign = nil
+  else 
+    @campaign = Campaign.find(current_user.current_campaign) -%>
+	<b><%=h @campaign.name%></b></a><br />
+	<br />
+	<%= link_to "Start Page", :controller=>"campaigns", :action=>"start_here"%><br />
+	<br />
+	<% if session[:user].can_edit_entities?(@campaign) %>
+	<%= link_to "New Person/Organization", :controller=>"entities", :action=>"new"%><br /><% end -%>
+	<%= link_to "View All", :controller=>"entities", :action=>"list", :params=>{:id=>nil}%><br />
+<br />
+	<%= link_to "Advanced Search", :controller=>"entities",:action=>"advanced_search" %><br />
+	<br />
+	<%= link_to "Groups",:controller=>"groups",:action=>"list" %><br />
+	<%= link_to "Campaign Events",:controller=>"campaign_events",:action=>"list" %><br />
+	<% if current_user.can_see_financial?(@campaign) %>
+	<%= link_to "Import Contributions", :controller=>"contributions", :action=>"import" %><br /><% end -%>
+	<% if current_user.manager?(@campaign) %>
+	<%= link_to "Configuration", :controller=>"admin", :action=>"configuration" %><br /><% end -%>
+	<br />
+	<%= link_to "Volunteer Calendar", :controller=>'volunteer_events', :action=>'calendar'%><br />
+	<%= link_to "Contact Supporters", :controller=>"contact_texts", :action=>"list" %><br />
+	<br />
+	Export Data<br />
+	&nbsp;&nbsp;<%= link_to "Download Exports", :controller=>"exported_files", :action=>"list" %><br />
+	<p>Tags:<br /><% cache(:controller=>"campaigns", :action => "tags", :action_suffix => @campaign.id) do -%>
+	<%= display_tags(@campaign) %>
+	<% end -%></p>
+<% end -%>

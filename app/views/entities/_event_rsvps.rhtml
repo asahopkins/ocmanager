@@ -1,0 +1,58 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h3>Events</h3>
+<div id="add_rsvp" class="add_box">
+	<a href="#" onClick="Element.show('new_rsvp'); Element.hide('add_rsvp'); return false;">Add or edit event invitation or RSVP</a>
+</div>
+<div id="new_rsvp" style="display:none;" class="add_box">
+	<%= form_remote_tag :url=>{:controller=>"rsvps", :action=>"create", :params=>{:entity_id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('new_campaign_event_indic')" %>
+	<dl>
+		<dt>Event</dt><dd><%= select :rsvp, :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name,30)+t.date.strftime(' (%m/%d/%Y)'), t.id]}%></dd>
+		<dt>Invited?</dt><dd><%= select :rsvp, :invited, [["Yes","true"],["No","false"]], { :include_blank=>true }%></dd>
+		<dt>Response</dt><dd><%= select :rsvp, :response, [["Yes","Yes"],["Maybe","Maybe"],["No","No"]], { :include_blank=>true } %></dd>
+		<dt>Attended?</dt><dd><%= select :rsvp, :attended, [["Yes","true"],["No","false"]], { :include_blank=>true }%></dd>
+		<dt><span id="new_campaign_event_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>&nbsp;</dt><dd><%= submit_tag "Add invite/RSVP" %> or <a href="#" onClick="Element.show('add_rsvp'); Element.hide('new_rsvp'); return false;">(Cancel)</a></dd>
+	</dl>
+	</form>
+</div>
+<div id="event_history">
+	<div class="contact_history_header">
+		<div class="left_40">Event Name</div>
+		<div class="left_10">Date</div>
+		<div class="left_10">Invited</div>
+		<div class="left_10">Response</div>
+		<div class="left_10">Attended</div>
+	</div>
+	<% @rsvps.each do |@rsvp| -%>
+	<div class="contact_event_summary"  id="rsvp_<%= @rsvp.id %>">
+		<div class="left_40"><%= link_to h(@rsvp.campaign_event.name),:controller=>"campaign_events",:action=>"show",:params=>{:id=>@rsvp.campaign_event.id} %></div>
+		<div class="left_10"><%= @rsvp.campaign_event.start_time.strftime("%m/%d/%Y") %></div>
+		<div class="left_10"><%= display_yes_no(@rsvp.invited) %>&nbsp;</div>
+		<div class="left_10"><%=h @rsvp.response.to_s %>&nbsp;</div>
+		<div class="left_10"><%= display_yes_no(@rsvp.attended) %>&nbsp;</div>
+		<div class="right_18"><%= link_to_remote image_tag("trash.gif"), :url=>{ :controller=>"rsvps", :action => 'destroy', :params=>{:campaign_event_id=>@rsvp.campaign_event_id, :entity_id=>@entity.id} }, :confirm => 'Are you sure?  This will remove all record tying this person to this event.', :method=>"post", :loading=>"Element.show('new_rsvp_page_indic');", :complete=>"Element.hide('new_rsvp_page_indic');" %>
+		</div>
+	</div>	
+	<% end -%>
+	<div class="contact_event_summary">
+		<%= link_to_remote "<< Later events", :update=>'events_info', :loading=>"Element.show('new_rsvp_page_indic')", :url=>{:controller=>'rsvps', :action=>'list', :params=>{ :entity_id=>@entity.id, :page => @rsvp_pages.current.previous }} if @rsvp_pages.current.previous %>
+		<%= link_to_remote "Earlier events >>", :update=>'events_info', :loading=>"Element.show('new_rsvp_page_indic')", :url=>{:controller=>'rsvps', :action=>'list', :params=>{ :entity_id=>@entity.id, :page => @rsvp_pages.current.next }} if @rsvp_pages.current.next %> <span id="new_rsvp_page_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
+	</div>
+</div>

@@ -1,0 +1,43 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+-%>
+<div class="data_header" onMouseOver="Element.show('edit_committee_info');" onMouseOut="Element.hide('edit_committee_info');">Committee Information<% if can_edit %> <span id="edit_committee_info" style="display:none;">(<a href="#" onClick="Element.hide('committee_info'); Element.show('form_committee_info'); return false;">edit</a>)</span><% end %></div>
+<div id="committee_info">
+<dl>
+	<dt>Federal ID</dt><dd><%=h @entity.federal_ID %>&nbsp;</dd>
+	<dt>State ID</dt><dd><%=h @entity.state_ID %>&nbsp;</dd>
+	<dt>Political Party</dt><dd><%= display_yes_no(@entity.party) %></dd>
+</dl>
+</div>
+<% if can_edit %>
+<div id="form_committee_info" style="display:none;">
+	<%= form_remote_tag :update=>"committee_info_box", :url=>{:action=>"update_partial", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id,:partial=>"committee_info_box"}}, :loading=>"Element.show('committee_info_box_indic')", :complete=>"Element.hide('committee_info_box_indic')"%>
+		<dl>
+	<dt>Federal ID</dt> <dd><%= text_field "entity", "federal_ID", :size=>20 %></dd>
+	<dt>State ID</dt><dd><%= text_field "entity", "state_ID", :size=>20 %></dd>
+	<dt>Political Party</dt> <dd><%= select "entity", "party", [["No","false"],["Yes","true"]] %></dd>
+	<dt>&nbsp;<span id="committee_info_box_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span></dt> <dd><input type="submit" value="Save changes"> or <a href="#" onClick=" Element.hide('form_committee_info'); Element.show('committee_info'); return false;">Cancel</a></dd>
+	</dl>
+</form>
+</div>
+<% end %>

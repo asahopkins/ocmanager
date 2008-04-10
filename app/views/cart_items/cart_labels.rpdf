@@ -1,0 +1,66 @@
+FONT = "Times-Roman"
+FONT_SIZE = 12
+
+COLS = 3
+LABELS_PER_PAGE = 30
+LABELS_PER_COL = 10
+
+# margins: .5in top & bottom, 0.19 in left and right
+# table column widths: 2.63in | 0.13in | 2.63in | 0.13in | 2.63in
+# table rows: 1in height
+
+MARG_X = pdf.in2pts 0.19
+MARG_Y = pdf.in2pts 0.5
+
+CELL_Y = pdf.in2pts 1
+CELL_X = pdf.in2pts 2.63
+
+COL_PAD_X = pdf.in2pts 0.19
+
+COL1_X = MARG_X 
+COL2_X = COL1_X + CELL_X + COL_PAD_X
+COL3_X = COL2_X + CELL_X + COL_PAD_X
+
+CELL_PAD_X = pdf.in2pts 0.13
+CELL_PAD_Y = pdf.in2pts 0.25
+CELL_LINE_Y = FONT_SIZE + 2
+
+def cell_x(col)
+  [COL1_X, COL2_X, COL3_X][col] + CELL_PAD_X
+end
+
+def cell_y(row, line)
+  MARG_Y + ((LABELS_PER_COL - row) * CELL_Y) - CELL_PAD_Y - (line * CELL_LINE_Y)
+end
+
+def add_label(row, col, entity, pdf)
+  if entity and entity.primary_address
+  	pdf.add_text_wrap(cell_x(col), cell_y(row, 0), CELL_X, entity.mailing_name.gsub(/ñ/,"n").gsub(/Ñ/,"N")
+    , FONT_SIZE)
+    pdf.add_text_wrap(cell_x(col), cell_y(row, 1), CELL_X, entity.primary_address.line_1.to_s.gsub(/ñ/,"n").gsub(/Ñ/,"N"), FONT_SIZE)
+	unless entity.primary_address.line_2.to_s == ""
+    	pdf.add_text_wrap(cell_x(col), cell_y(row, 2), CELL_X, entity.primary_address.line_2.to_s.gsub(/ñ/,"n").gsub(/Ñ/,"N"), FONT_SIZE)
+    	pdf.add_text_wrap(cell_x(col), cell_y(row, 3), CELL_X, "#{entity.primary_address.city.to_s.gsub(/ñ/,"n").gsub(/Ñ/,"N")}, #{entity.primary_address.state.to_s} #{entity.primary_address.zip.to_s}", FONT_SIZE)
+	else
+    	pdf.add_text_wrap(cell_x(col), cell_y(row, 2), CELL_X, "#{entity.primary_address.city.to_s.gsub(/ñ/,"n").gsub(/Ñ/,"N")}, #{entity.primary_address.state.to_s} #{entity.primary_address.zip.to_s}", FONT_SIZE)
+	end
+  end
+end
+
+pdf.select_font(FONT)
+
+pages = @entities.length / LABELS_PER_PAGE
+pages += 1 if (@entities.length % LABELS_PER_PAGE) > 0
+
+0.upto(pages - 1) do |page|
+  start = page * LABELS_PER_PAGE
+  address_page = @entities[start..start+LABELS_PER_PAGE]
+
+  0.upto(LABELS_PER_COL - 1) do |row|
+    add_label(row, 0, address_page[row*COLS], pdf)
+    add_label(row, 1, address_page[row*COLS+1], pdf)
+    add_label(row, 2, address_page[row*COLS+2], pdf)
+  end
+
+  pdf.new_page unless page + 1 == pages
+end

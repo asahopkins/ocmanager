@@ -1,0 +1,31 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><table>
+<tr>
+	<th>Label:</th><td>Last updated:</td><td>&nbsp;</td>
+</tr>
+<% @scripts.each do |script| %>
+	<tr>
+		<td><%= script.label %></td><td><%= script.updated_at %></td><td><%= link_to 'Call sheet', :controller=>'cart_items', :action => 'cart_phone_list', :params=>{:script_id => script} %> for MyPeople | <%= link_to 'Show script', :action => 'show', :params=>{:id => script, :campaign_id=>@campaign.id} %> | <%= link_to "Edit", :action => 'compose', :params=>{:type=>"Script", :id => script, :campaign_id=>@campaign.id} %></td>
+    </tr>
+<% end %>
+</table>
+<%= link_to_remote '<< Earlier', :update=>"scripts", :url=>{ :action=>"load_scripts", :params=>{:campaign_id=>@campaign.id, :page => @script_pages.current.next} } if @script_pages.current.next %> 
+<%= link_to_remote 'Later >>', :update=>"scripts", :url=>{ :action=>"load_scripts", :params=>{:campaign_id=>@campaign.id, :page => @script_pages.current.previous} } if @script_pages.current.previous %> 

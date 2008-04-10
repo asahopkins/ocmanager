@@ -1,0 +1,16 @@
+<%= error_messages_for 'group_field' %>
+
+<!--[form:group_field]-->
+<p><label for="group_field_name">Name</label><br/>
+<%= text_field 'group_field', 'name'  %></p>
+
+<p><label for="group_field_field_type">Field type</label><br/>
+<%= text_field 'group_field', 'field_type'  %></p>
+
+<p><label for="group_field_created_at">Created at</label><br/>
+<%= datetime_select 'group_field', 'created_at'  %></p>
+
+<p><label for="group_field_updated_at">Updated at</label><br/>
+<%= datetime_select 'group_field', 'updated_at'  %></p>
+<!--[eoform:group_field]-->
+

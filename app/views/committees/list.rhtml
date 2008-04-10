@@ -1,0 +1,42 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1>Listing committees</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+  </tr>
+  
+<% for committee in @committees %>
+  <tr>
+    <td><%=h committee.name %></td>
+    <td><%= link_to 'Show', :action => 'show', :id => committee %></td>
+    <td><%= link_to 'Edit', :action => 'edit', :id => committee %></td>
+    <td><%= link_to 'Destroy', { :action => 'destroy', :id => committee }, :confirm => 'Are you sure?', :method=>"post" %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to 'Previous page', { :page => @committee_pages.current.previous } if @committee_pages.current.previous %>
+<%= link_to 'Next page', { :page => @committee_pages.current.next } if @committee_pages.current.next %> 
+
+<br />
+
+<%= link_to 'New committee', :action => 'new',:params=>{:campaign_id=>@campaign.id} %>

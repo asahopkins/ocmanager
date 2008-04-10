@@ -1,0 +1,40 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1>Listing volunteer tasks</h1>
+
+<p>Campaign: <%= @campaign.name %></p>
+
+<ul id="task_list">
+<% @volunteer_tasks.each do |volunteer_task|  %>
+	<li id="task_<%= volunteer_task.id %>"><%= image_tag "drag.gif" %> <%=h volunteer_task.name %> | <%= link_to 'Edit', :action => 'edit', :id => volunteer_task %> <% link_to 'Destroy', { :action => 'destroy', :id => volunteer_task }, :confirm => 'Are you sure?', :method=>"post" %>
+<% end %>
+</ul>
+<p>You may reorder the volunteer tasks here by dragging them with the "DRAG" icons.  This order will set the order in which they are displayed elsewhere in the application.</p>
+<%= link_to 'Previous page', { :page => @volunteer_task_pages.current.previous } if @volunteer_task_pages.current.previous %>
+<%= link_to 'Next page', { :page => @volunteer_task_pages.current.next } if @volunteer_task_pages.current.next %> 
+
+<br />
+
+<%= link_to 'New volunteer task', :action => 'new', :params=>{:campaign_id=>@campaign.id} %>
+
+<%= sortable_element 'task_list',
+:url => { :action => "sort" },
+:complete => visual_effect(:highlight, 'task_list')
+%>

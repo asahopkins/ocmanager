@@ -1,0 +1,80 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+-%>
+<div class="primary_address" id="primary_address">
+	<div class="plus_minus">
+		<%= plus_minus("address_plus", "address_minus", "all_addresses") %>
+</div>
+	<div class="shifted_block">
+		<%= error_messages_for 'address' %>
+		<%= display_address(@entity.primary_address)%>
+	</div>
+	<div class="map_link"><%= render :partial=>"partial/map_link",:locals=>{:address=>@entity.primary_address}%></div>
+</div>
+<div class="expanded_list" id="all_addresses" style="display: none;">
+	<ul>
+		<% @entity.addresses.each { |address| -%>
+		<li><span id="address_<%=address.id%>" onMouseOver="Element.show('edit_address_link_<%=address.id.to_s%>')" onMouseOut="Element.hide('edit_address_link_<%=address.id.to_s%>')"><b><%= address.label %> <% if address.id == @entity.primary_address_id-%>(primary)<% elsif address.id == @entity.mailing_address_id -%>(mailing)<%end-%><% if can_edit %> <span id="edit_address_link_<%=address.id.to_s%>" style="display:none;">(<%=link_to_function "edit", "Element.show('edit_address_#{address.id}'); Element.hide('address_#{address.id}')"%>)</span><% end %></b><br />
+			<%= display_address(address) %></span>
+			<% if can_edit %>
+			<span id="edit_address_<%=address.id%>" style="display:none;">
+			<%= form_remote_tag :update=>"addresses", :url=>{:controller=>"entities", :action=>"update_address", :params=>{:id=>@entity.id, :campaign_id=>@entity.campaign_id, :address_id=>address.id}}, :loading=>"Element.show('edit_address_indic_#{address.id}')", :complete=>"Element.hide('edit_address_indic_#{address.id}')"%>
+			<dl>
+				<dt>Label</dt><dd><%= text_field "address", "label", :size=>"20", :value=>address.label%></dd>
+				<dt>Line 1</dt><dd><%= text_field "address", "line_1", :size=>"20", :value=>address.line_1%></dd>
+				<dt>Line 2</dt><dd><%= text_field "address", "line_2", :size=>"20", :value=>address.line_2%></dd>
+				<dt>City</dt><dd><%= text_field "address", "city", :size=>"20", :value=>address.city%></dd>
+				<dt>State</dt><dd><select id="address_state" name="address[state]"><%=render :partial=>'partial/states_options', :locals=>{:state=> address.state.to_s}%></select></dd>
+				<dt>ZIP code</dt><dd><%= text_field "address", "zip", :value=>address.zip, :size=>5, :maxlength=>5%>-<%= text_field "address", "zip_4", :value=>address.zip_4, :size=>4, :maxlength=>4%></dd>
+				<% if address.id != @entity.primary_address_id -%>
+				<dt>Primary</dt><dd><select id="address_primary" name="address[primary]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+				<% end -%>
+				<% if address.id != @entity.mailing_address_id -%>
+				<dt>Mailing</dt><dd><select id="address_mailing" name="address[mailing]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+				<% end -%>
+				<dt>&nbsp;<span id="edit_address_indic_<%=address.id%>" style="display:none;"><%= image_tag "indicator.gif"%></span></dt>
+				<dd><input type="submit" value="Save changes" name="save_address"> or <%=link_to_function "Cancel", "Element.hide('edit_address_#{address.id}'); Element.show('address_#{address.id}')"%></dd>
+				<dt>&nbsp;</dt><dd><%=link_to_remote "Delete this address", :update=>"addresses", :confirm=>"Are you sure you want to delete this address?", :url=>{:controller=>"entities", :action=>"delete_address",:params=>{:id=>@entity.id, :campaign_id=>@campaign.id, :address_id=>address.id}}, :loading=>"Element.show('edit_address_indic_#{address.id}')", :complete=>"Element.hide('edit_address_indic_#{address.id}')"%></dd>
+			</dl>
+			</form>
+			</span><% end %></li>
+		<% } -%>
+		<% if can_edit %>
+		<li><span id="add_address_link"><%=link_to_function "Add address", "Element.hide('add_address_link'); Element.show('add_address')"%></span>
+			<span id="add_address" style="display:none;"><b>New address:</b><br /><%= form_remote_tag :update=>"addresses", :url=>{:controller=>"entities", :action=>"add_address", :params=>{:id=>@entity.id, :campaign_id=>@entity.campaign_id}}, :loading=>"Element.show('add_address_indic')", :complete=>"Element.hide('add_address_indic')"%>
+			<dl>
+				<dt>Label</dt><dd><%= text_field "address", "label", :size=>"20"%></dd>
+				<dt>Line 1</dt><dd><%= text_field "address", "line_1", :size=>"20"%></dd>
+				<dt>Line 2</dt><dd><%= text_field "address", "line_2", :size=>"20"%></dd>
+				<dt>City</dt><dd><%= text_field "address", "city", :size=>"20"%></dd>
+				<dt>State</dt><dd><select id="address_state" name="address[state]"><%=render :partial=>'partial/states_options', :locals=>{:state=> "CA"}%></select></dd>
+				<dt>ZIP code</dt><dd><%= text_field "address", "zip", :size=>5, :maxlength=>5%>-<%= text_field "address", "zip_4", :size=>4, :maxlength=>4%></dd>
+				<dt>Primary</dt><dd><select id="address_primary" name="address[primary]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+				<dt>Mailing</dt><dd><select id="address_mailing" name="address[mailing]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+				<dt>&nbsp;<span id="add_address_indic" style="display:none;"><%= image_tag "indicator.gif"%></span></dt>
+				<dd><input type="submit" value="Save" name="save_address"> or <%=link_to_function "Cancel", "Element.hide('add_address'); Element.show('add_address_link')"%></dd>
+			</dl>
+			</form>
+			</span></li><% end %>
+</ul>
+</div>

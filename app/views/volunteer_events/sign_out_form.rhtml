@@ -1,0 +1,32 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1>All done?  Thank you!</h1>
+
+<%= form_tag({:action=>'sign_out'},{:id=>"sign_out_form"})%>
+<div id="entity_name">
+	<span id="person_name">
+		<div class="name_float">First name<br /><%= text_field :entity, :first_name, :size=>"10" %></div>
+		<div class="name_float">Last name<br /><%= text_field :entity, :last_name, :size=>"15" %></div>
+	</span>
+</div>
+<br class="brclear" />
+<div id="is_this_you">&nbsp;</div>
+<%= observe_form 'sign_out_form', :frequency=>0.5, :url=>{:controller=>'volunteer_events', :action=>'autocomplete_for_sign_out'}, :update=>"foo"%>
+<br class="brclear" />

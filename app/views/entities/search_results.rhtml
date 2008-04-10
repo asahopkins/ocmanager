@@ -1,0 +1,42 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h2>Search results</h2>
+
+<p><%=@count.to_s%> results found</p>
+<div id="cart_form"><form><%= submit_to_remote "Add", "Add results to MyPeople", :url=>{:controller=>"cart_items",:action=>"update_cart", :params=>{:cart=>"Add"}}, :loading=>"Element.show('cart_indicator')", :complete=>"Element.hide('cart_indicator');" %>  <%= submit_to_remote "Intersect", "Intersect results with MyPeople", :url=>{:controller=>"cart_items",:action=>"update_cart", :params=>{:cart=>"Intersect"}}, :loading=>"Element.show('cart_indicator')", :complete=>"Element.hide('cart_indicator')" %> <%= submit_to_remote "Remove", "Remove results from MyPeople", :url=>{:controller=>"cart_items",:action=>"update_cart", :params=>{:cart=>"Remove"}}, :loading=>"Element.show('cart_indicator')", :complete=>"Element.hide('cart_indicator');" %></form></div>
+
+<div id="entity_list_headers">
+<span class="left_20">Name</span><span class="left_30">Address</span><span class="left_12">Phone</span><span class="left_23">Email</span><span class="right_13">&nbsp;</span>
+</div>
+<div id="entities_list">
+	<% unless @campaign.nil? %>
+		<% session[:user].manager?(@campaign) ? can_delete = true : can_delete = false%>
+	<% end %>
+	<% for entity in @entities %>
+		<% if @campaign.nil? %>
+			<% session[:user].manager?(entity.campaign) ? can_delete = true : can_delete = false%>
+		<% end %>
+		<%= render :partial=>"list_line", :locals=>{:entity=>entity, :can_delete=>can_delete} %>
+	<% end %>
+</div>
+<br class="brclear"/>
+<%= pagination_links @entity_pages %> 
+<br class="brclear" />
+<p><b>Search conditions:</b> <%= to_where_statement(session[:search_cond].to_sql) %></p>

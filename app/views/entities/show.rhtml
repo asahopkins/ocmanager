@@ -1,0 +1,133 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div id="entity_name">
+	<%= render :partial=>"name", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+</div>
+
+<div class="left_half">
+	<div class="contact_block">
+		<div id="addresses">
+			<%= render :partial=>"addresses", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+		</div>
+	<div class="phone_email_block">
+		<div id="phones">
+			<%= render :partial=>"phones", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+		</div>
+		<div id="faxes">
+			<%= render :partial=>"faxes", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+		</div>
+		<div id="emails">
+			<%= render :partial=>"emails", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+		</div>
+		<div class="clear">
+			<div class="plus_minus">&nbsp;</div>
+		<div class="shifted_block">
+			<div id="website">
+				<%= render :partial=>"website", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+			</div>
+		</div>
+		</div>
+	</div>
+	</div>
+<div class="column" id="contact_box">
+	<%= render :partial=>"contact_box", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+</div>
+<div class="column" id="custom_fields_box">
+	<%= render :partial=>"custom_fields_box", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+</div>
+
+
+</div>
+
+<div class="right_half">
+	<div class="column">
+		<form><%= submit_to_remote "Add", "Add to MyPeople", :url=>{:controller=>"cart_items",:action=>"create", :params=>{:entity_id=>@entity.id}}, :loading=>"Element.show('cart_form_indicator')", :complete=>"Element.hide('cart_form_indicator');" %> <span id="delete_status"><%= render :partial=>"request_delete", :locals=>{:delete=>!@entity.delete_requested,:entity=>@entity}%></span> <span id="cart_form_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></form> 
+	</div>
+	<div class="column">
+		<% unless @entity.created_by.nil?
+			creator = User.find(@entity.created_by)
+		 	unless creator.nil? %>
+		Record created by <%= creator.firstname+" "+creator.lastname %> on <%= @entity.created_at.strftime('%b %d, %Y') %><br />
+		<% end end %>
+		<% unless @entity.updated_by.nil? 
+			updater = User.find(@entity.updated_by)
+			unless updater.nil?%>
+		Record last updated by <%= updater.firstname+" "+updater.lastname %> on <%= @entity.updated_at.strftime('%b %d, %Y') %>
+		<% end end %>
+	</div>
+	<div class="column" id="household_box">
+		<%= render :partial=>"household_box", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+	</div>
+	<% if @entity.class==Person%>
+	<div class="column" id="voter_info_box">
+		<%= render :partial=>"voter_info_box", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+	</div>
+	<% elsif @entity.class==OutsideCommittee %>
+	<div class="column" id="committee_info_box">
+		<%= render :partial=>"committee_info_box", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+	</div>
+	<% end %>
+	<div class="column" id="other_info_box">
+		<%= render :partial=>"other_info_box", :locals=>{:entity=>@entity, :can_edit=>@can_edit} %>
+	</div>
+</div>
+
+<div class="volunteering_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("volunteer_plus", "volunteer_minus", "volunteer_info", "entity_subhead", "Volunteering") %>
+	</div>
+	<div id="volunteer_info" style="display:none;" class="more_info_block">
+		<%= render :partial=>'volunteer_info'%>
+	</div>
+</div>
+
+
+<div class="campaign_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("campaign_plus", "campaign_minus", "campaign_info", "entity_subhead", "Campaign Events & Contact") %>
+	</div>
+	<div id="campaign_info" style="display:none;" class="more_info_block">
+		<%= render :partial=>'events_and_contacts'%>
+	</div>
+</div>
+
+<% if @can_see_financial %>
+<div class="financial_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("financial_plus", "financial_minus", "financial_info", "entity_subhead", "Financial Summaries") %>
+	</div>
+	<div id="financial_info" style="display:none;" class="more_info_block">
+		<!--<div id="remote_finances"><span id="loading_treasurer" style="display:none;"><%= image_tag "indicator.gif"%></span>
+			<span class="financial_committee_name"><%= link_to_remote "Load financial information from <i>Treasurer</i>",:update=>"remote_finances", :url=>{:action=>"load_treasurer_summaries", :params=>{:id=>@entity.id}}, :loading=>"Element.show('loading_treasurer')" %></span>
+		</div> -->
+		<%= render :partial=>'other_contributions', :locals=>{:entity=>@entity, :can_edit=>@can_edit}%>
+	</div>
+</div>
+<% end %>
+
+<div class="groups_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("groups_plus", "groups_minus", "groups_info", "entity_subhead", "Groups") %>
+	</div>
+	<div id="groups_info" style="display:none;" class="more_info_block">
+		<%= render :partial=>"groups_info",:locals=>{:entity=>@entity, :can_edit=>@can_edit, :can_edit_groups=>@can_edit_groups} %>
+	</div>
+</div>
+<br class="brclear" />

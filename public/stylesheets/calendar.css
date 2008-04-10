@@ -1,0 +1,68 @@
+/*
+  A blue based theme, inspired by Blinksale and their ColorBurn widget. http://firewheeldesign.com
+  
+  AUTHOR: Geoffrey Grosenbach http://nubyonrails.com
+  
+  Colors: 
+    Light Blue: bbccff 
+    White: eeddee
+    Turq: 003355
+    Cream: ffffdd
+*/
+
+.calendar {
+  margin: auto;
+}
+
+.monthName th {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 1em;
+  padding-bottom: 0.7em;
+}
+
+.dayName th {
+  font-size: 0.7em;
+  padding-top: 0.6em;
+  padding-bottom: 0.3em;
+  background-color: #303030;
+  color: white;
+}
+
+.otherMonth, .day, .specialDay {
+  padding: 0.5em 0.5em;
+  border-right: 1px solid white;
+  text-align: left;
+  vertical-align: top;
+  width: 80px;
+  height: 80px;
+}
+
+.otherMonth {
+  color: #dddddd;
+  background-color: white;
+}
+
+.day, .specialDay {
+  font-size: 0.8em;
+  border-bottom: 1px dotted #bbbbbb;
+  background-color: #bbccff;
+}
+
+.weekendDay {
+  background-color: #ffffdd;
+}
+.specialDay {
+  background-color: #003355;
+  color: white;
+}
+.specialDay a, .specialDay a:visited, .specialDay a:hover {
+  color: white;
+  text-decoration: none;
+}
+.specialDay a:hover {
+  color: white;
+  text-decoration: underline;
+}
+

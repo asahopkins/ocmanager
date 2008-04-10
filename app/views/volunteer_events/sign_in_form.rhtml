@@ -1,0 +1,93 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1>Thank you for volunteering</h1>
+<h2>Please sign in:</h2>
+
+<%= form_tag({:action=>'sign_in'},{:id=>"sign_in_form"})%>
+	<div id="entity_name">
+		<span id="person_name">
+			<div class="name_float">Title<br /><%= text_field :entity, :title, :size=>"4" %></div>
+			<div class="name_float">First name<br /><%= text_field :entity, :first_name, :size=>"10" %></div>
+			<div class="name_float">Middle<br /><%= text_field :entity, :middle_name, :size=>"6" %></div>
+			<div class="name_float">Last name<br /><%= text_field :entity, :last_name, :size=>"15" %></div>
+			<div class="name_float">Suffix<br /><%= text_field :entity, :name_suffix, :size=>"4" %></div>
+			<div class="name_float">&nbsp;</div>
+			<div class="name_float">Nickname<br /><%= text_field :entity, :nickname, :size=>"10" %></div>
+		</span>
+	</div>
+	<br class="brclear" />
+	<div class="left_half" id="sign_in_left_half">
+		<% if @entity -%>
+		<%= render :partial=>"entities/simple_show_for_sign_in"%>
+		<% else -%> 
+		<div class="column" id="addresses">
+			<div class="data_header">Primary Address</div>
+			<dl>
+				<dt>Label</dt><dd><%= text_field "address", "label", :size=>"20", :value=>"Home"%></dd>
+				<dt>Line 1</dt><dd><%= text_field "address", "line_1", :size=>"20", :value=>""%></dd>
+				<dt>Line 2</dt><dd><%= text_field "address", "line_2", :size=>"20", :value=>""%></dd>
+				<dt>City</dt><dd><%= text_field "address", "city", :size=>"20", :value=>"" %></dd>
+				<dt>State</dt><dd><select id="address_state" name="address[state]"><%=render :partial=>'partial/states_options', :locals=>{:state=>"CA"}%></select></dd>
+				<dt>ZIP code</dt><dd><%= text_field "address", "zip", :value=>"", :size=>5, :maxlength=>5%>-<%= text_field "address", "zip_4", :value=>"", :size=>4, :maxlength=>4%></dd>
+			</dl>
+		</div>
+		<div class="column" id="phones">
+			<div class="data_header">Primary Phone</div>
+			<dl>
+				<dt>Label</dt><dd><%= text_field "entity", "primary_phone", :value=>"Home", :size=>"20"%></dd>
+				<dt>Number</dt><dd><%= text_field "phone", "number", :value=>"", :size=>"20"%></dd>
+			</dl>		
+		</div>
+		<div class="column" id="emails">
+			<div class="data_header">Email</div>
+			<dl>
+				<dt>Address</dt><dd><%= text_field "email", "address", :value=>"", :size=>"20"%></dd>
+			</dl>		
+		</div>
+		<div class="column" id="skills">
+			<div class="data_header">Skills</div>
+			<dl>
+				<dt>Skills</dt><dd><%= text_field "entity", "skills", :size=>20%></dd>
+				<dt>Languages</dt><dd><%= text_field "entity", "languages", :size=>20%></dd>
+			</dl>
+		</div>
+		<div class="column" id="interests">
+			<div class="data_header">Volunteering Interests</div>
+			<dl>
+			<% @campaign.volunteer_tasks.each do |task| -%>
+			<dt><%= task.name %></dt><dd><%= check_box "entity", task.id.to_s, :index=>"volunteer_interests"%></dd>
+			<% end -%>
+			</dl>
+		</div>
+		<%= observe_form 'sign_in_form', :frequency=>0.5, :url=>{:controller=>'entities', :action=>'autocomplete_for_sign_in'}, :update=>"foo"%>
+		<% end -%>
+	</div>
+	<div class="right_half" id="sign_in_right_half">&nbsp;</div>
+	<br class="brclear" />
+	<div id="signin_buttons">
+		<table border="0" cellspacing="5" cellpadding="5" width="80%">
+			<tr><td width="40%" align="center">Today I plan to do:<br /><select id="volunteer_event_volunteer_task_id" name="volunteer_event[volunteer_task_id]"%>">
+				<% @campaign.volunteer_tasks.each do |task| -%>
+				<option value="<%=task.id%>"><%=task.name%></option>
+				<% end -%>
+				</select><br/><input type="submit" name="sign_in_or_up" value="Sign In" id="Sign In"></td><td width="40%" align="center">I can't volunteer now, but I will later:<br/><input type="submit" name="sign_in_or_up" value="Sign Up" id="Sign Up"></td><td><%= link_to "Start over", :action => "welcome" %></td></tr>
+		</table>
+	</div>
+</form>

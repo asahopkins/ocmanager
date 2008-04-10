@@ -1,0 +1,31 @@
+<h2>Exported files</h2>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Created on</th>
+    <th>Already downloaded?</th>
+  </tr>
+  
+<% for file in @files %>
+	<% key_name = "export_labels_key_"+file.filename
+	if MiddleMan[key_name.to_sym] %>
+  <tr>
+	<td><%=h file.filename %></td>
+	<td><%=h file.created_at.strftime('%m/%d/%Y') %></td>
+	<td>No</td>
+    <td>Progress: <%= MiddleMan[key_name.to_sym].progress %>%</td>
+  </tr>
+	<% else -%>
+  <tr>
+	<td><%= link_to file.filename, :action => 'get', :params=>{:id => file} %></td>
+	<td><%=h file.created_at.strftime('%m/%d/%Y') %></td>
+	<td><% if file.downloaded? %>Yes<%else-%>No<%end-%></td>
+    <td><%= link_to 'Delete forever', { :action => 'destroy', :params=>{:id => file} }, :confirm => 'Are you sure?  This cannot be undone.', :method=>"post" %></td>
+  </tr>
+	<% end -%>
+<% end %>
+</table>
+<br />
+<%= pagination_links @file_pages %>
+<br />

@@ -1,0 +1,70 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div class="highlight_float">Hours volunteered this year: <%= display_duration(@entity.total_volunteer_minutes_this_year) %></div>
+<div id="volunteer_events_form">
+	<div id="add_volunteer_event" class="add_box">
+		<a href="#" onClick="Element.show('new_volunteer_event'); Element.hide('add_volunteer_event'); return false;">Add volunteer session</a>
+	</div>
+	<div id="new_volunteer_event" style="display:none;" class="add_box">
+		<%= form_remote_tag :url=>{:controller=>"volunteer_events", :action=>"create", :params=>{:campaign_id=>@campaign.id, :entity_id=>@entity.id}}, :loading=>"Element.show('new_volunteer_indic')"%>
+		<%= hidden_field :volunteer_event, :entity_id, :value=>@entity.id %>
+		<dl>
+			<dt>Date</dt><dd><%= date_select :date, :time, :order=>[:month, :day, :year] %></dd>
+			<dt>Start time</dt><dd><%= select_hour Time.now, :field_name=>'start_time(4i)' %>:<%= select_minute Time.now, :field_name=>'start_time(5i)' %></dd>
+			<dt>End time</dt><dd><%= select_hour Time.now, :field_name=>'end_time(4i)' %>:<%= select_minute Time.now, :field_name=>'end_time(5i)' %></dd>
+			<dt>Task</dt><dd><%= select :volunteer_event, :volunteer_task_id, @campaign.volunteer_tasks.collect{|t| [t.name, t.id]} %></dd>
+			<dt>Comments</dt><dd><%= text_field :volunteer_event, :comments %></dd>
+			<dt>&nbsp;<span id="new_volunteer_indic" style="display:none"><%= image_tag "indicator.gif" %></span></dt><dd><%= submit_tag "Add session" %> or <a href="#" onClick="Element.hide('new_volunteer_event'); Element.show('add_volunteer_event'); return false;">Cancel</a></dd>
+		</dl></form>
+	</div>
+</div>
+<div class="notice" id="volunteer_history_notice"></div>
+<div class="volunteer_history_header">
+	<div class="left_15">Date</div>
+	<div class="left_25">Task</div>
+	<div class="left_10">Duration</div>
+	<div class="left_30">Comments</div>
+</div>
+<% @volunteer_events.each do |@volunteer_event| %>
+<div class="volunteer_event_summary">
+	<span class="left_15"><%= @volunteer_event.start_time.strftime("%m/%d/%Y") %>&nbsp;</span>
+	<span class="left_25"><%= @volunteer_event.volunteer_task.name %>&nbsp;</span>
+	<span class="left_10"><%= display_duration(@volunteer_event.duration) %>&nbsp;</span>		
+	<span class="left_30"><%=h @volunteer_event.comments %>&nbsp;</span>		
+	<span class="right_13"><%= link_to_function "Edit", "Element.show('edit_vol_event_#{@volunteer_event.id}')"%>&nbsp;<%= link_to_remote image_tag('trash.gif'), :url=>{:controller=>"volunteer_events", :action=>"destroy", :params=>{:id=>@volunteer_event.id, :campaign_id=>@campaign.id, :entity_id=>@entity.id}}, :method=>"post", :confirm=>"Are you sure?", :loading=>"Element.show('edit_volunteer_indic_#{@volunteer_event.id}')"%>&nbsp;<span id="edit_volunteer_indic_<%= @volunteer_event.id %>" style="display:none"><%= image_tag "indicator.gif" %></span></span>		
+</div>
+<div class="edit_volunteer_event" id="edit_vol_event_<%= @volunteer_event.id %>" style="display:none;">
+	<%= form_remote_tag :url=>{:controller=>"volunteer_events", :action=>"update", :params=>{:campaign_id=>@campaign.id, :entity_id=>@entity.id}}, :loading=>"Element.show('edit_volunteer_indic_#{@volunteer_event.id}')"%>
+	<%= hidden_field :volunteer_event, :entity_id, :value=>@entity.id %>
+	<%= hidden_field :volunteer_event, :id, :value=>@volunteer_event.id %>
+	<dl>
+		<dt>Date</dt><dd><%= select_month @volunteer_event.start_time, :field_name=>'time(2i)' %> <%= select_day @volunteer_event.start_time, :field_name=>'time(3i)' %>, <%= select_year @volunteer_event.start_time, :field_name=>'time(1i)', :start_year=>Date.today.year-1 %></dd>
+		<dt>Start time</dt><dd><%= select_hour @volunteer_event.start_time, :field_name=>'start_time(4i)' %>:<%= select_minute @volunteer_event.start_time, :field_name=>'start_time(5i)' %></dd>
+		<dt>End time</dt><dd><%= select_hour @volunteer_event.end_time, :field_name=>'end_time(4i)' %>:<%= select_minute @volunteer_event.end_time, :field_name=>'end_time(5i)' %></dd>
+		<dt>Task</dt><dd><%= select :volunteer_event, :volunteer_task_id, @campaign.volunteer_tasks.collect{|t| [t.name, t.id]} %></dd>
+		<dt>Comments</dt><dd><%= text_field :volunteer_event, :comments %></dd>
+		<dt>&nbsp;</dt><dd><%= submit_tag "Update session" %> or <a href="#" onClick="Element.hide('edit_vol_event_<%= @volunteer_event.id %>'); return false;">Cancel</a></dd>
+	</dl></form>
+</div>
+<% end %>
+<div class="volunteer_event_summary">
+	<%= link_to_remote "<< Later sessions", :url=>{:controller=>'volunteer_events', :action=>'list', :params=>{ :entity_id=>@entity.id, :campaign_id=>@campaign.id, :page => @volunteer_event_pages.current.previous }} if @volunteer_event_pages.current.previous %>
+	<%= link_to_remote "Earlier sessions >>", :url=>{:controller=>'volunteer_events', :action=>'list', :params=>{ :entity_id=>@entity.id, :campaign_id=>@campaign.id, :page => @volunteer_event_pages.current.next }} if @volunteer_event_pages.current.next %>
+</div>

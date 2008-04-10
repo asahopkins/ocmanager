@@ -1,0 +1,116 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%= error_messages_for 'entity' %>
+
+<!--[form:entity]-->
+<p><label for="entity_name">Name</label><br/>
+<%= text_field 'entity', 'name'  %></p>
+
+<p><label for="entity_title">Title</label><br/>
+<%= text_field 'entity', 'title'  %></p>
+
+<p><label for="entity_first_name">First name</label><br/>
+<%= text_field 'entity', 'first_name'  %></p>
+
+<p><label for="entity_middle_name">Middle name</label><br/>
+<%= text_field 'entity', 'middle_name'  %></p>
+
+<p><label for="entity_last_name">Last name</label><br/>
+<%= text_field 'entity', 'last_name'  %></p>
+
+<p><label for="entity_name_suffix">Name suffix</label><br/>
+<%= text_field 'entity', 'name_suffix'  %></p>
+
+<p><label for="entity_nickname">Nickname</label><br/>
+<%= text_field 'entity', 'nickname'  %></p>
+
+<p><label for="entity_voter_ID">Voter id</label><br/>
+<%= text_field 'entity', 'voter_ID'  %></p>
+
+<p><label for="entity_precinct">Precinct</label><br/>
+<%= text_field 'entity', 'precinct'  %></p>
+
+<p><label for="entity_languages">Languages</label><br/>
+<%= text_field 'entity', 'languages'  %></p>
+
+<p><label for="entity_skills">Skills</label><br/>
+<%= text_area 'entity', 'skills'  %></p>
+
+<p><label for="entity_occupation">Occupation</label><br/>
+<%= text_field 'entity', 'occupation'  %></p>
+
+<p><label for="entity_employer">Employer</label><br/>
+<%= text_field 'entity', 'employer'  %></p>
+
+<p><label for="entity_time_to_reach">Time to reach</label><br/>
+<%= text_field 'entity', 'time_to_reach'  %></p>
+
+<p><label for="entity_receive_email">Receive email</label><br/>
+<select id="entity_receive_email" name="entity[receive_email]"><option value="false">False</option><option value="true">True</option></select></p>
+
+<p><label for="entity_receive_phone">Receive phone</label><br/>
+<select id="entity_receive_phone" name="entity[receive_phone]"><option value="false">False</option><option value="true">True</option></select></p>
+
+<p><label for="entity_federal_ID">Federal id</label><br/>
+<%= text_field 'entity', 'federal_ID'  %></p>
+
+<p><label for="entity_state_ID">State id</label><br/>
+<%= text_field 'entity', 'state_ID'  %></p>
+
+<p><label for="entity_party">Party</label><br/>
+<select id="entity_party" name="entity[party]"><option value="false">False</option><option value="true">True</option></select></p>
+
+<p><label for="entity_created_by">Created by</label><br/>
+<%= text_field 'entity', 'created_by'  %></p>
+
+<p><label for="entity_updated_by">Updated by</label><br/>
+<%= text_field 'entity', 'updated_by'  %></p>
+
+<p><label for="entity_created_at">Created at</label><br/>
+<%= datetime_select 'entity', 'created_at'  %></p>
+
+<p><label for="entity_updated_at">Updated at</label><br/>
+<%= datetime_select 'entity', 'updated_at'  %></p>
+
+<p><label for="entity_phones">Phones</label><br/>
+<%= text_area 'entity', 'phones'  %></p>
+
+<p><label for="entity_primary_phone">Primary phone</label><br/>
+<%= text_field 'entity', 'primary_phone'  %></p>
+
+<p><label for="entity_faxes">Faxes</label><br/>
+<%= text_area 'entity', 'faxes'  %></p>
+
+<p><label for="entity_primary_fax">Primary fax</label><br/>
+<%= text_field 'entity', 'primary_fax'  %></p>
+
+<p><label for="entity_emails">Emails</label><br/>
+<%= text_area 'entity', 'emails'  %></p>
+
+<p><label for="entity_primary_email">Primary email</label><br/>
+<%= text_field 'entity', 'primary_email'  %></p>
+
+<p><label for="entity_registered_party">Registered party</label><br/>
+<%= text_field 'entity', 'registered_party'  %></p>
+
+<p><label for="entity_birthdate">Birthdate</label><br/>
+<%= date_select 'entity', 'birthdate'  %></p>
+<!--[eoform:entity]-->
+

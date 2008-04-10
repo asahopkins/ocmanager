@@ -1,0 +1,6 @@
+--- 
+prefix: /manager
+port: "8000"
+environment: development
+pid_file: log/mongrel.pid
+servers: 2

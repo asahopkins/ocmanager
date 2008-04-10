@@ -1,0 +1,27 @@
+<h1>Listing group_fields</h1>
+
+<table>
+  <tr>
+  <% for column in GroupField.content_columns %>
+    <th><%= column.human_name %></th>
+  <% end %>
+  </tr>
+  
+<% for group_field in @group_fields %>
+  <tr>
+  <% for column in GroupField.content_columns %>
+    <td><%=h group_field.send(column.name) %></td>
+  <% end %>
+    <td><%= link_to 'Show', :action => 'show', :id => group_field %></td>
+    <td><%= link_to 'Edit', :action => 'edit', :id => group_field %></td>
+    <td><%= link_to 'Destroy', { :action => 'destroy', :id => group_field }, :confirm => 'Are you sure?', :method=>"post" %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to 'Previous page', { :page => @group_field_pages.current.previous } if @group_field_pages.current.previous %>
+<%= link_to 'Next page', { :page => @group_field_pages.current.next } if @group_field_pages.current.next %> 
+
+<br />
+
+<%= link_to 'New group_field', :action => 'new' %>

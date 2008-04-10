@@ -1,0 +1,29 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+-%>
+<% if delete -%>
+<%= submit_to_remote "request_deletion", "Request deletion", :update=>'delete_status', :url=>{:controller=>"entities",:action=>"request_delete", :params=>{:delete=>true, :id=>@entity.id}}, :loading=>"Element.show('cart_form_indicator')", :complete=>"Element.hide('cart_form_indicator'); new Effect.Highlight('delete_status');",:confirm=>"Are you sure?" %>
+<% else %>
+<%= submit_to_remote "unrequest_deletion", "Undo delete request", :update=>'delete_status', :url=>{:controller=>"entities",:action=>"request_delete", :params=>{:delete=>false, :id=>@entity.id}}, :loading=>"Element.show('cart_form_indicator')", :complete=>"Element.hide('cart_form_indicator'); new Effect.Highlight('delete_status');",:confirm=>"Are you sure?" %> <% if session[:user].manager?(@campaign) and @entity.delete_requested? -%><%= link_to image_tag('trash.gif'), { :action => 'destroy', :id => @entity }, :confirm => 'Are you sure?', :method=>"post" %><% end -%>
+<% if @entity.treasurer_entities and @entity.treasurer_entities.length >= 1 -%><br />Note: This person or organization has a record in <i>Treasurer</i>, so you may not want to delete this entry.<% end -%>
+<% end %>

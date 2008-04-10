@@ -1,0 +1,304 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%= form_tag({:action => 'search_results', :params=>{:campaign_id=>@campaign.id}},{:name=>"test"})%>
+<%= error_messages_for 'entity' %>
+<%= error_messages_for 'address' %>
+<div id="select_entity_type" >
+<% any_options_hash = Hash["onclick","Element.hide('person_name'); Element.show('voter_info_box'); Element.show('volunteering_block'); Element.show('org_name'); Element.show('person_other_fields'); Element.show('committee_info_box'); return true;"]
+per_options_hash = Hash["onclick","Element.show('person_name'); Element.show('voter_info_box'); Element.show('volunteering_block'); Element.hide('org_name'); Element.show('person_other_fields'); Element.hide('committee_info_box'); return true;"]
+org_options_hash = Hash["onclick", "Element.show('org_name'); Element.hide('committee_info_box'); Element.hide('person_name'); Element.hide('voter_info_box'); Element.hide('person_other_fields'); Element.hide('volunteering_block'); return true;"] 
+comm_options_hash = Hash["onclick", "Element.show('org_name'); Element.show('committee_info_box'); Element.hide('person_name'); Element.hide('voter_info_box'); Element.hide('person_other_fields'); Element.hide('volunteering_block'); return true;"] 
+check_hash = Hash["checked","checked"]
+per_options_hash.update(check_hash)
+%>
+<b>Are you searching for a person, an organization, a political committee, or any of these?</b><br />
+Person: <%= radio_button 'entity', 'class', 'Person', per_options_hash%><br />
+Organization: <%= radio_button 'entity', 'class', 'Organization', org_options_hash%><br />
+Political Committee: <%= radio_button 'entity', 'class', 'OutsideCommittee', comm_options_hash%><br />
+Any: <%= radio_button 'entity', 'class', 'Any', any_options_hash%>
+</div>
+<div id="entity_name">
+	<span id="person_name">
+		<div class="name_float">Title<br /><%= text_field :entity, :title, :size=>"4" %></div>
+		<div class="name_float">First name<br /><%= text_field :entity, :first_name, :size=>"10" %></div>
+		<div class="name_float">Middle<br /><%= text_field :entity, :middle_name, :size=>"6" %></div>
+		<div class="name_float">Last name<br /><%= text_field :entity, :last_name, :size=>"15" %></div>
+		<div class="name_float">Suffix<br /><%= text_field :entity, :name_suffix, :size=>"4" %></div>
+		<div class="name_float">&nbsp;</div>
+		<div class="name_float">Goes by<br /><%= text_field :entity, :nickname, :size=>"10" %></div>
+	</span>
+	<span id="org_name" style="display:none;">
+		<div class="name_float">Name<br /><%= text_field :entity, :name, :size=>"40" %></div>
+	</span>
+	<span>&nbsp;<br /><%= submit_tag "Search" %></span>
+</div>
+
+<div class="left_half">
+	<div class="column" id="addresses">
+		<div class="data_header"><%= plus_minus("address_plus", "address_minus", "address_search", "", "Address")%></div>
+		<dl id="address_search" style="display:none;">
+			<dt>Which?</dt><dd><%= select "entity", "address_which", [["All","All"],["Primary only","Primary"]]%></dd>
+			<dt>Any field</dt><dd>
+				<%= select "entity", "address_any_field_flag", [["[Ignore]",""],["Includes","Includes"],["Matches","Matches"]]%><br />
+				<%= text_field "entity", "address_any_field", :size=>"20", :value=>""%></dd>
+			<dt>Line 1</dt><dd>
+				<%= select "entity", "address_line_1_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "address_line_1", :size=>"20", :value=>""%></dd>
+			<dt>Line 2</dt><dd>
+				<%= select "entity", "address_line_2_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "address_line_2", :size=>"20", :value=>""%></dd>
+			<dt>City</dt><dd>
+				<%= select "entity", "address_city_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["In list", "In List"], ["Not in list", "Not List"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "address_city", :size=>"20", :value=>""%></dd>
+			<dt>State</dt><dd>
+				<%= select "entity", "address_state_flag", [["[Ignore]",""],["Matches","Matches"],["In List", "In List"], ["Not in list", "Not List"], ["Does not match","Not"]]%><br />
+				<select id="entity_address_state" name="entity[address_state]"><%=render :partial=>'partial/states_options', :locals=>{:state=>"CA"}%></select></dd>
+			<dt>ZIP code</dt><dd>
+				<%= select "entity", "address_zip_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["In List", "In List"], ["Not in list", "Not List"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "address_zip", :value=>"", :size=>5%></dd>
+		</dl>
+	</div>
+	<div class="column" id="phones">
+		<div class="data_header"><%= plus_minus("phone_plus", "phone_minus", "phone_search", "", "Phones")%></div>
+		<dl id="phone_search" style="display:none;">
+			<dt>Number</dt><dd>
+				<%= select "entity", "phone_number_flag", [["[Ignore]",""],["Includes","Includes"],["Does not include","Not"]]%><br />
+				<%= text_field "entity", "phone_number", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+	<div class="column" id="faxes">
+		<div class="data_header"><%= plus_minus("fax_plus", "fax_minus", "fax_search", "", "Faxes")%></div>
+		<dl id="fax_search" style="display:none;">
+			<dt>Number</dt><dd>
+				<%= select "entity", "fax_number_flag", [["[Ignore]",""],["Includes","Includes"],["Does not include","Not"]]%>
+				<%= text_field "entity", "fax_number", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+	<div class="column" id="emails">
+		<div class="data_header"><%= plus_minus("email_plus", "email_minus", "email_search", "", "Email")%></div>
+		<dl id="email_search" style="display:none;">
+			<dt>Address</dt><dd><%= select "entity", "email_address_flag", [["[Ignore]",""],["Includes","Includes"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "email_address", :value=>"", :size=>"15"%></dd>
+			<dt>Valid</dt><dd><%= select "entity", "email_valid_flag", [["[Ignore]",""],["Matches","Matches"]]%> <%= select "entity", "email_valid", [["Invalid","false"],["Valid","true"]], {:include_blank=>false } %></dd>
+		</dl>	
+	</div>
+	<div class="column" id="website">
+		<div class="data_header"><%= plus_minus("website_plus", "website_minus", "website_search", "", "Website")%></div>
+		<dl id="website_search" style="display:none;">
+			<dt>Address</dt><dd><%= select "entity", "website_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "website", :value=>"", :size=>"15"%></dd>
+		</dl>		
+	</div>
+	<div class="column" id="contact_box">
+		<div class="data_header"><%= plus_minus("contact_plus", "contact_minus", "contact_flags_search", "", "Contact")%></div>
+		<div id="contact_flags_search" style="display:none;">
+				<dl>
+			<dt>Phone OK?</dt> <dd><%= select "entity", "receive_phone_flag", [["[Ignore]",""], ["Matches","Matches"], ["Does not match","Not"]]%> <%= select "entity", "receive_phone", [["No","false"],["Yes","true"]], { :include_blank=>false}%></dd>
+			<dt>Email OK?</dt> <dd><%= select "entity", "receive_email_flag", [["[Ignore]",""], ["Matches","Matches"], ["Does not match","Not"]]%> <%= select "entity", "receive_email", [["No","false"],["Yes","true"]], {:include_blank=>false } %></dd>
+			<dt>Best time to reach</dt><dd><%= select "entity", "time_to_reach_flag", [["[Ignore]",""],["Includes","Includes"], ["Does not include","Not"]]%><br />
+				<%= text_field "entity", "time_to_reach", :size=>20 %></dd>
+			</dl>
+		</div>
+	</div>
+	<div class="column" id="custom_fields_box">
+		<div class="data_header"><%= plus_minus("custom_plus", "custom_minus", "custom_search", "", "Custom Fields")%></div>
+		<div id="custom_search" style="display:none;">
+			<dl>
+				<% @campaign.custom_fields.each { |field| -%>
+				<% if field.field_type.nil? or field.field_type=="Text" -%>
+				<dt><%= field.name %></dt><dd><select id="custom_field_flag_<%=field.id%>" name="custom_field[flag][<%=field.id%>]">
+					<option value="">[Ignore]</option>
+					<option value="Includes">Includes</option>
+					<option value="Matches">Matches</option>
+					<option value="Not">Does not include</option>
+					</select><br />
+				<%= text_field "custom_field", "value", :size=>20, :index=>field.id %></dd>
+				<% elsif field.field_type=="Num" -%>
+				<dt><%= field.name %></dt><dd><select id="custom_field_flag_<%=field.id%>" name="custom_field[flag][<%=field.id%>]">
+					<option value="">[Ignore]</option>
+					<option value="Greater_than">Greater than or equal to</option>
+					<option value="Less_than">Less than</option>
+					</select><br />
+				<%= text_field "custom_field", "value", :size=>20,:index=>field.id %></dd>
+			
+				<% elsif field.field_type=="Bool" -%>
+				<dt><%= field.name %></dt><dd><select id="custom_field_flag_<%=field.id%>" name="custom_field[flag][<%=field.id%>]">
+					<option value="">[Ignore]</option>
+					<option value="Matches">Matches</option>
+					<option value="Not">Does not match</option>
+					</select><br />
+				<select id="custom_field_<%=field.id%>_value" name="custom_field[<%=field.id%>][value]">
+					<option value="" selected>&nbsp;</option>
+					<option value="false">No</option>
+					<option value="true">Yes</option>			
+					</select></dd>
+				<% elsif field.field_type=="Select" -%>
+				<dt><%= field.name %></dt><dd><select id="custom_field_flag_<%=field.id%>" name="custom_field[flag][<%=field.id%>]">
+					<option value="">[Ignore]</option>
+					<option value="Matches">Matches</option>
+					</select><br />
+				<select id="custom_field_<%=field.id%>_value" name="custom_field[<%=field.id%>][value]">
+					<option value="" selected ></option>
+					<%= options_for_select field.select_options %>
+					</select>
+				<% end  -%>
+				<% } -%></dd>
+			</dl>
+		</div>
+	</div>
+</div>
+
+<div class="right_half">
+	<div class="column" id="voter_info_box">
+		<div class="data_header"><%= plus_minus("voter_plus", "voter_minus", "voter_flags_search", "", "Voter Information")%></div>
+		<div id="voter_flags_search" style="display:none;">
+				<dl>
+			<dt>Party</dt> <dd><%= select "entity", "regd_party_flag", [["[Ignore]",""], ["Matches","Matches"], ["Does not match","Not"]]%><br />
+				<%= select "entity", "registered_party", ["Democratic", "Decline to State", "Republican", "Green", "Peace & Freedom", "Natural Law","American Independent"], { :include_blank=>true }%></dd>
+			<dt>Voter ID</dt> <dd><%= select "entity", "voter_ID_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br /><%= text_field "entity", "voter_ID", :size=>20 %></dd>
+			<dt>Precinct</dt><dd><%= select "entity", "precinct_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["In List", "In List"], ["Not in list", "Not List"],["Does not include","Not"]]%><br /><%= text_field "entity", "precinct", :size=>20 %></dd>
+			</dl>
+		</div>
+	</div>
+	<div class="column" id="committee_info_box" style="display:none;">
+		<div class="data_header"><%= plus_minus("committee_plus", "committee_minus", "committee_info_search", "", "Committee Information")%></div>
+		<div id="committee_info_search" style="display:none;">
+				<dl>
+			<dt>Federal ID</dt> <dd><%= select "entity", "federal_ID_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br /><%= text_field "entity", "federal_ID", :size=>20 %></dd>
+			<dt>State ID</dt><dd><%= select "entity", "state_ID_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br /><%= text_field "entity", "state_ID", :size=>20 %></dd>
+			<dt>Political Party</dt> <dd><%= select "entity", "party_flag", [["[Ignore]",""],["Matches","Matches"]]%><br /><%= select "entity", "party", [["No","false"],["Yes","true"]] %></dd>
+			</dl>
+		</div>
+	</div>
+	<div class="column" id="other_info_box">
+		<div class="data_header"><%= plus_minus("other_plus", "other_minus", "other_info_search", "", "Other Information")%></div>
+		<div id="other_info_search" style="display:none;">
+				<dl>
+			<span id="person_other_fields">
+				<dt>Occupation</dt> <dd><%= select "entity", "occupation_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br /><%= text_field "entity", "occupation", :size=>20 %></dd>
+				<dt>Employer</dt> <dd><%= select "entity", "employer_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br /><%= text_field "entity", "employer", :size=>20 %></dd>
+			</span>
+			<dt>Referred by</dt> <dd><%= select "entity", "referred_flag", [["[Ignore]",""],["Includes","Includes"], ["Matches","Matches"], ["Does not include","Not"]]%><br /><%= text_field "entity", "referred_by", :size=>20 %></dd>
+			<dt>Tags</dt> <dd><%= select "entity", "tags_flag", [["[Ignore]",""],["Include","Includes"]]%><br /><%= text_field "entity", "tags", :size=>20 %></dd>
+			<dt>Comments</dt><dd><%= select "entity", "comments_flag", [["[Ignore]",""],["Include","Includes"], ["Do not include","Not"]]%><br /><%= text_field "entity", "comments", :size=>20 %></dd>
+			<dt>Delete requested</dt> <dd><%= select "entity", "delete_requested_flag", [["[Ignore]",""],["Matches","Matches"]]%><br /><%= select "entity", "delete_requested", [["No","false"],["Yes","true"]] %></dd>
+			<dt>Creation date</dt> <dd><%= select "entity", "created_after_flag", [["[Ignore]",""],["On or after","After"]]%><br /><%= date_select "entity", "created_after", :order=>[:month, :day, :year] %></dd>
+			<dt>Modification date</dt> <dd><%= select "entity", "updated_after_flag", [["[Ignore]",""],["On or after","After"]]%><br /><%= date_select "entity", "updated_after", :order=>[:month, :day, :year] %></dd>
+			</dl>
+		</div>
+	</div>
+</div>
+
+<div class="volunteering_block" id="volunteering_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("volunteer_plus", "volunteer_minus", "volunteer_info", "entity_subhead", "Volunteering")%>
+	</div>
+	<div id="volunteer_info" style="display:none;">
+		<div id="form_volunteer_interests" class="wide_column">
+			<dl>
+				<dt>Interests</dt>
+				<dd><%= select "entity", "interests_flag", [["[Ignore]",""],["Include any of","Includes_any"]]%><br />
+					<select id="entity_volunteer_interests" name="entity[volunteer_interests][]" multiple size="<%=@campaign.volunteer_tasks.length>6 ? 6.to_s : @campaign.volunteer_tasks.length %>">
+					<% @campaign.volunteer_tasks.each do |task| -%>
+					<option value="<%=task.id%>"><%=task.name%></option>
+					<% end -%>
+					</select>
+				</dd>
+				<dt>Skills</dt>
+				<dd><%= select "entity", "skills_flag", [["[Ignore]",""],["Includes","Includes"], ["Does not include","Not"]]%><br /><%= text_field "entity", "skills", :size=>20%></dd>
+				<dt>Languages</dt>
+				<dd><%= select "entity", "language_flag", [["[Ignore]",""],["Includes","Includes"], ["Does not include","Not"]]%><br /><%= text_field "entity", "languages", :size=>20%></dd>
+		</div>
+		<div id="volunteer_history" class="wide_column">
+			<dl>
+				<dt>Volunteer History:</dt>
+				<dd><%= select "volunteer_history", "flag", [["[Ignore]",""],["Search","Search"]]%>: Hours volunteered doing<br /><select id="volunteer_history_tasks" name="volunteer_history[tasks][]" multiple size="<%=@campaign.volunteer_tasks.length>5 ? 6.to_s : (@campaign.volunteer_tasks.length+1) %>">
+				<option value="ANY_TASK">*Any task*</option>
+				<% @campaign.volunteer_tasks.each do |task| -%>
+				<option value="<%=task.id%>"><%=task.name%></option>
+				<% end -%>
+				</select><br />between <%= date_select "volunteer_history", "start_date", :start_year => 2002, :end_year=>Date.today.year.to_i, :include_blank => false, :order => [:month, :day, :year] %><br />and <%= date_select "volunteer_history", "end_date", :start_year => 2002, :end_year=>Date.today.year.to_i, :include_blank => false, :order => [:month, :day, :year] %><br />meet or exceed <%= text_field "volunteer_history", "hours", :size=>5 %> hours</dd>
+		</div>
+	</div>
+</div>
+
+<div class="campaign_block" id="campaign_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("campaign_plus", "campaign_minus", "campaign_info", "entity_subhead", "Campaign Contact") %>
+	</div>
+	<div id="campaign_info" style="display:none;">
+		<div id="form_campaign_contact" class="wide_column">
+			<dl>
+				<dt>Requires followup</dt>
+				<dd><%= select "entity", "followup_required_flag", [["[Ignore]",""], ["Matches","Matches"], ["Does not match","Not"]]%> <%= select "entity", "followup_required", [["No","false"],["Yes","true"]], { :include_blank=>false}%></dd>
+				<dt>Received email/letter</dt>
+				<dd><%= select "entity", "received_text", @campaign.get_recent_texts.collect {|t| [t.label, t.id]}, { :include_blank=>true}%></dd>
+				<!-- <dt>Contacted by METHOD between DATE and DATE</dt>
+				<dd></dd>
+				<dt>Contribution pledged to WHO between DATE and DATE</dt>
+				<dd></dd>
+				<dt>Volunteering pledged for date between DATE and DATE</dt>
+				<dd></dd> -->
+		</div>
+	</div>
+</div>
+<% if current_user.can_see_financial?(@campaign) %>
+<div class="financial_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("financial_plus", "financial_minus", "financial_info", "entity_subhead", "Financial Information")%>
+	</div>
+	<div class="wide_column" id="financial_info" style="display:none;">
+		<div>
+		<dl>
+			<% if false #current_user.treasurer_info %>
+			<dt>Contributions tracked in <i>Treasurer</i>:</dt> <dd>
+				<%= select "remote_contribution", "flag", [["[Ignore]",""],["Total meets or exceeds","Total"],["One meets or exceeds","One"]]%>
+				<%= text_field "remote_contribution", "value", :size=>5 %><br />
+				between <%= date_select "remote_contribution", "start_date", :start_year => 1998, :end_year=>Date.today.year.to_i, :include_blank => false, :order => [:month, :day, :year] %><br />and <%= date_select "remote_contribution", "end_date", :start_year => 1998, :end_year=>Date.today.year.to_i, :include_blank => false, :order => [:month, :day, :year] %>.</dd><% end -%>
+			<dt>Contributions:</dt> <dd>
+				<%= select "local_contribution", "flag", [["[Ignore]",""],["Total meets or exceeds","Total"],["One meets or exceeds","One"],["Totals less than","Less"]]%>
+				<%= text_field "local_contribution", "amount", :size=>5 %> to <%= text_field "local_contribution", "recipient", :size=>10, :value=>"anyone" %><br />
+				between <%= date_select "local_contribution", "start_date", :start_year => 1998, :end_year=>Date.today.year.to_i, :include_blank => false, :order => [:month, :day, :year] %><br />and <%= date_select "local_contribution", "end_date", :start_year => 1998, :end_year=>Date.today.year.to_i, :include_blank => false, :order => [:month, :day, :year] %>.</dd>
+		</dl>
+		</div>		
+	</div>
+</div>
+<% end -%>
+
+<div class="groups_block">
+	<div class="entity_subhead_banner">
+		<%= plus_minus("groups_plus", "groups_minus", "groups_info", "entity_subhead", "Group Memberships")%>
+	</div>
+	<div class="wide_column" id="groups_info" style="display:none;">
+		<div>
+		<dl>
+			<dt>Groups:</dt> <dd>
+				<%= select "group_membership", "flag", [["[Ignore]",""],["Member of","Member"]]%>
+				<select id="group_membership_id" name="group_membership[id]">
+				<% @campaign.groups.each do |group| -%>
+				<option value="<%=group.id%>"><%=group.name%></option>
+				<% end -%>
+				</select></dd>
+		</dl>
+		</div>		
+	</div>
+</div>
+
+</form>

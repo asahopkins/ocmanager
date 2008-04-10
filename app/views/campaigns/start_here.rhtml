@@ -1,0 +1,61 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1><%= @campaign.name %></h1>
+<h2>Search</h2>
+<div id="entity_quick_search">
+	<%= form_tag :controller=>"entities", :action=>"search", :params=>{:campaign_id=>@campaign.id} %>
+	<%= select "search", "field", ["Name", "Address", "Email", "Phone"] %>&nbsp;<%= text_field "search", "content" %>&nbsp;<%= submit_tag "Quick Search" %><br /><b>*</b> is a "wild card" in Name and Address 
+	</form>
+</div>
+<ul>
+	<li>Assemble more complicated searches on the <%= link_to "Advanced Search", :controller=>"entities", :action=>"advanced_search" %> page.</li>
+	<li>To combine or intersect arbitrary searches, store the results in <%= link_to "MyPeople", :controller => "cart_items", :action=>"list" %>, and then use the buttons at the top of your search results.</li>
+</ul>	
+
+<h2>Manage Volunteers</h2>
+<ul>
+	<li>View the <%= link_to "Volunteer Calendar", :controller => "volunteer_events", :action => "calendar" %></li>
+	<% if current_user.manager?(@campaign) %>
+	<li>View the list of <%= link_to "current volunteers", :controller => "volunteer_events", :action => "list_current" %></li>
+	<li>Turn this computer into a <%= form_tag :controller=>"user", :action=>"set_volunteer_terminal"%>
+		<%= submit_tag "Volunteer Sign-In Terminal"%>
+	</form></li><% end -%>
+</ul>
+
+<h2>Campaign Events</h2>
+<ul>
+	<li>View all <%= link_to "upcoming events", :controller => "campaign_events", :action => "list" %> and their attendees.</li>
+</ul>
+
+<% if current_user.can_edit_entities?(@campaign) %>
+<h2>Add and Edit New Supporters</h2>
+<ul>
+	<li><%= link_to "Create a new individual, organization, or political committee", :controller=>"entities", :action=>"new"%></li>
+	<li>View <%= link_to "Groups",:controller=>"groups",:action=>"list" %></li>
+</ul>
+<% end -%>
+
+<h2>Contact Supporters</h2>
+<ul>
+	<li><%= link_to "Compose a new email", :controller=>"contact_texts", :action=>"compose", :params=>{:type=>"Email"}%></li>
+	<li><%= link_to "Compose a new letter", :controller=>"contact_texts", :action=>"compose", :params=>{:type=>"Letter"}%></li>
+	<li>Get a quick <%= link_to 'mail merge', :controller=>"contact_texts", :action => 'download_mail_file', :params=>{:id => "mypeople"} %> or <%= link_to 'mailing labels', :controller=>"contact_texts", :action => 'prepare_labels', :params=>{:id => "mypeople"} %> file for MyPeople</li>
+	<li><%= link_to "See all the contact options", :controller=>"contact_texts", :action=>"list" %></li>
+</ul>

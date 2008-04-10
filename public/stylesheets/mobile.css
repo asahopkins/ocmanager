@@ -1,0 +1,25 @@
+html, body, ol, ul, li, dl, dt, dd, img {
+  margin: 0; 
+  padding: 0;
+  border: 0;
+/*	list-style: none;*/
+}
+
+body { background-color: #fff; color: #000; }
+
+body, p, ol, ul, td {
+  font-family: helvetica, verdana, arial, sans-serif;
+  font-size:   10pt;
+  line-height: 12pt;
+}
+
+a { 
+	color: #029;
+	text-decoration: underline;
+}
+
+a:hover {
+	color: #04F;
+	text-decoration: underline;
+}
+

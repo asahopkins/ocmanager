@@ -1,0 +1,20 @@
+--- 
+javascripts: 
+- base: 
+  - prototype
+  - effects
+  - dragdrop
+  - controls
+  - builder
+- slider:
+  - slider
+stylesheets: 
+- base: 
+  - manager-piefecta
+  - manager-textstyling
+  - phone_list
+  - calendar
+- email:
+  - mailer
+- mobile:
+  - mobile

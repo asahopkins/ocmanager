@@ -1,0 +1,28 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% for entity in @entities 
+	unless entity.household == @household %>
+
+	<div class="entity_list_line">
+	<span class="left_50"><%= link_to h(entity.name), :controller=>"entities", :action=>"show", :params=>{:id=>entity.id} %></span>
+	<span class="left_50"><%= link_to_remote "Add to Household", :update=>'household_box', :url=>{:controller=>"entities",:action=>"add_to_household", :params=>{:id=>entity.id, :household_id=>@household.id, :page_entity_id=>@entity.id}}, :method=>"post", :loading=>"Element.show('household_box_indic')"%></span>
+	</div>
+<% end 
+end %>

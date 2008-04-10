@@ -1,0 +1,103 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h3>Contact History</h3>
+<div id="add_contact_event" class="add_box">
+	<a href="#" onClick="Element.show('new_contact_event'); Element.hide('add_contact_event'); return false;">Add contact report</a>
+</div>
+<div id="new_contact_event" style="display:none;" class="add_box">
+	<%= form_remote_tag :url=>{:controller=>"contact_events", :action=>"create", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('new_contact_event_indic')" %>
+	<dl>
+		<dt>Date</dt><dd><%= date_select :contact_event, :when_contact, :order=>[:month, :day, :year] %></dd>
+		<dt>Contact with</dt><dd><%= text_field :contact_event, :initiated_by, :value=>session[:user].name %></dd>
+		<dt>Form</dt><dd><%= select :contact_event, :form, ["Phone", "Email", "Mail", "In person"]%></dd>
+		<dt>Interaction?</dt><dd><%= select :contact_event, :interaction, [["No","false"],["Yes","true"]] %></dd>
+		<dt>Letter/Script</dt><dd><%= select :contact_event, :contact_text_id, @recent_texts.collect{|t| [cut_to_length(t.label,25)+" (#{t.class.to_s})", t.id]}, {:include_blank=>true} %></dd>
+		<dt>or Event</dt><dd><%= select :contact_event, :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name, 25)+t.date.strftime(' (%m/%d/%Y)'), t.id]}, {:include_blank=>true} %></dd>
+		<dt>$$$</dt><dd><div class="dl_block"><%= select :contact_event, :will_contribute, [["Will not contribute","false"],["Will contribute","true"]] %> How much? <%= text_field :contact_event, :pledge_value, :size=>5 %></div></dd>
+		<dt>Volunteer</dt><dd><div class="dl_block"><%= select :contact_event, :will_volunteer, [["No","false"],["Yes","true"]] %><br /><table><tr><td class="smaller_text">How?</td><td><%= text_field :contact_event, :how_volunteer, :size=>15 %></td></tr><tr><td class="smaller_text">When?</td><td class="smaller_text"><%= date_select :contact_event, :when_volunteer, :order=>[:month, :day, :year] %><br /> or <%= text_field :contact_event, :when_volunteer_text, :size=>10 %></td></tr></table></div></dd>
+		<dt>Followup</dt><dd><%= select :contact_event, :requires_followup, [["Not required","false"],["Required","true"]] %> by <%= date_select :contact_event, :future_contact_date, {:order=>[:month, :day, :year], :include_blank=>true} %></dd>
+		<dt>Memo</dt><dd><%= text_field :contact_event, :memo %></dd>
+		<dt><span id="new_contact_event_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>&nbsp;</dt><dd><%= submit_tag "Add report" %> or <a href="#" onClick="Element.show('add_contact_event'); Element.hide('new_contact_event'); return false;">(Cancel)</a></dd>
+	</dl>	
+	</form>
+</div>
+<% if @entity.followup_required? %><div><b>Followup required.</b></div><% end %>
+<div id="contact_history">
+	<div class="contact_history_header">
+	<div class="left_10">Date</div>
+	<div class="left_10">Form</div>
+	<div class="left_15">Contact with</div>
+	<div class="left_10">Interaction</div>
+	<div class="left_25">Letter/Script/Event</div>
+	<div class="left_5">$$$?</div>
+	<div class="left_5">Vol.?</div>
+	<div class="left_8">Follow up</div>
+</div>
+<% @contact_events.each do |@contact_event| %>
+<div class="contact_event_summary" id="contact_event_<%= @contact_event.id %>">
+	<span class="left_10"><%= @contact_event.when_contact.strftime("%m/%d/%Y") %>&nbsp;</span>
+	<span class="left_10"><%= @contact_event.form %>&nbsp;</span>
+	<span class="left_15"><%=h @contact_event.initiated_by %>&nbsp;</span>
+	<span class="left_10"><%= display_yes_no(@contact_event.interaction) %>&nbsp;</span>
+	<span class="left_25"><% if @contact_event.contact_text_id.to_s != "" -%><%= link_to @contact_event.contact_text.label, :controller=>'contact_texts', :action=>'show', :params=>{:id=>@contact_event.contact_text_id,:campaign_id=>@contact_event.campaign_id} %><% elsif @contact_event.campaign_event_id.to_s != "" and !@contact_event.campaign_event.hidden? -%><%= link_to @contact_event.campaign_event.name, :controller=>'campaign_events', :action=>"show",:params=>{:id=>@contact_event.campaign_event_id} %><% else -%>&nbsp;<% end -%></span>
+	<span class="left_5"><%= display_yes_no(@contact_event.will_contribute) %>&nbsp;</span>
+	<span class="left_5"><%= display_yes_no(@contact_event.will_volunteer) %>&nbsp;</span>
+	<span class="left_8"><%= display_yes_no(@contact_event.requires_followup) %><% if @contact_event.future_contact_date %>, <%= @contact_event.future_contact_date.strftime("%m/%d/%Y") %><% end -%>&nbsp;</span>
+	<span class="right_10"><%= link_to_function "Edit", "Element.show('edit_contact_event_#{@contact_event.id}')" %> <%= link_to_remote image_tag('trash.gif'), :url=>{:controller=>"contact_events", :action=>"destroy", :params=>{:entity_id=>@entity.id, :campaign_id=>@campaign.id, :id=>@contact_event.id}},:confirm=>"Are you sure?", :method=>"post", :loading=>"Element.show('event_indic_#{@contact_event.id}')" %><span id="event_indic_<%= @contact_event.id %>" style="display:none"><%= image_tag('indicator.gif') %></span></span>
+	<% if (@contact_event.will_contribute or @contact_event.will_volunteer or @contact_event.yard_sign or @contact_event.memo.to_s != "")-%>
+	<div class="more_contact_event_info" id="contact_details_<%= @contact_event.id %>">
+		<% if @contact_event.will_contribute -%>
+		<i>Contribution pledged:</i> <%=h @contact_event.pledge_value %><br />
+		<% end -%>
+		<% if @contact_event.will_volunteer -%>
+		<i>Volunteer:</i> <%= @contact_event.when_volunteer.strftime("%m/%d/%Y") %> (<%=h @contact_event.when_volunteer_text %>), <%=h @contact_event.how_volunteer %><br />
+		<% end -%>
+		<% if @contact_event.yard_sign -%>
+		<i>Wants yard sign</i><br />
+		<% end -%>
+		<% if @contact_event.memo.to_s != "" -%>
+		<i>Memo:</i> <%=h @contact_event.memo %>
+		<% end -%>
+	</div><% end -%>
+</div>
+<div class="edit_contact_event" id="edit_contact_event_<%= @contact_event.id %>" style="display:none">
+	<%= form_remote_tag :url=>{:controller=>"contact_events", :action=>"update", :params=>{:entity_id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('edit_contact_event_indic_#{@contact_event.id}')" %>
+	<%= hidden_field :contact_event, :id, :value=>@contact_event.id %>
+	<dl>
+		<dt>Date</dt><dd><%= date_select :contact_event, :when_contact, :order=>[:month, :day, :year] %></dd>
+		<dt>Contact with</dt><dd><%= text_field :contact_event, :initiated_by %></dd>
+		<dt>Form</dt><dd><%= select :contact_event, :form, ["Phone", "Email", "Mail", "In person"]%></dd>
+		<dt>Interaction?</dt><dd><%= select :contact_event, :interaction, {"No"=>"false","Yes"=>"true"}, :selected=>@contact_event.interaction?.to_s %></dd>
+		<dt>Letter/Script</dt><dd><%= select :contact_event, :contact_text_id, @recent_texts.collect{|t| [cut_to_length(t.label, 25)+" (#{t.class.to_s})", t.id]}, {:include_blank=>true} %></dd>
+		<dt>or Event</dt><dd><%= select :contact_event, :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name, 25)+t.date.strftime(' (%m/%d/%Y)'), t.id]}, {:include_blank=>true} %></dd>
+		<dt>$$$</dt><dd><div class="dl_block"><%= select :contact_event, :will_contribute, [["Will not contribute","false"],["Will contribute","true"]], {:selected=>@contact_event.will_contribute?.to_s} %> How much? <%= text_field :contact_event, :pledge_value, :size=>5 %></div></dd>
+		<dt>Volunteer</dt><dd><div class="dl_block"><%= select :contact_event, :will_volunteer, [["No","false"],["Yes","true"]], {:selected=>@contact_event.will_volunteer?.to_s} %><br /><table><tr><td class="smaller_text">How?</td><td><%= text_field :contact_event, :how_volunteer, :size=>15 %></td></tr><tr><td class="smaller_text">When?</td><td class="smaller_text"><%= date_select :contact_event, :when_volunteer, :order=>[:month, :day, :year] %><br /> or <%= text_field :contact_event, :when_volunteer_text, :size=>10 %></td></tr></table></div></dd>
+		<dt>Followup</dt><dd><%= select :contact_event, :requires_followup, [["Not required","false"],["Required","true"]], {:selected=>@contact_event.requires_followup?.to_s} %> by <%= date_select :contact_event, :future_contact_date, {:order=>[:month, :day, :year], :include_blank=>true} %></dd>
+		<dt>Memo</dt><dd><%= text_field :contact_event, :memo %></dd>
+		<dt><span id="edit_contact_event_indic_<%= @contact_event.id %>" style="display:none;"><%= image_tag 'indicator.gif' %></span>&nbsp;</dt><dd><%= submit_tag "Update report" %> or <a href="#" onClick="Element.show('add_contact_event'); Element.hide('edit_contact_event_<%= @contact_event.id %>'); return false;">Cancel</a></dd>
+	</dl>
+	</form>
+</div>
+<% end %>
+	<div class="contact_event_summary">
+		<%= link_to_remote "<< Later contacts", :update=>'contact_events_info', :loading=>"Element.show('contact_event_pages_indic')", :url=>{:controller=>'contact_events', :action=>'list', :params=>{ :id=>@entity.id, :page => @contact_event_pages.current.previous }} if @contact_event_pages.current.previous %>
+		<%= link_to_remote "Earlier contacts >>", :update=>'contact_events_info', :loading=>"Element.show('contact_event_pages_indic')", :url=>{:controller=>'contact_events', :action=>'list', :params=>{ :id=>@entity.id, :page => @contact_event_pages.current.next }} if @contact_event_pages.current.next %> <span id="contact_event_pages_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
+	</div>
+</div>

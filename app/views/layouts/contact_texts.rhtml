@@ -1,0 +1,168 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="icon" href="http://secure.opencampaigns.net/manager/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="http://secure.opencampaigns.net/manager/favicon.ico" type="image/x-icon">
+	<% if @page_title %>
+ 	<title>Manager :: <%= @page_title %></title>
+	<% else %>
+ 	<title>Manager :: <%= controller.controller_name.camelize %> :: <%= controller.action_name.camelize %></title>
+	<% end %>
+	<% stylesheet_link_tag 'scaffold' %>
+	<% stylesheet_link_tag 'manager-piefecta' %>
+	<% stylesheet_link_tag 'manager-textstyling' %>
+	<% stylesheet_link_tag 'registers' %>
+	<% stylesheet_link_tag 'mailer' %>
+	<%= stylesheet_link_merged :base %>
+	<%= stylesheet_link_merged :email %>
+	<%= javascript_include_merged :base %>
+	<%= javascript_include_merged :slider %>
+	
+   	<!--[if IE]>
+  	<style type="text/css">
+  	.sizer {
+  		width:expression(document.body.clientWidth > 900 ? "120px" : "60%" );
+  	/* CSS comments are safe here, but no html comments inside the Conditional Comment! */
+  	}
+  	</style>
+  	<![endif]-->
+
+
+
+</head>
+<body onLoad="Element.hide('styles'); Element.hide('subheads_body'); Element.hide('textstyle_body'); Element.hide('incidentals_body');">
+
+<div id="sizer">
+<div id="expander">
+
+
+<div class="header"><span class="headline">Manager<br/><span class="byline">by Open Campaigns</span></span>
+	<span id="search">
+		<%= form_tag :controller=>"entities", :action=>"search" %>
+		Search:<br />
+		<select id="search_type" name="search[type]">
+			<option value="All" selected>People &amp; Organizations</option>
+			<option value="Person">People</option>
+			<option value="Organizations">Organizations</option>
+	  	</select>
+		<%= text_field "search", "content",:size=>20 %>
+		<%= hidden_field "search", "field", :value=>"Name"%>
+		</form>
+		<div id="search_results">&nbsp;</div>
+	</span>
+	
+</div><!-- The header is before the 1st wrapper so that it is separate from the columns -->
+
+<div id="wrapper1">
+
+<div id="wrapper2">
+<!-- This wrapper is only used for BG tiling on the right column -->
+
+<div class="outer">
+
+<div class="float-wrap">
+
+<div class="center">
+
+<div class="centerbox"> <!-- optional extra styling div -->
+<div class="textpadder">
+
+	<p class="notice" id='flash_notice'><%=h flash[:notice] %></p>
+	<p class="warning" id='flash_warning'><%=h flash[:warning] %></p>
+
+	<%= @content_for_layout %>
+
+</div> <!-- end .textpadder -->
+
+</div> <!-- end .centerbox -->
+
+</div> <!-- end .center -->
+
+ <div class="left">
+
+<div class="container-left"> 
+
+<!--XXXXXXXX Begin left column includes XXXXXXXX-->
+
+<div class="textpadder">
+
+<div class="global_nav">
+
+<p><b><i><%=current_user.name%></i></b><br>
+<%= link_to "Edit Account", :controller=>"user", :action=>"edit"%><br>
+<%= link_to "Logout", :controller=>"user", :action=>"logout"%></p>
+<b>MyPeople</b><br />
+<ul id="cart_list">
+<li>MyPeople: <span id='cart_items_number'><%=h current_user.cart_items.count %></span>&nbsp;<span id="cart_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></li>
+<li><%= link_to "Show MyPeople",:controller=>"cart_items", :action=>"list" %></a></li>
+<li><form><%= submit_to_remote "Empty", "Empty MyPeople", :url=>{:controller=>"cart_items",:action=>"destroy_all"},:confirm=>'Are you sure?',:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');" %></form></li>
+</ul>
+<p><%= link_to "Admin", :controller=>"admin"%></p>
+<p>Help</p>
+</div>
+<div id="navigation">
+	<%= render :partial=>"campaigns/navigation" %>
+</div>
+</div> <!-- end .textpadder -->
+
+
+<!--XXXXXXXX End left column includes XXXXXXXX-->
+
+</div> <!-- end .container-left -->
+</div> <!-- end .left -->
+
+
+<br class="brclear" />
+
+
+</div> <!-- end .float-wrap -->
+
+<div class="right">
+<div class="container-right">
+
+<!--XXXXXXXX Begin right column includes XXXXXXXX-->
+
+<div class="textpadder">
+
+</div> <!-- end .textpadder -->
+
+<!--XXXXXXXX End right column includes XXXXXXXX-->
+
+</div> <!-- end .container-right -->
+</div><!-- end .right -->
+
+<br class="brclear" />
+
+</div><!-- end .outer -->
+
+</div><!-- end #wrapper2 -->
+
+</div><!-- end #wrapper1 -->
+
+<div class="footer"><p>Copyright 2005-2008 Open Campaigns.  http://www.opencampaigns.net, open.campaigns@gmail.com.</p>
+	<p>Open Campaigns Manager is released under the <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU Affero General Public License, version 3</a>.  Current running code can be downloaded <a href="http://www.opencampaigns.net/manager.tar.bz2">here</a>.</p></div>
+
+</div><!-- end #expander -->
+</div><!-- end #sizer -->
+</body>
+</html>

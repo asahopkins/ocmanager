@@ -1,0 +1,124 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%>filename: <%= @filename %><br>
+<% unless @errors.nil? -%>
+There were errors with lines <%= @errors.to_s %>.
+<% end -%>
+<%= form_tag :controller=>"entities", :action=>"process_csv_data" %>
+<%= check_box_tag "ignore_first_line" %> Ignore first line on processing<br>
+All lines are: 
+<select name="type">
+<option value="Person">People</option>
+<option value="Organization">Organizations</option>
+<option value="OutsideCommittee">Political Committees</option>
+</select>
+<br>
+<table>
+	<tr>
+	<th>Select data field</th>
+	<th>1st line of CSV file</th>
+	<th>2nd line of CSV file</th>	
+	</tr>
+	<% counter = 0
+	@rows.first.each { |entry| %>
+		<tr>
+		<td><select name="field_match[<%=counter%>]">
+			<option value="ignore" selected>Don't import</option>
+			<option value="name">Name</option>
+			<option value="title">Title</option>
+			<option value="first_name">First name</option>
+			<option value="legal_first_name">Legal First Name</option>
+			<option value="middle_name">Middle name</option>
+			<option value="last_name">Last name</option>
+			<option value="name_suffix">Suffix</option>
+			<option value="home_addr_1">Home address: Line 1</option>
+			<option value="home_addr_2">Home address: Line 2</option>
+<!-->			<option value="home_addr_st_num">Home address: Street number</option>
+			<option value="home_addr_st_num_frac">Home address: Street number fraction</option>
+			<option value="home_addr_st_name">Home address: Street name</option>
+			<option value="home_addr_apt_num">Home address: Apt. number</option> -->
+			<option value="home_addr_city">Home address: City</option>
+			<option value="home_addr_state">Home address: State</option>
+			<option value="home_addr_zip">Home address: ZIP (5)</option>
+			<option value="home_addr_zip_4">Home address: ZIP (4)</option>
+			<option value="home_addr_zip_9">Home address: ZIP+4 (9)</option>
+			<option value="work_addr_1">Work address: Line 1</option>
+			<option value="work_addr_2">Work address: Line 2</option>
+			<option value="work_addr_city">Work address: City</option>
+			<option value="work_addr_state">Work address: State</option>
+			<option value="work_addr_zip">Work address: ZIP (5)</option>
+			<option value="work_addr_zip_4">Work address: ZIP (4)</option>
+			<option value="work_addr_zip_9">Work address: ZIP+4 (9)</option>
+			<option value="home_phone">Home Phone</option>
+			<option value="work_phone">Work Phone</option>
+			<option value="cell_phone">Cell Phone</option>
+			<option value="fax">Fax Number</option>
+			<option value="email">Email</option>
+			<option value="work_email">Work/Secondary Email</option>
+			<option value="registered_party">Party Affiliation</option>
+			<option value="precinct">Precinct</option>
+			<option value="voter_id">Voter ID</option>
+			<option value="receive_phone">Okay to Call</option>
+			<option value="receive_email">Okay to Email</option>
+			<option value="federal_id">FEC Committee ID</option>
+			<option value="state_id">State Committee ID</option>
+			<option value="employer">Employer</option>
+			<option value="occupation">Occupation</option>
+			<option value="languages">Other Languages Spoken</option>
+			<option value="skills">Skills</option>
+			<option value="time_to_reach">Best Time to Reach</option>
+			<option value="referred_by">Referred By</option>
+			<option value="comments">Comments</option>
+			<!-- From here down should be generated dynamically -->
+			<!-- volunteer_tasks -->
+				<% @tasks.each { |task| %>
+					<option value="task_<%=task.id%>">Task: <%= task.name %></option>
+				<% } %>
+			
+			<% @custom_fields.each { |field| 
+				unless field.hidden? %>
+				<option value="custom_<%=field.id%>"><%= field.name %></option>
+			<% end } %>
+			<!-- tags -->
+			<% @tags.each { | tag| %>
+				<option value="tag_<%=tag.id%>">Tag as: <%= tag.name %></option>
+			<% } %>
+
+			<!-- contributions -->
+			<% current_year = Time.now.year.to_i 
+			start_year = current_year-4
+			end_year = current_year+1
+			years = start_year..end_year
+			%>
+			<% years.each {|year| %>
+				<option value="contrib_<%=year.to_s%>">Contribution: <%=year.to_s%></option>
+			<%	} %>
+			<option value="delete_requested">Delete requested</option>
+			
+		</select></td>
+		<td><%= entry %></td>
+		<td><%= @rows[1][counter].to_s%></td>
+	<% counter += 1
+	} %>
+</table>
+<%= hidden_field_tag "campaign_id", @campaign.id%>
+<%= hidden_field_tag "filename", @filename%>
+<%= submit_tag "Import data"%>
+</form>

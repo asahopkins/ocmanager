@@ -1,0 +1,47 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h2>MyPeople [if you're seeing this page, tell Asa!]</h2>
+<!-- Send email to MyPeople -->
+<!-- Print labels for MyPeople 
+<p><%= form_tag :controller=>"cart_items", :action=>"cart_labels" %><%= submit_tag "Print address labels for MyPeople" %></form></p> -->
+<!-- Tag MyPeople -->
+<p><%= form_remote_tag :url=>{:controller=>"entities", :action=>"add_tag_to_cart"} %><%= submit_tag "Add tag to MyPeople:" %> <%= text_field "entity", "tag",:size=>10 %> (put multiple word tags "in quotes")</form></p>
+<!-- Add MyPeople to a Group (new or existing) -->
+<% if session[:user].edit_groups?(@campaigns) %>
+<p><%= form_remote_tag :url=>{:controller=>"groups", :action=>"add_cart_to_group"} %><%= submit_tag "Add MyPeople to Group:" %> <%= select "group", "id", @groups.collect { |g| [g.name, g.id] } %> in role: <%= text_field "group", "role",:size=>10,:value=>"Member" %> </form></p>
+<% end %></p>
+&nbsp;<br />
+<div id="entity_list_headers">
+<span class="left_20">Name</span><span class="left_30">Address</span><span class="left_12">Phone</span><span class="left_23">Email</span><span class="left_10">&nbsp;</span>
+</div>
+
+<div id="entities_list">
+	<% for entity in @entities %>
+	<div class="entity_list_line" id="cart_line_<%= entity.id %>">
+	<span class="left_20"><%= link_to h(entity.name), :controller=>"entities", :action=>"show", :params=>{:id=>entity.id} %></span>
+	<span class="left_30"><% unless entity.primary_address.nil? -%><%=h entity.primary_address.line_1%>, <%=h entity.primary_address.city%><%end -%>&nbsp;</span>
+	<span class="left_12"><%=number_to_phone(entity.primary_phone_number)%>&nbsp;</span>
+	<span class="left_23"><%= link_to_email(entity.primary_email_address)%>&nbsp;</span>
+	<span class="right_15"><%= link_to_remote "(Remove)", :url=>{:controller=>"entities",:action=>"update_cart", :params=>{:cart=>"Remove",:id=>entity.id,:reload_cart=>true}}, :method=>"post", :loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');"%></span></div>
+	<% end %>
+</div>
+<br class="brclear"/>
+<%= link_to 'Previous page', { :page => @entity_pages.current.previous } if @entity_pages.current.previous %>
+<%= link_to 'Next page', { :page => @entity_pages.current.next } if @entity_pages.current.next %> 

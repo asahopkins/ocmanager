@@ -1,0 +1,26 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% unless session[:volunteer_sign_in] -%>
+<h2 class="red_text">Session insecure.  Return to the <%= link_to '"start here"', :controller=>"campaigns", :action => "start_here" %> page and click on the "Volunteer Sign In Terminal" button.</h2>
+<% else -%>
+<table border="0" width="100%">
+	<tr><td width="50%"><%= link_to image_tag("sign_in.png"), :action => "sign_in_form" %></td><td><%= link_to image_tag("sign_out.png"), :action => "sign_out_form" %></td></tr>
+</table>
+<% end -%>

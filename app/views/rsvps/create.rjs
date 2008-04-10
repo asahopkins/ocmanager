@@ -1,0 +1,5 @@
+if @success
+  page.replace_html "events_info", :partial=>'entities/event_rsvps', :protocol=>@protocol    
+end
+page.replace_html "rsvps_notice", @notice
+page.visual_effect :highlight, 'rsvps_notice'

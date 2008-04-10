@@ -1,0 +1,54 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><p><% if @month == 1 -%><%= link_to "<< Previous month", :controller=>'volunteer_events', :action=>'calendar', :params=>{:year=>@year-1, :month=>12,:campaign_id=>@campaign.id} %><% else -%><%= link_to "<< Previous month", :controller=>'volunteer_events', :action=>'calendar', :params=>{:year=>@year, :month=>@month-1,:campaign_id=>@campaign.id} %><% end %> |
+<% if @month == 12 -%><%= link_to "Next month >>", :controller=>'volunteer_events', :action=>'calendar', :params=>{:year=>@year+1, :month=>1,:campaign_id=>@campaign.id} %><% else -%><%= link_to "Next month >>", :controller=>'volunteer_events', :action=>'calendar', :params=>{:year=>@year, :month=>@month+1,:campaign_id=>@campaign.id} %><% end -%> (<%= link_to "Go to today", :controller=>'volunteer_events', :action=>'calendar', :params=>{:year=>Date.today.year, :month=>Date.today.month,:campaign_id=>@campaign.id} %>)</p>
+
+<%= calendar({:year => @year, :month => @month}) do |d|
+	if d < Date.today
+		people = @campaign.past_volunteers(d)
+	else
+		people = @campaign.promised_volunteers(d)	
+	end
+	
+	events = CampaignEvent.find(:all,:conditions=>["start_time >= :begin_day AND start_time < :end_day AND campaign_id=:campaign",{:begin_day=>d, :end_day=>(d+1),:campaign=>@campaign.id}])
+	
+	cell_text = d.mday.to_s+"<br />"
+	if events.length > 0
+		cell_text += "Events:<br />"
+	end
+	events.each do |event|
+		cell_text += link_to(event.name,:controller=>'campaign_events',:action=>'show',:id=>event.id)+"<br />"
+	end
+	if people.length > 0
+		cell_text += "Volunteers:<br />"
+	end
+	people.each do |person|
+		cell_text += link_to(person.name,:controller=>'entities',:action=>'show',:params=>{:id=>person.id})+"<br />"
+	end
+	if d == Date.today
+		cell_attrs = {:class=>'specialDay'}
+	else
+		cell_attrs = nil
+	end
+	[cell_text, cell_attrs]
+end
+%>
+
+<p>For dates prior to today, the calendar shows people who volunteered.  For dates starting today, it shows people who have committed to volunteer.</p>

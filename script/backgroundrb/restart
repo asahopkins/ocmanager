@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cd /var/www/virtual/asahopkins.com/secure/htdocs/manager/current
+
+if [ -a "log/backgroundrb.pid" ]; then
+  pid=`cat log/backgroundrb.pid`
+  if [[ -n "$pid" ]]; then
+    echo "Killing current BackgrounDRb server (pid: $pid)"
+    kill -9 $pid
+  fi
+fi
+
+echo "Starting the BackgrounDRb server"
+log="/tmp/backgroundrb.`date +%s`"
+echo "Writing to $log"
+nohup rake backgroundrb:start RAILS_ENV=production > $log 2>&1
+cat $log
+rm -f $log

@@ -1,0 +1,67 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+@campaign = @entity.campaign
+-%>
+<div class="data_header" onMouseOver="Element.show('edit_custom_info');" onMouseOut="Element.hide('edit_custom_info');">Custom Fields<% if can_edit %> <span id="edit_custom_info" style="display:none;">(<a href="#" onClick="Element.hide('custom_info'); Element.show('form_custom_info'); return false;">edit</a>)</span><% end %></div>
+<div id="custom_info">
+<dl>
+	<% @campaign.custom_fields.each { |field|
+		unless field.hidden?  -%>
+	<dt><%= field.name %></dt>
+		<% if field.field_type.nil? or field.field_type=="Num" or field.field_type=="Text" -%>
+		<dd><%=h @entity.custom_field_value(field.id).to_s %>&nbsp;</dd>
+		<% elsif field.field_type=="Bool" -%>
+		<dd><%= display_yes_no(@entity.custom_field_value(field.id)) %>&nbsp;</dd>
+		<% elsif field.field_type=="Select" -%>
+		<dd><%=h @entity.custom_field_value(field.id).to_s %>&nbsp;</dd>
+		<% end end  } -%>
+</dl>
+</div>
+<% if can_edit -%>
+<div id="form_custom_info" style="display:none;">
+	<%= form_remote_tag :update=>"custom_fields_box", :url=>{:action=>"update_custom", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id,:partial=>"custom_fields_box"}}, :loading=>"Element.show('custom_info_box_indic')", :complete=>"Element.hide('custom_info_box_indic')"%>
+	<dl>
+		<% @campaign.custom_fields.each { |field|
+			unless field.hidden? 
+				value = @entity.custom_field_value(field.id) 
+			-%>
+		<dt><%= field.name %></dt>
+		<% if field.field_type.nil? or field.field_type=="Num" or field.field_type=="Text" -%>
+		<dd><%= text_field "entity", "value", :size=>20, :value=>value.to_s, :index=>field.id %></dd>
+		<% elsif field.field_type=="Bool" -%>
+		<dd><select id="entity_<%=field.id%>_value" name="entity[<%=field.id%>][value]">
+			<option value="" <% if value.to_s == ""%>selected<%end%>>&nbsp;</option>
+			<option value="false" <% if value.to_s == "false"%>selected<%end%>>No</option>
+			<option value="true" <% if value.to_s == "true"%>selected<%end%>>Yes</option>			
+			</select></dd>
+		<% elsif field.field_type=="Select" -%>
+		<dd><select id="entity_<%=field.id%>_value" name="entity[<%=field.id%>][value]">
+			<option value="" <% if value.to_s == ""%>selected<%end%>></option>
+			<%= options_for_select field.select_options, value %>
+			</select></dd>
+		<% end end -%>
+		<% } -%>
+	<dt>&nbsp;<span id="custom_info_box_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span></dt> <dd><input type="submit" value="Save changes"> or <a href="#" onClick=" Element.hide('form_custom_info'); Element.show('custom_info'); return false;">Cancel</a></dd>
+	</dl>
+</form>
+</div><% end %>

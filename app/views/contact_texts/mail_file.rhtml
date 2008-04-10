@@ -1,0 +1,49 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><p>A mail merge file will automatically include the following fields:
+<ol>
+	<li>Title</li>
+	<li>First name</li>
+	<li>Middle name</li>
+	<li>Last name</li>
+	<li>Suffix</li>
+	<li>Full name</li>
+	<li>Address line 1</li>
+	<li>Address line 2</li>
+	<li>City</li>
+	<li>State</li>
+	<li>ZIP</li>
+	<li>ZIP+4</li>
+</ol></p>
+<%= form_tag :action=>"download_mail_file", :params=>{:id=>@text.id, :campaign_id=>@campaign.id} %>
+<p><b>File name:</b> <%= text_field "mail_merge", "filename", :value=>"Please enter a file name",:maxlength=>28 %> (Limit 28 characters. Please don't use weird characters in naming your file.)</p>
+<p>To add additional fields, use these options:</p>
+<ul>
+	<li><%= check_box :mail_merge, :total_financial_box, :value=>"0" %> Total financial contributions to committee: <%= select :mail_merge, :total_financial_committee, @campaign.committees.collect {|c| [c.name, c.id] } %> in the last 
+		<%= select :mail_merge, :total_financial_timeframe, ["day", "week", "month", "year"], :selected=>"month" %>.</li>
+	<li><%= check_box :mail_merge, :latest_financial_box, :value=>"0" %> Latest financial contribution to committee: <%= select :mail_merge, :latest_financial_committee, @campaign.committees.collect {|c| [c.name, c.id] } %></li>
+	<li><%= check_box :mail_merge, :phone, :value=>"0" %> Include alternate phone number</li>
+	<li><%= check_box :mail_merge, :annual_financial_box, :value=>"0" %> Annual financial contributions to all committees in the last <%= select :mail_merge, :annual_financial_years, [1,2,3,4,5,6,7,8,9,10] %> years.</li>
+	<li><%= check_box :mail_merge, :volunteer_box, :value=>"0" %> Total volunteer hours in the last <%= text_field :mail_merge, :volunteer_num, :value=>"6",:size=>"4" %>
+		<%= select :mail_merge, :volunteer_timeframe, ["days", "weeks", "months", "years"], :selected=>"months" %>.</li>
+</ul>
+<%= check_box :mail_merge, :delete_blank_addresses, :value=>"0" %> Remove people or organizations with no address from file.<br />
+<%= submit_tag "Create your mail merge file" %>
+</form>

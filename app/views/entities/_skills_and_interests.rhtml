@@ -1,0 +1,50 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+	@campaign = campaign
+end
+-%>
+<div class="wide_column" id="volunteer_interests">
+	<dl>
+		<dt onMouseOver="Element.show('edit_vol_interests')" onMouseOut="Element.hide('edit_vol_interests');">Volunteer interests</dt><dd onMouseOver="Element.show('edit_vol_interests')" onMouseOut="Element.hide('edit_vol_interests');"><%= @entity.volunteer_interests.collect {|interest| h(interest.name)}.join(", ")%>&nbsp;<% if can_edit -%><span id="edit_vol_interests" style="display:none;">(<a href="#" onClick="Element.show('form_volunteer_interests'); Element.hide('volunteer_interests'); return false;">edit</a>)</span><% end -%></dd>
+		<dt onMouseOver="Element.show('edit_skills')" onMouseOut="Element.hide('edit_skills');">Skills</dt><dd onMouseOver="Element.show('edit_skills')" onMouseOut="Element.hide('edit_skills');"><%=h@entity.skills%>&nbsp;<% if can_edit -%><span id="edit_skills" style="display:none;">(<a href="#" onClick="Element.show('form_volunteer_interests'); Element.hide('volunteer_interests'); return false;">edit</a>)</span><% end -%></dd>
+		<dt onMouseOver="Element.show('edit_languages')" onMouseOut="Element.hide('edit_languages');">Languages</dt><dd onMouseOver="Element.show('edit_languages')" onMouseOut="Element.hide('edit_languages');"><%=h@entity.languages%>&nbsp;<% if can_edit -%><span id="edit_languages" style="display:none;">(<a href="#" onClick="Element.show('form_volunteer_interests'); Element.hide('volunteer_interests'); return false;">edit</a>)</span><% end -%></dd>
+	</dl>		
+</div>
+<% if can_edit -%>
+<div id="form_volunteer_interests" class="volunteer_form" style="display:none;">
+	<%=form_remote_tag :update=>"skills_and_interests", :url=>{:controller=>"entities", :action=>"update_skills",:params=>{:campaign_id=>@campaign.id, :id=>@entity.id}}, :loading=>"Element.show('edit_skills_indic')", :complete=>"Element.hide('edit_skills_indic')"%><dl>
+		<dt>Interests</dt>
+		<dd><select id="entity_volunteer_interests" name="entity[volunteer_interests][]" multiple size="6">
+			<% @campaign.volunteer_tasks.each do |task| -%>
+			<option value="<%=task.id%>" <% if @entity.volunteer_interests.include?(task)-%>selected<%end-%>><%=task.name%></option>
+			<% end -%>
+			</select>
+		</dd>
+		<dt>Skills</dt>
+		<dd><%= text_field "entity", "skills", :size=>20%></dd>
+		<dt>Languages</dt>
+		<dd><%= text_field "entity", "languages", :size=>20%></dd>
+		<dt>&nbsp;<span id="edit_skills_indic" style="display:none;"><%= image_tag "indicator.gif"%></span></dt>
+		<dd><%= submit_tag "Save changes"%> or <a href="#" onClick="Element.show('volunteer_interests'); Element.hide('form_volunteer_interests'); return false;">Cancel</a></dl>
+			</form>
+</div>
+<% end -%>

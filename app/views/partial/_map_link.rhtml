@@ -1,0 +1,15 @@
+<% unless address.nil? -%>
+<% query = ""
+query += address.line_1.to_s
+query = query.gsub(/\s#\w+/,'')
+query = query.gsub(/\sApt\s\w+/,'')
+query = query.gsub(/\sApt.\s\w+/,'')
+query += "+"+address.city.to_s+"+"
+query += address.state.to_s+"+"+address.zip.to_s
+unless address.zip_4.nil? or address.zip_4 == ""
+	query += "-"+address.zip_4.to_s
+end
+query = query.gsub(/\s/,'+')
+%>
+(<a href="http://maps.google.com/maps?q=<%=query%>" target="_blank">map</a>)
+<% end -%>

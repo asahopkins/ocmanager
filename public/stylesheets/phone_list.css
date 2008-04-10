@@ -1,0 +1,76 @@
+.phone_list_line {
+	width: 100%;
+	border-bottom: 1px solid black;
+	height: 2em;
+	padding-top: 5px;
+}
+
+.phone_list_header_line {
+	width: 100%;
+	border-bottom: 2px solid black;
+	font-weight: bold;
+	margin-top: 5px;
+	height: 1em;
+	margin-bottom: 5px;
+}
+
+.left_5 {
+	float: left;
+	width:5%;
+}
+
+.left_10 {
+	float: left;
+	width:10%;
+}
+
+.left_12 {
+	float: left;
+	width:12%;
+}
+
+.left_15 {
+	float: left;
+	width:15%;
+}
+
+.right_15 {
+	float:right;
+	width:15%;
+	text-align: right;
+}
+
+.left_20 {
+	float: left;
+	width:20%;
+}
+
+.left_23 {
+	float: left;
+	width:23%;
+}
+
+.left_25 {
+	float: left;
+	width:25%;
+}
+
+.left_30 {
+	float: left;
+	width:30%;
+}
+
+.left_40 {
+	float: left;
+	width:40%;
+}
+
+.left_50 {
+	float: left;
+	width:50%;
+}
+
+.left_60 {
+	float: left;
+	width:60%;
+}

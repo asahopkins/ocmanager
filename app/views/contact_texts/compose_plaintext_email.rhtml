@@ -1,0 +1,77 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div id="email">
+<div id="message_compose">
+	<div class="margins"><%= link_to "Back to Email/Letter/Script list",:controller=>"contact_texts",:action=>"list", :params=>{:campaign_id=>@campaign.id} %></div>
+<% unless @message.complete? or @show_only %>
+	<h3>To send an HTML formatted email, <%= link_to "click here", :action=>"compose", :params=>{:id=>@id,:type=>"Email"} %>.</h3>
+	<%= form_tag({:controller=>"contact_texts", :action=>"send_or_save_email",:params=>{:campaign_id=>@campaign.id}},{:id=>'message_form'},{}) %>
+<!--<form id="message_form" action="/contact_texts/send_or_save_email" method="post"> -->
+	<%= hidden_field :contact_text, :campaign_id, :value=>@campaign.id %>
+	<%= hidden_field :contact_text, :id, :value=>@id %>
+	<%= hidden_field :contact_text, :plaintext, :value=>true %>
+<div id="event_invitation" class="grey_box">
+	<p>Is this an event invitation? <%= select :contact_text, :invitation, [["Yes","true"],["No","false"]], :selected=>@message.invitation?.to_s %><br />
+	For which event? <%= select :contact_text, :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name,30)+t.date.strftime(' (%m/%d/%Y)'), t.id]}, {:selected=>@message.campaign_event_id, :include_blank=>true }%></p>
+</div>
+<div id="email_header">
+	<dl>
+		<% if @campaign.from_emails 
+			emails = @campaign.from_emails
+			unless emails.include?(session[:user].email)
+				emails << session[:user].email
+			end %>
+		<dt>From:</dt><dd><%= select :contact_text, :sender, emails, {:selected=>@message.sender} %></dd>
+		<% else %>
+		<dt>From:</dt><dd><%= session[:user].email %><%= hidden_field :contact_text, :sender, :value=>session[:user].email %></dd>
+		<% end %>
+		<dt>Subject:</dt><dd><%= text_field :contact_text, :subject, :value=>@message.subject %></dd>
+	</dl>
+</div>
+
+<div id="email_body">
+	<%= text_area :contact_text, :text, :cols=>"80", :rows=>"20", :value=>@message.text  %>
+</div>
+
+<div id="send_or_save">
+	<%= submit_tag "Save" %>
+</div>
+</form>
+<% else %>
+<div class="margins">
+<% if @message.complete? %>
+<b>Message has been sent!</b><br />
+<%= link_to "Send again", :controller=>"contact_texts", :action=>"compose",:params=>{:based_on=>@message.id,:id=>nil, :type=>"PlainEmail", :campaign_id=>@campaign.id} %><br />
+<% else %>
+<%= link_to "Edit message", :controller=>"contact_texts", :action=>"compose",:params=>{:id=>@message.id, :type=>"Email"} %><br />
+<% end %></div>
+<dl>
+	<dt>To:</dt><% if @message.complete? %><%= link_to "Show list", :controller=>'contact_texts', :action=>'show_recipient_list', :params=>{:id=>@message.id, :campaign_id=>@campaign.id} %><% else %><dd>(not yet sent)</dd><% end %>
+	<dt>From:</dt><dd><%= @message.sender %></dd>
+	<dt>Subject:</dt><dd><%= @message.subject %></dd>
+</dl>
+<div id="preview">
+	<%= render :partial=>"email_preview" %>
+</div>
+
+<% end %>
+</div>
+
+</div>

@@ -1,0 +1,34 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div title="<%= title_helper %>" class="form">
+  <%= head_helper :error => true %>
+
+  <div class="form-padding">
+    <%= start_form_tag_helper %>
+      <%= render_partial 'edit', :user => @user, :submit => false %></br>
+      <% render_partial 'password', :submit => false %>
+      <%= render_partial 'campaign_roles', :user => @user, :campaigns => @campaigns%></br>
+      
+      <div class="button-bar">
+        <%= button_helper 'signup' %>
+      </div>
+    </form>
+  </div>
+</div>

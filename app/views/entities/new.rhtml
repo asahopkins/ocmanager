@@ -1,0 +1,55 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%= form_tag :action => 'create', :params=>{:campaign_id=>@campaign.id} %>
+<%= error_messages_for 'entity' %>
+<%= error_messages_for 'address' %>
+<div id="select_entity_type" >
+<% per_options_hash = Hash["onclick","Element.show('person_name'); Element.show('voter_info_box'); Element.show('volunteering_block'); Element.hide('org_name'); Element.show('person_other_fields'); Element.hide('committee_info_box'); return true;"]
+org_options_hash = Hash["onclick", "Element.show('org_name'); Element.hide('committee_info_box'); Element.hide('person_name'); Element.hide('voter_info_box'); Element.hide('person_other_fields'); Element.hide('volunteering_block'); return true;"] 
+comm_options_hash = Hash["onclick", "Element.show('org_name'); Element.show('committee_info_box'); Element.hide('person_name'); Element.hide('voter_info_box'); Element.hide('person_other_fields'); Element.hide('volunteering_block'); return true;"] 
+check_hash = Hash["checked","checked"]
+per_options_hash.update(check_hash)
+%>
+<b>Is this a person, an organization, or a political committee?</b><br/>
+Person: <%= radio_button 'entity', 'class', 'Person', per_options_hash%><br>
+Organization: <%= radio_button 'entity', 'class', 'Organization', org_options_hash%><br>
+Political Committee: <%= radio_button 'entity', 'class', 'OutsideCommittee', comm_options_hash%>
+</div>
+<div id="entity_name">
+	<span id="person_name">
+		<div class="name_float">Title<br /><%= text_field :entity, :title, :size=>"4" %></div>
+		<div class="name_float">First name<br /><%= text_field :entity, :first_name, :size=>"10" %></div>
+		<div class="name_float">Middle<br /><%= text_field :entity, :middle_name, :size=>"6" %></div>
+		<div class="name_float">Last name<br /><%= text_field :entity, :last_name, :size=>"15" %></div>
+		<div class="name_float">Suffix<br /><%= text_field :entity, :name_suffix, :size=>"4" %></div>
+		<div class="name_float">&nbsp;</div>
+		<div class="name_float">Goes by<br /><%= text_field :entity, :nickname, :size=>"10" %></div>
+	</span>
+	<span id="org_name" style="display:none;">
+		<div class="name_float">Name<br /><%= text_field :entity, :name, :size=>"40" %></div>
+	</span>
+	<span>&nbsp;<br /><%= submit_tag "Create" %></span>
+</div>
+
+<div id="new_entity">
+	<%= render :partial=>'quick_new_entity'%>
+</div>
+
+</form>

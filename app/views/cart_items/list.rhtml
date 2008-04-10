@@ -1,0 +1,49 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h2>MyPeople</h2>
+<div class="entity_subhead_banner">
+	<%= plus_minus("mypeople_actions_plus", "mypeople_actions_minus", "mypeople_actions", "entity_subhead", "Take action with MyPeople") %>
+</div>
+<div id="mypeople_actions" style="display:none;" class="more_info_block">
+	<p><%= form_remote_tag :url=>{:controller=>"cart_items", :action=>"add_tag"}, :loading=>"Element.show('tag_indicator')", :complete=>"Element.hide('tag_indicator')" %><%= submit_tag "Add tag to MyPeople:" %> <%= text_field "entity", "tag",:size=>10 %> (put multiple word tags "in quotes") <span id="tag_indicator" style="display:none"><%= image_tag "indicator.gif" %></span></form></p>
+	<!-- Add MyPeople to a Group (new or existing) -->
+	<% if current_user.edit_groups?(@campaign) %>
+	<p><%= form_remote_tag :url=>{:controller=>"groups", :action=>"add_cart_to_group"}, :loading=>"Element.show('group_indicator')", :complete=>"Element.hide('group_indicator')" %><%= submit_tag "Add MyPeople to Group:" %> <%= select "group", "id", @groups.collect { |g| [g.name, g.id] } %> in role: <%= text_field "group", "role",:size=>10,:value=>"Member" %> <span id="group_indicator" style="display:none"><%= image_tag "indicator.gif" %></span></form></p>
+	<% end %>
+	<p><%= form_remote_tag :url=>{:controller=>"rsvps", :action=>"add_cart_to_event_invitees"}, :loading=>"Element.show('invite_event_indicator')", :complete=>"Element.hide('invite_event_indicator')" %><%= submit_tag "MyPeople have been invited to event:" %> <%= select "campaign_event", "id", @campaign_events.collect { |ce| [ce.name, ce.id] } %><span id="invite_event_indicator" style="display:none"><%= image_tag "indicator.gif" %></span></form></p>
+	<p><%= form_remote_tag :url=>{:controller=>"rsvps", :action=>"add_cart_to_event_attendees"}, :loading=>"Element.show('attend_event_indicator')", :complete=>"Element.hide('attend_event_indicator')" %><%= submit_tag "MyPeople attended event:" %> <%= select "campaign_event", "id", @campaign_events.collect { |ce| [ce.name, ce.id] } %><span id="attend_event_indicator" style="display:none"><%= image_tag "indicator.gif" %></span></form></p>
+</div>
+&nbsp;<br />
+<div id="entity_list_headers">
+<span class="left_20">Name</span><span class="left_30">Address</span><span class="left_12">Phone</span><span class="left_23">Email</span><span class="right_13">&nbsp;</span>
+</div>
+
+<div id="entities_list">
+	<% for cart_item in @cart_items %>
+	<div class="entity_list_line" id="cart_line_<%= cart_item.id %>">
+	<span class="left_20"><%= link_to h(cart_item.entity.name), :controller=>"entities", :action=>"show", :params=>{:id=>cart_item.entity.id} %></span>
+	<span class="left_30"><% unless cart_item.entity.primary_address.nil? -%><%=h cart_item.entity.primary_address.line_1%>, <%=h cart_item.entity.primary_address.city%><%end -%>&nbsp;</span>
+	<span class="left_12"><%=number_to_phone(cart_item.entity.primary_phone_number)%>&nbsp;</span>
+	<span class="left_23"><%= link_to_email(cart_item.entity.primary_email_address)%>&nbsp;</span>
+	<span class="right_13"><%= link_to_remote "(Remove)", :url=>{:action=>"destroy", :params=>{:id=>cart_item}}, :method=>"post" ,:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');"%></span></div>
+	<% end %>
+</div>
+<br class="brclear"/>
+<%= pagination_links @cart_item_pages %> 

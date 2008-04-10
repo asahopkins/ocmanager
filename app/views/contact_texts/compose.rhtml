@@ -1,0 +1,37 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><%= form_tag({:controller=>"contact_texts", :action=>"create_or_update",:params=>{:campaign_id=>@campaign.id, :id=>@contact_text.id}}) %>
+<%= hidden_field :contact_text, :type, :value=>@type %>
+<div id="text_header">
+	<dl>
+		<dt>Label</dt><dd><%= text_field :contact_text, :label %></dd>
+	</dl>
+</div>
+<% if @type == "Letter" -%>
+<div id="event_invitation" class="grey_box">
+	<p>Is this an event invitation? <%= select :contact_text, :invitation, [["Yes","true"],["No","false"]], :selected=>@contact_text.invitation?.to_s %><br />
+	For which event? <%= select :contact_text, :campaign_event_id, @recent_events.collect{|t| [cut_to_length(t.name,30)+t.date.strftime(' (%m/%d/%Y)'), t.id]}, {:selected=>@contact_text.campaign_event_id, :include_blank=>true }%></p>
+</div>
+<% end -%>
+
+<div id="text_body">
+	<%= text_area :contact_text, :text, :cols=>"80", :rows=>"40"  %>	
+</div>
+<p><%= submit_tag "Save" %> or <%= link_to "Cancel", :controller=>"contact_texts", :action=>"list", :params=>{:campaign_id=>@campaign.id} %></p>

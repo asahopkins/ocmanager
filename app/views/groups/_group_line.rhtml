@@ -1,0 +1,30 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div class="entity_list_line"id="group_line_<%= entity.id %>">
+<span class="left_20"><%= link_to h(entity.name), :controller=>"entities", :action=>"show", :params=>{:id=>entity.id} %></span>
+<span class="left_12"><%= entity.role(group) %></span>
+<span class="left_30"><% unless entity.primary_address.nil? -%><%=h entity.primary_address.line_1%>, <%=h entity.primary_address.city%><%end -%>&nbsp;</span>
+<span class="left_23"><%= link_to_email(entity.primary_email_address)%>&nbsp;</span>
+<span class="right_13"> 
+<% if can_remove -%>
+	<%= link_to_remote "Remove from group", :url=>{ :controller=>"groups", :action => 'remove_member', :params=>{:entity_id => entity,:id=>group.id, :campaign_id=>@campaign.id} }, :method=>"post" %>
+<% end -%>
+</span>
+</div>

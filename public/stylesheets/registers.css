@@ -1,0 +1,58 @@
+.financial_committee_name {
+	float: left;
+	font-weight: normal;
+	font-size: 120%;
+	clear: both;
+}
+.financial_external_link {
+	float: left;
+	margin: 4px 2px 2px 2px;	
+}
+.financial_external_link a {
+	text-decoration: none;
+	font-weight: bold;
+}
+.entity_summary_financial_register {
+	width: 40%;
+	border: 1px solid;	
+	float: left;
+	margin: 5px 0px 15px 3%;
+	display: inline;
+	font-size: 100.01%;
+	clear: both;
+}
+
+.financial_register_headers {
+	font-weight: bold;
+	float: left;
+	width: 100%;
+	padding: 2px 0px 2px 0px;
+	background: #ddf;	
+}
+
+.financial_register_entry {
+	width: 100%;
+	float: left;
+	margin: 2px 0px 2px 0px;
+}
+
+.financial_register_total {
+	float: left;
+	width: 100%;
+	margin: 2px 0px 0px 0px;
+	padding: 2px 0px 2px 0px;
+	background: #CCC;	
+	font-weight: bold;
+}
+
+.financial_register_name {
+	margin-left: 2%;
+	width: 18%;
+	float: left;
+	clear: left;
+}
+
+.financial_register_35 {
+	width: 35%;
+	float: left;
+}

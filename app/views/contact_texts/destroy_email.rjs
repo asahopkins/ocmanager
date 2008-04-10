@@ -1,0 +1,1 @@
+page.replace_html "draft_emails", :partial=>'draft_emails_table', :protocol=>@protocol

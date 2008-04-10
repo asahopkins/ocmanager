@@ -1,0 +1,5 @@
+if @success
+  page.replace_html "volunteer_history", :partial=>'volunteer_history', :protocol=>@protocol    
+end
+page.replace_html "volunteer_history_notice", @notice
+page.visual_effect :highlight, 'volunteer_history_notice'

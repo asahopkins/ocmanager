@@ -1,0 +1,64 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><% if @entity.nil? 
+	@entity = entity
+end
+-%>
+<div id="primary_email">
+	<div class="plus_minus">
+		<%= plus_minus("email_plus", "email_minus", "all_emails") %>
+	</div>
+	<div class="shifted_block">
+		<b>Email:</b> <%= link_to_email(@entity.primary_email_address) %><%unless @entity.primary_email.nil? -%> (<%=@entity.primary_email.label%>)<% if @entity.primary_email.invalid? -%><br /><b class="red_text">This email address doesn't work.</b><br /><% end -%><%end -%>
+	</div>
+</div>
+<div class="expanded_list" id="all_emails" style="display: none;">
+	<ul>
+		<% @entity.email_addresses.each do |email| 
+			@email = email -%>
+<li><span id="show_<%=email.label%>_email" onMouseOver="Element.show('edit_<%=email.label%>_email')" onMouseOut="Element.hide('edit_<%=email.label%>_email')"><b><%=email.label%><% if email==@entity.primary_email -%> (primary)<% end -%></b> <% if can_edit %><span id="edit_<%=email.label%>_email" style="display: none;">(<%=link_to_function "edit", "Element.show('form_#{email.label}_email'); Element.hide('show_#{email.label}_email')" %>)</span><% end %><br /><%=link_to_email(email.address)%>
+<% if email.invalid? -%>
+<br /><b class="red_text">This address doesn't work.</b>
+<% end -%></span>
+	<% if can_edit -%>
+	<span id="form_<%=email.label%>_email" style="display: none;"><%= form_remote_tag :update=>"emails", :url=>{:controller=>"emails", :action=>"update", :params=>{:id=>email.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('email_indic_#{email.label}')", :complete=>"Element.hide('email_indic_#{email.label}')"%>
+		<dl>
+			<dt>Label</dt><dd><%= text_field "email", "label", :value=>email.label, :size=>"15"%></dd>
+			<dt>Address</dt><dd><%= text_field "email", "address", :value=>email.address, :size=>"15"%></dd>
+			<dt>Valid?</dt><dd><%= check_box "email", "valid"%></dd>
+			<% if email!=@entity.primary_email -%>
+			<dt>Primary</dt><dd><select id="entity_primary_email" name="entity[primary_email]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+			<% end -%>
+			<dt>&nbsp;<span id="email_indic_<%=email.label%>" style="display:none;"><%= image_tag 'indicator.gif' %></span></dt><dd><input type="submit" value="Save changes" name="save_email"> or <%=link_to_function "Cancel", "Element.hide('form_#{email.label}_email'); Element.show('show_#{email.label}_email')"%></dd>
+			<dt>&nbsp;</dt><dd><%=link_to_remote "Delete this email", :update=>"emails", :confirm=>"Are you sure you want to delete this email?", :url=>{:controller=>"emails", :action=>"destroy",:params=>{:id=>email.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('email_indic_#{email.label}')", :complete=>"Element.hide('email_indic_#{email.label}')"%></dd>
+		</dl></form>
+		</span><% end %></li>
+		<% end -%>
+		<% if can_edit -%>
+	<li><span id="add_email_link"><%= link_to_function "Add email", "Element.show('add_email_form'); Element.hide('add_email_link')" %></span>
+		<span id="add_email_form" style="display: none;"><%= form_remote_tag :update=>"emails", :url=>{:controller=>"emails", :action=>"create", :params=>{:entity_id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('add_email_indic')", :complete=>"Element.hide('add_email_indic')"%>
+			<dl>
+				<dt>Label</dt><dd><%= text_field "email", "label", :value=>"", :size=>"15"%></dd>
+				<dt>Address</dt><dd><%= text_field "email", "address", :value=>"", :size=>"15"%></dd>
+				<dt>Primary</dt><dd><select id="entity_primary_email" name="entity[primary_email]"><option value="0" selected>No</option><option value="1">Yes</option></select></dd>
+				<dt>&nbsp;<span id="add_email_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span></dt><dd><input type="submit" value="Save" name="save_email"> or <%=link_to_function "Cancel", "Element.hide('add_email_form'); Element.show('add_email_link')"%></dd>
+			</dl></form></span></li><% end %>
+</ul>
+</div>

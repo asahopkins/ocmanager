@@ -1,0 +1,30 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><table>
+<tr>
+	<th>Label:</th><td>Last updated:</td><td>&nbsp;</td>
+</tr>
+<% @draft_letters.each do |draft| %>
+	<tr>
+		<td><%= draft.label %></td><td><%= draft.updated_at %></td><td><%= link_to 'Edit', :action => 'compose', :params=>{:type=>"Letter", :id => draft, :campaign_id=>@campaign.id} %> | <%= link_to 'Mail file', :action => 'mail_file', :params=>{:id => draft, :campaign_id=>@campaign.id} %> | <%= link_to 'Labels', :action => 'prepare_labels', :params=>{:id => draft} %> | <%= link_to "Mark as sent", :action=>'mark_as_sent', :params=>{:id => draft, :campaign_id=>@campaign.id} %> </td>
+    </tr>
+<% end %>
+</table><%= link_to_remote '<< Earlier', :update=>"draft_letters", :url=>{ :action=>"load_draft_letters", :params=>{:campaign_id=>@campaign.id, :page => @draft_letter_pages.current.next} } if @draft_letter_pages.current.next %> 
+<%= link_to_remote 'Later >>', :update=>"draft_letters", :url=>{ :action=>"load_draft_letters", :params=>{:campaign_id=>@campaign.id, :page => @draft_letter_pages.current.previous} } if @draft_letter_pages.current.previous %> 

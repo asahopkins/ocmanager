@@ -1,0 +1,48 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><h1>Custom fields:</h1>
+
+<ul id="field_list">
+<% @custom_fields.each do |custom_field|  %>
+	<li id="field_<%= custom_field.id %>"><%= image_tag "drag.gif" %> <%=h custom_field.name %> | <%= link_to 'Edit', :action => 'edit', :id => custom_field %> <% link_to 'Destroy', { :action => 'destroy', :id => custom_field }, :confirm => 'Are you sure?', :method=>"post" %><br />
+		<dl class="side_by_side_dl">
+			<dt>Type:</dt><dd><%=h custom_field.field_type %></dd>
+			<% if custom_field.field_type == "Select"%>
+			<dt>Select options:</dt><dd><%=h display_array(custom_field.select_options) %></dd>
+			<% end %>
+			<dt>Hidden?</dt><dd><%= display_yes_no(custom_field.hidden?) %></dd>			
+		</dl>
+		<br class="brclear" />
+	</li>
+<% end %>
+</ul>
+<%= sortable_element 'field_list',
+:url => { :action => "sort" },
+:complete => visual_effect(:highlight, 'field_list')
+%>
+<p>You may reorder the custom fields here by dragging them with the "DRAG" icons.  This order will set the order in which they are displayed elsewhere in the application.</p>
+
+<%= link_to 'Previous page', { :page => @custom_field_pages.current.previous } if @custom_field_pages.current.previous %>
+<%= link_to 'Next page', { :page => @custom_field_pages.current.next } if @custom_field_pages.current.next %> 
+
+<br />
+
+<%= link_to "Create new custom field", :controller=>"custom_fields", :action=>"new" %>
+

@@ -1,0 +1,5 @@
+TRIGGER_FILE = "/var/www/virtual/yoursite.com/"
+REMOTE_PROTOCOL = "https://"
+LOCAL_PROTOCOL = "http://"
+REMOTE_DOWNLOAD_PATH = "/var/www/virtual/yoursite.com/manager/current/exported_files/"
+LOCAL_DOWNLOAD_PATH = "/Users/you/manager/exported_files/"

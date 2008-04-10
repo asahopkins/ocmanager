@@ -1,0 +1,39 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><div id="manager_entity_<%= @entity.id.to_s %>_<%= @row.object_id %>" class="match_contrib_data">
+<%= @entity.name %><br />
+<%= display_address(@entity.primary_address) %>
+</div>
+<div id="import_entity_<%= @entity.id.to_s %>_<%= @row.object_id %>" class="match_contrib_data">
+<%= @row[16] + " " + @row[17] %><br />
+<%= @row[3] %><br />
+<%= @row[4] %>, <%= @row[5] %> <%= @row[6] %><br />
+Phone: <%= @row[7].to_s %><br />
+Email: <%= @row[19].to_s %><br />
+</div>
+<div id="form_<%= @entity.id.to_s %>_<%= @row.object_id %>" class="clear">
+<b>Are these two the same?</b>
+<form class="match_contrib_form_left">
+<%= submit_to_remote "Yes", "Yes", :url=>{:controller=>"contributions", :action=>"process_match", :params=>{:entity_id=>@entity.id, :row=>@row.to_csv, :recipient_name=>@recipient_name, :recipient_id=>@recipient_id},:dom_id=>"match_#{@entity.id.to_s}_#{@row.object_id}"}, :loading=>"Element.show('process_match_indic_#{@entity.id.to_s}_#{@row.object_id}')", :complete=>"Element.hide('process_match_indic_#{@entity.id.to_s}_#{@row.object_id}')"%></form>
+<form class="match_contrib_form_right">
+<%= submit_to_remote "No", "No", :url=>{:controller=>"contributions", :action=>"process_match", :params=>{:entity_id=>@entity.id, :row=>@row.to_csv, :recipient_name=>@recipient_name, :recipient_id=>@recipient_id},:dom_id=>"match_#{@entity.id.to_s}_#{@row.object_id}"}, :loading=>"Element.show('process_match_indic_#{@entity.id.to_s}_#{@row.object_id}')", :complete=>"Element.hide('process_match_indic_#{@entity.id.to_s}_#{@row.object_id}')"%>
+</form>
+<span id="process_match_indic_<%= @entity.id.to_s %>_<%= @row.object_id %>" style="display:none"><%= image_tag 'indicator.gif'%></span>
+</div>

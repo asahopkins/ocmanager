@@ -1,0 +1,45 @@
+<% # ---------------------------------------------------------------------------
+# 
+# Open Campaigns Manager
+# Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# ---------------------------------------------------------------------------
+-%><table width="100%">
+	<tr>
+		<td width="50%">
+<div class="basic_dl"><dl>
+	<dt><ul><li>Bulleted list style:</li></ul></dt>
+	<dd><%= select :stylesheet, :ul_type, [["Disc","disc"],["Circle","circle"],["Square","square"]] %></dd>
+	<dt><ol><li>Numbered list style:</li></ol></dt>
+	<dd><%= select :stylesheet, :ol_type, [["Numbers","decimal"],["LETTERS","upper-alpha"],["letters","lower-alpha"],["ROMAN NUMERALS","upper-roman"],["roman numerals","lower-roman"]] %></dd>
+</dl></div>
+</td>
+<td width="50%">
+	<hr width="80%"/>
+<div class="basic_dl"><dl>
+	<dt>Rule height:</dt>
+	<dd><%= slider_field :stylesheet, :hr_height, :range=>1..6, :values=>[1,2,3,4,5,6], :slider_value=>@stylesheet.hr_height.to_i %><% text_field :stylesheet, :hr_height, :size=>"2",:maxlength=>"2" %></dd>
+	<dt>Rule width:</dt>
+	<dd><%= slider_field :stylesheet, :hr_width, :range=>0..100, :slider_value=>@stylesheet.hr_width.to_i %><% text_field :stylesheet, :hr_width, :size=>"3",:maxlength=>"3" %></dd>
+	<dt>Rule color:</dt>
+	<dd><%= color_sliders :stylesheet, :hr_color, :tag=>"hr" %></dd>
+</dl></div>
+	
+</td>
+</tr>
+</table>
+<div class="spacer_clear">&nbsp;</div>
+	

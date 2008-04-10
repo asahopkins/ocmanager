@@ -1,0 +1,491 @@
+/* order is top -- right -- bottom -- left */
+/* based on the Jello Mold Piefecta from positioniseverything.net -- Thanks! */
+
+html, body, ol, ul, li, dl, dt, dd, img {
+  margin: 0; 
+  padding: 0;
+  border: 0;
+/*	list-style: none;*/
+}
+
+body {
+  padding: 0 480px; /* the critical side padding that sets the natural min-width! */ 
+	background-color: white; /* this BG tiles the area outside the columns */
+/*	background: url(../images/brownlattice2.gif); /* this BG tiles the area outside the columns */
+	color: #000; 
+  font-family: Helvetica, Verdana, Futura, sans-serif;
+  font-size: 10pt; /* this body font-size fixes an IE bug and maintains x-browser uniformity */ 
+  text-align: center; /* centers the #sizer element in IE5.x/win */
+}
+
+tr, td {
+/*	vertical-align: top;*/
+	font-family: Helvetica, Verdana, Futura, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+}
+
+p {
+	font-size: 10pt;
+}
+
+
+#sizer {
+  margin: 0 auto; /* centers #sizer in standard browsers */
+  padding: 0;
+  width: 70%; /* this value controls liquidity; 0% = full rigid, 100% = full liquid */
+  text-align: left; /* resets the default text alignment for the page */
+	max-width: 120px;
+}
+
+#expander { /* Any % height here causes IE to lose the neg right margin */
+	margin: 0 -465px; /* neg side margin values should be < or = to side body padding -335px */
+	position: relative; /* makes #expander visible outside #sizer in IEwin */
+} 
+
+/*\*/
+* html #expander {height: 0;} 
+/* #expander must have "height: 0" in IEwin bug fixing */
+
+/* The above is a modified Holly hack for #expander, with zero substituted for the 
+usual 1% height value. Any % value on this element causes a horrendous IE bug! */ 
+
+#wrapper1 {
+  margin-top: 10px;
+  position: relative;
+/*	background: url(../images/redcircles.gif); /* this BG tiles the left column */
+  font-size: .9em; /* set global font-size here */ 
+  border: 3px solid #fff; /*border around all three columns, but not header or footer*/
+  border-width: 4px 3px;
+} /* this positioning may be needed for IEwin if page is to contain positioned elements */
+
+#wrapper2 {  
+  position: relative; /* extra insurance against bugs in IEwin */
+/*	background: url(../images/redblots.gif) 100% 0 repeat-y; /* this BG tiles the right column */
+}
+
+
+/****************** Main Page Structure *****************/
+
+/* To modify the side column widths and the col divider widths, the values that are 
+marked "critical" and also refer to the desired mod MUST be changed as a group. */
+
+
+.outer {
+	background-color: #fff;/* this BG colors the center column */
+/*  background: url(../images/bluelattice.gif); /* this BG tiles the center column */
+	/* these borders are between the side columns and center text*/
+  border-left: 1px solid #000; /*** Critical left divider dimension value ***/
+  border-right: 0px solid #000; /*** Critical right divider dimension value ***/
+  margin-left: 180px;    /*** Critical left col width value ***/
+  margin-right: 40px;    /*** Critical right col width value ***/
+}
+
+.float-wrap {
+  float: left;
+  width: 100%;
+}
+
+.center {
+  float: right;
+  width: 99%;
+}
+
+.left {
+  float: left;
+  position: relative; /* Needed for IE/win */
+  width: 180px;    /*** Critical left col width value ***/
+  margin-left: -181px;    /*** Critical left col width value ***/ /*** Critical left divider dimension value ***/
+}
+
+.right {
+  float: right; 
+  position: relative; /* Needed for IE/win */
+  width: 40px;    /*** Critical right col width value ***/
+  margin-right: -40px;    /*** Critical right col width value ***/ /*** Critical right divider dimension value ***/
+  margin-left: 0px;   /*** Critical right divider dimension value ***/
+}
+
+.centerbox {
+  font-weight: normal;
+  text-align: left;
+  overflow: visible;
+  width: 100%;
+}
+
+.container-left { /* styling for the lefthand column */
+	color: #000000;
+	font: 10pt Helvetica, Verdana, Futura, sans-serif;
+}
+
+.container-right { /* styling for the righthand column */
+	color: #000000; 
+}
+
+.header {
+	width: 100%;
+	padding: 5px 0;
+	background-color: #6E84B6;
+	height: 48pt;
+	/*  background: url(../images/jello1.gif) no-repeat 50px 7px;*/
+}
+
+/*\*/
+/* * html .header {background-position: 10px 3px;} */
+/* IEwin hack needed because the "jello" BG is in a positioned wrapper and shows
+variance. IEwin does not support fixed backgrounds on elements other than the body */ /*I only need this is I have a header background image*/
+
+/*.header span {color: #FF0000;} /*I don't think this is used on my page*/
+
+#notes {
+	float: right;
+	width: 100%;
+/*	padding: 1% 1% 3% 2%;*/
+	border: 1px solid;
+}
+
+#navigation {
+	float: right;
+	width: 90%;
+	padding: 5px;
+	margin: 5px;
+	border: 1px solid;
+	line-height: 1.1em;
+}
+
+.footer {
+	width: 100%;
+	clear: both;
+	padding: 5px 0 15px;
+	position: relative;
+	background-color: #EEE;
+}
+/* I may not need any of these
+.footer p {margin: 10px 0 0 20px; color: #383;}
+
+.footer hr {
+  color: #944;
+	margin: 0;
+	background: #944;
+	height: 5px;
+}
+*/
+
+/************** Spacing Controls for various column contents ***************/
+
+/*.outer ul { I don't currently need this
+  text-align: center;
+  margin: 10px 0;
+}*/
+
+.textpadder {padding: 8px;}
+
+
+/************** Generic Rules *************/
+/* I have mostly put these in a different file, I hope */
+
+
+/************** Special Fixes *************/
+
+/* .outer {word-wrap: break-word;} */
+/* Prevents long urls from breaking layout in IE, must 
+be hidden in a conditional comment for CSS to validate */
+
+img {max-width: 100%;} 
+/* prevents oversize images from breaking layout in browsers that support max-width */
+
+/* \*/
+* html #wrapper1,
+* html #wrapper2,
+* html .outer a, 
+* html .container-left, 
+* html .container-right,
+* html .outer,
+* html h2,
+* html .sidenav li a 
+{height: 1%;}
+/* Holly hack */
+
+
+/*** Variance fixes for IEwin ***/
+
+/*\*/
+* html .outer p {margin-right: -6px;}
+/* */
+
+/**************** Utility Rules *******************/
+
+/*\*/ /*/
+.sidenav a:hover {position: relative;}
+/* this fixes an IEmac hover bug in the left column, hidden from other browsers */ /* I probably won't have hovers, but you never know */
+
+
+.brclear { /* Use a break with this class to clear float containers */
+  clear:both;
+  height:0;
+  margin:0;
+  font-size: 1px;
+  line-height: 0;
+}
+
+/*begin: stuff not associated with piefecta*/
+
+#search {
+	/*clear: both;*/
+	float: right;
+	width: 25%;
+/*	padding: 1% 1% 1% 2%;*/
+}
+#search_results {
+	width: 100%;
+/*	margin: ;*/
+}
+
+#letters_for_list {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	margin-bottom: 5px;
+}
+
+/* for autocomplete */
+
+.entry_edit_entity {
+	width: 90%;
+	margin: 0px 5% 0px 5%;
+	padding: 10px 10px 10px 0px;
+	background: #EFE;
+	clear: left;
+	border: 1px dotted;
+}
+
+.entity_info_left {
+	width: 100%;
+/*  	border:1px solid #888;*/
+}
+
+
+.person_edit_entry {
+	width: 100%;
+}
+
+
+div.auto_complete {
+	float: right;
+	clear: right;
+/*  	border:1px solid #888; */
+  	margin-left: 3%;
+  	margin-right: 1%;
+	width: 29%;
+  	background: #ddd;
+}
+div.auto_complete ul {
+/*  	border:1px solid #888;*/
+  	margin:0;
+  	padding:0;
+  	width:100%;
+  	list-style-type:none;
+}
+div.auto_complete ul li {
+  	margin:0;
+  	padding:3px;
+}
+
+.entity_search_name {
+	
+}
+.entity_search_address {
+	margin-left: 10%;
+	font-size: 8pt;
+}
+
+.match_page_entry {
+	border-bottom: 2px solid blue;
+	padding: 10px;
+	padding-bottom: 40px;
+}
+
+.match_contrib_data {
+	float: left;
+	width: 30%;
+	border: 1px solid black;
+	padding: 10px;
+	margin: 10px;
+}
+
+.match_contrib_form_left {
+	float: left;
+	padding-right: 15px;
+}
+
+.match_contrib_form_right {
+	float: left;	
+}
+
+.float {
+	float: left;
+}
+
+.right_float {
+	float: right;
+}
+
+.plus_minus {
+	float:left;
+	width:6%;
+	clear:left;
+	margin-bottom: 2px;
+}
+
+.shifted_block {
+	float:left;
+	width:93%;
+	margin-top: 2px;
+}
+
+.expanded_list {
+	float:left;
+	width:90%;
+	margin-left: 10%;
+}
+
+.more_info_block {
+	margin-top: 8px;
+}
+
+.column {
+	width:100%;
+	margin-bottom: 0px;
+	margin-top: 5px;
+	clear: left;
+	float: left;
+}
+
+.right_half {
+	float: left;
+	width:40%;
+	margin-top: 10px;
+}
+
+.left_half {
+	float: left;
+	clear: left;
+	width: 40%;
+	margin-top: 10px;
+	margin-right: 10%;
+}
+
+.field_labels {
+	width:30%;
+	float:left;
+}
+
+.field_values {
+	float:left;
+	width:70%;
+}
+
+.clear {
+	clear:both;
+}
+
+.indented {
+	width: 95%;
+	margin-left: 5%;
+}
+
+.left_5 {
+	float: left;
+	width:5%;
+}
+
+.left_8 {
+	float: left;
+	width:8%;
+}
+
+.left_10 {
+	float: left;
+	width:10%;
+}
+
+.right_10 {
+	float:right;
+	width:10%;
+	text-align: right;
+}
+
+.left_12 {
+	float: left;
+	width:12%;
+}
+
+.right_13 {
+	float:right;
+	width:13%;
+	text-align: right;
+}
+
+.left_15 {
+	float: left;
+	width:15%;
+}
+
+.right_15 {
+	float:right;
+	width:15%;
+	text-align: right;
+}
+
+.left_18 {
+	float: left;
+	width:18%;
+}
+
+.right_18 {
+	float:right;
+	width:18%;
+	text-align: right;
+}
+
+.left_20 {
+	float: left;
+	width:20%;
+}
+
+.right_20 {
+	float: right;
+	width:20%;
+	text-align: right;
+}
+
+.left_23 {
+	float: left;
+	width:23%;
+}
+
+.left_25 {
+	float: left;
+	width:25%;
+}
+
+.left_30 {
+	float: left;
+	width:30%;
+}
+
+.left_40 {
+	float: left;
+	width:40%;
+}
+
+.left_50 {
+	float: left;
+	width:50%;
+}
+
+.left_60 {
+	float: left;
+	width:60%;
+}
+/*begin: styles not related to site layout*/

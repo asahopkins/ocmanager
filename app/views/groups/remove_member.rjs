@@ -1,0 +1,1 @@
+page.remove "group_line_#{@entity.id}"
