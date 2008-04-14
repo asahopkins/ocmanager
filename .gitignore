@@ -1,0 +1,12 @@
+config/database.yml
+config/benchmarks.rb
+config/benchmarks.yml
+config/email_config.rb
+config/server_config.rb
+config/database-remote.yml
+config/deploy.rb
+config/mongrel.config
+Capfile
+.DS_Store
+log
+tmp
