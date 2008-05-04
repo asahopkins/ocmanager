@@ -5,6 +5,7 @@ config/email_config.rb
 config/server_config.rb
 config/database-remote.yml
 config/deploy.rb
+config/deploy_svn.rb
 config/mongrel.config
 Capfile
 .DS_Store

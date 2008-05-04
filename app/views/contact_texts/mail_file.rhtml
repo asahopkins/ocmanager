@@ -36,9 +36,9 @@
 <p><b>File name:</b> <%= text_field "mail_merge", "filename", :value=>"Please enter a file name",:maxlength=>28 %> (Limit 28 characters. Please don't use weird characters in naming your file.)</p>
 <p>To add additional fields, use these options:</p>
 <ul>
-	<li><%= check_box :mail_merge, :total_financial_box, :value=>"0" %> Total financial contributions to committee: <%= select :mail_merge, :total_financial_committee, @campaign.committees.collect {|c| [c.name, c.id] } %> in the last 
+	<li><%= check_box :mail_merge, :total_financial_box, :value=>"0" %> Total financial contributions to committee: <%= select :mail_merge, :total_financial_committee, @campaign.outside_committees.collect{|c| [cut_to_length(c.name, 30), c.id.to_s]} %> in the last 
 		<%= select :mail_merge, :total_financial_timeframe, ["day", "week", "month", "year"], :selected=>"month" %>.</li>
-	<li><%= check_box :mail_merge, :latest_financial_box, :value=>"0" %> Latest financial contribution to committee: <%= select :mail_merge, :latest_financial_committee, @campaign.committees.collect {|c| [c.name, c.id] } %></li>
+	<li><%= check_box :mail_merge, :latest_financial_box, :value=>"0" %> Latest financial contribution to committee: <%= select :mail_merge, :latest_financial_committee, @campaign.outside_committees.collect{|c| [cut_to_length(c.name, 30), c.id.to_s]} %></li>
 	<li><%= check_box :mail_merge, :phone, :value=>"0" %> Include alternate phone number</li>
 	<li><%= check_box :mail_merge, :annual_financial_box, :value=>"0" %> Annual financial contributions to all committees in the last <%= select :mail_merge, :annual_financial_years, [1,2,3,4,5,6,7,8,9,10] %> years.</li>
 	<li><%= check_box :mail_merge, :volunteer_box, :value=>"0" %> Total volunteer hours in the last <%= text_field :mail_merge, :volunteer_num, :value=>"6",:size=>"4" %>

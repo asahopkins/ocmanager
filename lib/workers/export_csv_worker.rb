@@ -118,7 +118,7 @@ class ExportCsvWorker < BackgrounDRb::Rails
       if total_financial == 1
         labels << "Total contributions in the last #{total_timeframe}"
         row_size += 1
-        total_committee = Committee.find(total_financial_committee)
+        total_committee = OutsideCommittee.find(total_financial_committee)
         if total_timeframe == "day"
           start_date = Time.now - 1.day
         elsif total_timeframe == "week"
@@ -126,6 +126,8 @@ class ExportCsvWorker < BackgrounDRb::Rails
         elsif total_timeframe == "month"
           start_date = Time.now - 1.month
         elsif total_timeframe == "year"
+          start_date = Time.now - 1.year
+        else
           start_date = Time.now - 1.year
         end
         start_date = start_date.to_date
@@ -136,7 +138,7 @@ class ExportCsvWorker < BackgrounDRb::Rails
       if latest_financial_box == 1
         labels << "Latest contribution"
         row_size += 1
-        latest_committee = Committee.find(latest_financial_committee)
+        latest_committee = OutsideCommittee.find(latest_financial_committee)
       end
       if annual_financial_box == 1
         this_year = DateTime.now.year
@@ -179,24 +181,20 @@ class ExportCsvWorker < BackgrounDRb::Rails
           end
         end
         if total_financial == 1
-          value = nil
-          unless user.treasurer_info.nil? or user.treasurer_info[total_committee.id].nil?  or total_committee.treasurer_api_url.to_s == ""
-            treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>total_committee.id}])
-        		unless treasurer_entity.nil?
-        		  treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,total_committee.treasurer_api_url)
-              value = treasurer.get_transaction_values_by_date(user.treasurer_info[total_committee.id][0], user.treasurer_info[total_committee.id][1], total_committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
+          contribs_array = entity.contribs_by_date(total_committee.id,false,start_date,end_date)
+          value = 0
+          unless contribs_array.nil? or contribs_array.length == 0
+            contribs_array.each do |contrib|
+              value += contrib.amount
             end
           end
           fields << value
         end
         if latest_financial_box == 1
-          value = nil
-          unless user.treasurer_info.nil? or user.treasurer_info[latest_committee.id].nil?  or latest_committee.treasurer_api_url.to_s == ""
-            treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>latest_committee.id}])
-        		unless treasurer_entity.nil?
-        		  treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,latest_committee.treasurer_api_url)
-              value = treasurer.get_transaction_values_by_date(user.treasurer_info[latest_committee.id][0], user.treasurer_info[latest_committee.id][1], latest_committee.treasurer_id, treasurer_entity.treasurer_id, DateTime.now, DateTime.now, true, true)
-            end
+          contrib = entity.contribs_by_date(latest_committee.id,true)
+          value = 0
+          unless contrib.nil?
+              value += contrib.amount
           end
           fields << value
         end    
@@ -207,14 +205,6 @@ class ExportCsvWorker < BackgrounDRb::Rails
             annual_end_date = Date.civil(year+1).to_time - 1.second
             year_value = 0
             value = 0
-            committees.each do |committee|
-              treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>committee.id}])
-              unless user.treasurer_info.nil? or user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == "" or treasurer_entity.nil?
-          		  treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
-                value = treasurer.get_transaction_values_by_date(user.treasurer_info[committee.id][0], user.treasurer_info[committee.id][1], committee.treasurer_id, treasurer_entity.treasurer_id, annual_start_date, annual_end_date, false, true)
-                year_value += value
-              end
-            end
             contributions = entity.contributions.find(:all, :conditions=>["date BETWEEN :start AND :end",{:start=>annual_start_date, :end=>annual_end_date}])
             contributions.each do |contrib|
               year_value += contrib.amount

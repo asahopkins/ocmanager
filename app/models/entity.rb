@@ -334,6 +334,14 @@ class Entity < ActiveRecord::Base
     contributions.find(:all,:limit=>num.to_i,:order=>"date DESC")
   end
 
+  def contribs_by_date(committee_id, latest = false, start_date = DateTime.now, end_date = DateTime.now)
+    if latest
+      return contributions.find(:first,:conditions=>["recipient_committee_id = :recipient_committee",{:recipient_committee=>committee_id}])
+    else
+      return contributions.find(:all,:conditions=>["recipient_committee_id = :recipient_committee AND date >= :start_date AND date <= :end_date",{:recipient_committee=>committee_id,:start_date=>start_date, :end_date=>end_date}])
+    end
+  end
+
   def top_recent_recipients(num)
     contribs = contributions.find(:all,:conditions=>["date >= :start_date",{:start_date=>(Time.now).beginning_of_year}])
     tmp_hash = Hash.new(0)
