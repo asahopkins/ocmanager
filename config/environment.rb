@@ -11,6 +11,20 @@ RAILS_GEM_VERSION = '1.2.3'
 require File.join(File.dirname(__FILE__), 'boot')
 
 Rails::Initializer.run do |config|
+  # =======
+    # HACK
+    require 'drb'
+    class DRb::DRbTCPSocket
+      class << self
+        alias parse_uri_orig parse_uri
+        def parse_uri(*args)
+          ary = parse_uri_orig(*args)
+          ary[1] = nil if ary[1] == 0
+          ary
+        end
+      end
+    end
+  # =======
   # Settings in config/environments/* take precedence those specified here
   
   # Skip frameworks you're not going to use
