@@ -220,7 +220,7 @@ class User < ActiveRecord::Base
 
   def can_see_financial?(campaign)
     if cur = CampaignUserRole.find(:first,:conditions=>["campaign_id = :campaign AND user_id = :user",{:campaign=>campaign.id, :user=>self.id}])
-      if cur.role.rank <= 3 and cur.financial == false
+      if cur.role.rank <= 3 and (cur.financial.nil? or cur.financial == false)
         cur.update_attribute(:financial,true)
       end
       return cur.financial
