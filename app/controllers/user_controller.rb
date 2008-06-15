@@ -128,7 +128,7 @@ class UserController < ApplicationController
     else
       @campaigns = Array.new
       session[:user].campaign_user_roles.each {|cur|
-        if cur.role_id<=2
+        if cur.role.rank<=2
           @campaigns << cur.campaign
         end
       }
@@ -164,10 +164,21 @@ class UserController < ApplicationController
                 else
                   api_token = nil
                 end
+                financial = false
+                # logger.debug "about to assign financial"
+                unless params['user_campaign']['financial'].nil? or params['user_campaign']['financial'][campaign.id.to_s].nil?
+                  # logger.debug "financial hash exists"
+                  if params['user_campaign']['financial'][campaign.id.to_s].to_i == 1
+                    # logger.debug "financial is true"
+                    financial = true
+                  end
+                end
+                # logger.debug "financial assigned"
                 cur_hash = {"campaign_id"=>campaign.id, "user_id"=>@user.id, "role_id"=>params['user_campaign']['role'][campaign.id.to_s],"created_by"=>session[:user].id,:api_token=>api_token}
                 logger.debug cur_hash
                 @cur = CampaignUserRole.new(cur_hash)
                 @cur.save!
+                @cur.update_attribute(:financial,financial)
               end
             end
             key = @user.generate_security_token
@@ -305,6 +316,21 @@ class UserController < ApplicationController
           @cur = CampaignUserRole.find(:first, :conditions=>["user_id = :user AND campaign_id = :comm",{:user=>@user.id, :comm=>campaign_id}])
           campaign = Campaign.find(campaign_id)
           logger.debug "params[:user_campaign][:role]["+campaign_id.to_s+"] = " + params[:user_campaign][:role][campaign_id.to_s]
+          # logger.debug params[:user_campaign][:financial][campaign_id.to_s].to_s
+          unless params[:user_campaign][:financial].nil?
+            if params[:user_campaign][:financial][campaign_id.to_s].to_i == 1
+              financial = true
+            else
+              financial = false
+            end
+          else
+            financial = false
+          end
+          # if financial
+          #   logger.debug "financial is true"
+          # else
+          #   logger.debug "financial is false"
+          # end
           if @cur.nil?
             logger.debug "@cur.nil? is true"
             unless params[:user_campaign][:role][campaign_id.to_s].to_s=="0"
@@ -316,6 +342,7 @@ class UserController < ApplicationController
               new_cur_hash = {"user_id"=>@user.id, "campaign_id"=> campaign_id, "role_id"=>params[:user_campaign][:role][campaign_id.to_s],"created_by"=>session[:user].id, :api_token=>api_token}
               @cur = CampaignUserRole.new(new_cur_hash)
               @cur.save!
+              @cur.update_attribute(:financial,financial)
             end
           else
             logger.debug "@cur.nil? is false"
@@ -340,6 +367,7 @@ class UserController < ApplicationController
                 raise
               end
             end
+            @cur.update_attribute(:financial,financial)
           end
           logger.debug "User "+@user.name+" has updated roles"
           flash[:notice] = "User "+@user.name+" has updated roles"
@@ -350,7 +378,7 @@ class UserController < ApplicationController
     end
     redirect_to :action=>"list", :protocol=>@@protocol
   rescue
-    flash[:notice] = 'Something went wrong.'
+    flash[:warning] = 'Something went wrong.'
 	  redirect_to :controller=>"user", :action=>"list", :protocol=>@@protocol
   end
 

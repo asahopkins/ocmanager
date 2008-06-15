@@ -45,7 +45,7 @@
   <% if session[:user].manager_campaigns.include?(cur.campaign_id) %>
   <tr>
       <td><%= cur.campaign.name %></td>
-      <td><%= cur.role.name %></td>
+      <td><%= cur.role.name %><% if user.can_see_financial?(cur.campaign) -%>(+ finances)<% end -%></td>
       <td>	<% unless user.superuser? %>
 	<%= link_to '(Inactivate)', {:action => 'inactivate', :params=>{:user_id => user.id, :campaign_id => cur.campaign_id}}, :confirm => 'Are you sure?' %>	<% end %>&nbsp;</td>
   </tr>

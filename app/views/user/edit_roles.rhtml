@@ -35,7 +35,7 @@
     <option value="<%= Role.readonly_id %>" <%= role_hash[6]%>>Read Only</option>
     <option value="<%= Role.sign_in_id %>" <%= role_hash[7]%>>Sign In</option>
     <option value="<%= Role.inactive_id %>" <%= role_hash[8]%>>Inactive</option>
-      </select>    </p>
+      </select>&nbsp;&nbsp;User can see and edit finances?&nbsp;<%= check_box_tag "user_campaign[financial][#{campaign.id}]", 1, @user.can_see_financial?(campaign) %></p>
 <% end -%>
 <%= hidden_field 'cur', 'updated_by', :value=>session[:user].id %>
 <%= submit_tag 'Save' %> &nbsp; <%= link_to '(Cancel)', :action => 'list' %>

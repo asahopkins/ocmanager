@@ -2,7 +2,7 @@
 # migrations feature of ActiveRecord to incrementally modify your database, and
 # then regenerate this schema definition.
 
-ActiveRecord::Schema.define(:version => 58) do
+ActiveRecord::Schema.define(:version => 59) do
 
   create_table "addresses", :force => true do |t|
     t.column "entity_id",  :integer,               :default => 0,  :null => false
@@ -45,12 +45,13 @@ ActiveRecord::Schema.define(:version => 58) do
   add_index "campaign_events", ["campaign_id"], :name => "campaign_events_campaign_id_index"
 
   create_table "campaign_user_roles", :force => true do |t|
-    t.column "user_id",     :integer, :default => 0, :null => false
-    t.column "role_id",     :integer, :default => 0, :null => false
-    t.column "campaign_id", :integer, :default => 0, :null => false
+    t.column "user_id",     :integer, :default => 0,     :null => false
+    t.column "role_id",     :integer, :default => 0,     :null => false
+    t.column "campaign_id", :integer, :default => 0,     :null => false
     t.column "created_by",  :integer
     t.column "updated_by",  :integer
     t.column "api_token",   :string
+    t.column "financial",   :boolean, :default => false
   end
 
   add_index "campaign_user_roles", ["user_id"], :name => "campaign_user_roles_user_id_index"

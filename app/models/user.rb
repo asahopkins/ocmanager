@@ -219,8 +219,18 @@ class User < ActiveRecord::Base
   end
 
   def can_see_financial?(campaign)
-    return self.role(campaign)<=3
+    if cur = CampaignUserRole.find(:first,:conditions=>["campaign_id = :campaign AND user_id = :user",{:campaign=>campaign.id, :user=>self.id}])
+      if cur.role.rank <= 3 and cur.financial == false
+        cur.update_attribute(:financial,true)
+      end
+      return cur.financial
+    else
+      return false
+    end
   end
+    
+  #   return self.role(campaign)<=3
+  # end
 
   def can_edit_entities?(campaign)
     return self.role(campaign)<=5
