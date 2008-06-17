@@ -57,6 +57,7 @@ class User < ActiveRecord::Base
       role = cur.role # TODO: cache this
       ####
       rank = cur.role.rank
+      financial = cur.financial
       if vol_sign_in # boolean
         rank = 7
       end
@@ -77,19 +78,25 @@ class User < ActiveRecord::Base
           return false
         end
       when 4 # Edit Groups
-        if ['admin','custom_fields', 'group_fields'].include?(controller) or  ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'entities/load_treasurer_summaries', 'entities/update_contribution', 'entities/create_contribution', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
+        logger.debug "edit groups"
+        logger.debug financial
+        if ['admin','custom_fields', 'group_fields'].include?(controller) or  ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'entities/load_treasurer_summaries', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
           return true
+        elsif ( !financial and ['entities/update_contribution', 'entities/create_contribution'].include?(resource))
+            return true
         else
           return false
         end
-      when 5 # Basic Edit
-        if ['admin', 'custom_fields', 'group_fields'].include?(controller) or  ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'groups/new', 'groups/edit', 'groups/update', 'groups/create', 'groups/remove_member', 'groups/add_cart_to_group', 'groups/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'entities/load_treasurer_summaries', 'entities/update_contribution', 'entities/create_contribution', 'entities/add_to_group', 'entities/remove_from_group', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
+      when 5 # Basic Edit (Data Entry)
+        if ['admin', 'custom_fields', 'group_fields'].include?(controller) or  ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'groups/new', 'groups/edit', 'groups/update', 'groups/create', 'groups/remove_member', 'groups/add_cart_to_group', 'groups/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'entities/load_treasurer_summaries', 'entities/add_to_group', 'entities/remove_from_group', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
           return true
+        elsif ( !financial and ['entities/update_contribution', 'entities/create_contribution'].include?(resource))
+            return true
         else
           return false
         end
       when 6 # Read Only # TODO: ?? allow readonly folks to fill MyPeople, or no?
-        # TODO: should be about to access user/edit to change password
+        # TODO: should be able to access user/edit to change password
         if ['admin', 'committees','custom_fields', 'group_fields'].include?(controller) or ['edit', 'update', 'new', 'create','destroy'].include?(action) or ['backend/update_entity_from_struct', 'backend/create_entity_from_struct', 'groups/remove_member', 'groups/add_cart_to_group', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/load_treasurer_summaries', 'entities/update_contribution', 'entities/create_contribution', 'entities/add_to_group', 'entities/remove_from_group', 'entities/add_tag_to_cart', 'entities/add_to_household', 'entities/remove_from_household', 'entities/household_search', 'entities/update_partial','entities/update_custom', 'entities/update_name', 'entities/update_address', 'entities/delete_address', 'entities/add_address', 'entities/update_phones', 'entities/add_phone', 'entities/delete_phone', 'entities/update_faxes', 'entities/add_fax', 'entities/delete_fax', 'entities/update_emails', 'entities/add_email', 'entities/delete_email', 'entities/update_website', 'entities/update_skills', 'campaign_events/hide'].include?(resource)
           return true
         else
