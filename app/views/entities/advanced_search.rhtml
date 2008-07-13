@@ -94,7 +94,7 @@ Any: <%= radio_button 'entity', 'class', 'Any', any_options_hash%>
 	<div class="column" id="emails">
 		<div class="data_header"><%= plus_minus("email_plus", "email_minus", "email_search", "", "Email")%></div>
 		<dl id="email_search" style="display:none;">
-			<dt>Address</dt><dd><%= select "entity", "email_address_flag", [["[Ignore]",""],["Includes","Includes"], ["Does not include","Not"]]%><br />
+			<dt>Address</dt><dd><%= select "entity", "email_address_flag", [["[Ignore]",""],["Matches","Matches"],["Includes","Includes"], ["Does not include","Not"]]%><br />
 				<%= text_field "entity", "email_address", :value=>"", :size=>"15"%></dd>
 			<dt>Valid</dt><dd><%= select "entity", "email_valid_flag", [["[Ignore]",""],["Matches","Matches"]]%> <%= select "entity", "email_valid", [["Invalid","false"],["Valid","true"]], {:include_blank=>false } %></dd>
 		</dl>	

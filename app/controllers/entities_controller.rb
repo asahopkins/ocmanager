@@ -369,6 +369,21 @@ class EntitiesController < ApplicationController
           address! == :null
         end
         cond.append cond_email   
+      elsif params[:entity][:email_address_flag] == "Matches"
+        includes << :email_addresses
+        search = params[:entity][:email_address]
+        if search==""
+          cond_email = EZ::Where::Condition.new :email_addresses do
+            address == :null
+          end
+          cond_email.append "email_addresses.address=''", :or
+        else
+          cond_email = EZ::Where::Condition.new :email_addresses do
+            address == search
+            address! == :null
+          end
+        end
+        cond.append cond_email   
       end
       
       # bad emails
