@@ -1,5 +1,5 @@
 # Railspdf
-require 'pdf/writer'
+# require 'pdf/writer'
 
 module RailsPDF
   
