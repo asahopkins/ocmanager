@@ -15,23 +15,10 @@
 	<%= javascript_include_tag 'prototype.js' %>
 	<%= javascript_include_tag 'scriptaculous.js' %>
 	
-   	<!--[if IE]>
-  	<style type="text/css">
-  	.sizer {
-  		width:expression(document.body.clientWidth > 900 ? "120px" : "60%" );
-  	/* CSS comments are safe here, but no html comments inside the Conditional Comment! */
-  	}
-  	</style>
-  	<![endif]-->
-
-
-
 </head>
 <body>
 
 <div id="sizer">
-<div id="expander">
-
 
 <div class="header"><span class="headline">Manager<br/><span class="byline">by Open Campaigns</span></span>
 	
@@ -39,13 +26,28 @@
 
 <div id="wrapper1">
 
-<div id="wrapper2">
-<!-- This wrapper is only used for BG tiling on the right column -->
-
 <div class="outer">
 
 <div class="float-wrap">
+	<div class="left">
 
+	<div class="container-left"> 
+
+	<!--XXXXXXXX Begin left column includes XXXXXXXX-->
+
+	<div class="textpadder">
+
+	<h3><%= @campaign.name %></h3>
+	<%= link_to "Start over", :action => "welcome" %><br /><br /><br />
+	<%= link_to "Logout", :controller => "user", :action => "logout" %>
+	</div> <!-- end .textpadder -->
+
+
+	<!--XXXXXXXX End left column includes XXXXXXXX-->
+
+	</div> <!-- end .container-left -->
+	</div> <!-- end .left -->
+	
 <div class="center">
 
 <div class="centerbox"> <!-- optional extra styling div -->
@@ -62,57 +64,19 @@
 
 </div> <!-- end .center -->
 
- <div class="left">
-
-<div class="container-left"> 
-
-<!--XXXXXXXX Begin left column includes XXXXXXXX-->
-
-<div class="textpadder">
-
-<h3><%= @campaign.name %></h3>
-<%= link_to "Start over", :action => "welcome" %><br /><br /><br />
-<%= link_to "Logout", :controller => "user", :action => "logout" %>
-</div> <!-- end .textpadder -->
-
-
-<!--XXXXXXXX End left column includes XXXXXXXX-->
-
-</div> <!-- end .container-left -->
-</div> <!-- end .left -->
-
-
 <br class="brclear" />
 
-
 </div> <!-- end .float-wrap -->
-
-<div class="right">
-<div class="container-right">
-
-<!--XXXXXXXX Begin right column includes XXXXXXXX-->
-
-<div class="textpadder">
-
-</div> <!-- end .textpadder -->
-
-<!--XXXXXXXX End right column includes XXXXXXXX-->
-
-</div> <!-- end .container-right -->
-</div><!-- end .right -->
 
 <br class="brclear" />
 
 </div><!-- end .outer -->
-
-</div><!-- end #wrapper2 -->
 
 </div><!-- end #wrapper1 -->
 
 <div class="footer"><p>Copyright 2005-2008 Open Campaigns.  http://www.opencampaigns.net, open.campaigns@gmail.com.</p>
 	<p>Open Campaigns Manager is released under the <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU Affero General Public License, version 3</a>.  Current running code can be downloaded <a href="http://www.opencampaigns.net/manager.tar.bz2">here</a>.</p></div>
 
-</div><!-- end #expander -->
 </div><!-- end #sizer -->
 
 </body>

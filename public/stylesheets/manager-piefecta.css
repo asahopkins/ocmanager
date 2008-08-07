@@ -9,7 +9,7 @@ html, body, ol, ul, li, dl, dt, dd, img {
 }
 
 body {
-  padding: 0 480px; /* the critical side padding that sets the natural min-width! */ 
+  padding: 0; /* the critical side padding that sets the natural min-width! */ 
 	background-color: white; /* this BG tiles the area outside the columns */
 /*	background: url(../images/brownlattice2.gif); /* this BG tiles the area outside the columns */
 	color: #000; 
@@ -33,30 +33,29 @@ p {
 #sizer {
   margin: 0 auto; /* centers #sizer in standard browsers */
   padding: 0;
-  width: 70%; /* this value controls liquidity; 0% = full rigid, 100% = full liquid */
+  width: 920px; 
   text-align: left; /* resets the default text alignment for the page */
-	max-width: 120px;
 }
 
-#expander { /* Any % height here causes IE to lose the neg right margin */
-	margin: 0 -465px; /* neg side margin values should be < or = to side body padding -335px */
-	position: relative; /* makes #expander visible outside #sizer in IEwin */
-} 
+/*#expander { /* Any % height here causes IE to lose the neg right margin */
+/*	margin: 0 -465px; /* neg side margin values should be < or = to side body padding -335px */
+/*	position: relative; /* makes #expander visible outside #sizer in IEwin */
+/*} */
 
 /*\*/
-* html #expander {height: 0;} 
+/* * html #expander {height: 0;} 
 /* #expander must have "height: 0" in IEwin bug fixing */
 
 /* The above is a modified Holly hack for #expander, with zero substituted for the 
 usual 1% height value. Any % value on this element causes a horrendous IE bug! */ 
 
 #wrapper1 {
-  margin-top: 10px;
+  margin-top: 6px;
   position: relative;
 /*	background: url(../images/redcircles.gif); /* this BG tiles the left column */
   font-size: .9em; /* set global font-size here */ 
-  border: 3px solid #fff; /*border around all three columns, but not header or footer*/
-  border-width: 4px 3px;
+  /*border: 2px solid #fff; /*border around all three columns, but not header or footer*/
+  /*border-width: 2px 1px;*/
 } /* this positioning may be needed for IEwin if page is to contain positioned elements */
 
 #wrapper2 {  
@@ -75,10 +74,8 @@ marked "critical" and also refer to the desired mod MUST be changed as a group. 
 	background-color: #fff;/* this BG colors the center column */
 /*  background: url(../images/bluelattice.gif); /* this BG tiles the center column */
 	/* these borders are between the side columns and center text*/
-  border-left: 1px solid #000; /*** Critical left divider dimension value ***/
-  border-right: 0px solid #000; /*** Critical right divider dimension value ***/
-  margin-left: 180px;    /*** Critical left col width value ***/
-  margin-right: 40px;    /*** Critical right col width value ***/
+  margin-left: 3px;    /*** Critical left col width value ***/
+  margin-right: 3px;    /*** Critical right col width value ***/
 }
 
 .float-wrap {
@@ -87,23 +84,17 @@ marked "critical" and also refer to the desired mod MUST be changed as a group. 
 }
 
 .center {
+ /* border-left: 1px solid #000; /*** Critical left divider dimension value ***/
   float: right;
-  width: 99%;
+  width: 720px;
 }
 
 .left {
   float: left;
   position: relative; /* Needed for IE/win */
-  width: 180px;    /*** Critical left col width value ***/
-  margin-left: -181px;    /*** Critical left col width value ***/ /*** Critical left divider dimension value ***/
-}
-
-.right {
-  float: right; 
-  position: relative; /* Needed for IE/win */
-  width: 40px;    /*** Critical right col width value ***/
-  margin-right: -40px;    /*** Critical right col width value ***/ /*** Critical right divider dimension value ***/
-  margin-left: 0px;   /*** Critical right divider dimension value ***/
+  width: 190px;
+  margin-left: 1px;
+  border-right: 1px solid #555; /*** Critical right divider dimension value ***/
 }
 
 .centerbox {

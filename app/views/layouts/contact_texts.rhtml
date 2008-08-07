@@ -37,24 +37,11 @@
 	<%= stylesheet_link_merged :email %>
 	<%= javascript_include_merged :base %>
 	<%= javascript_include_merged :slider %>
-	
-   	<!--[if IE]>
-  	<style type="text/css">
-  	.sizer {
-  		width:expression(document.body.clientWidth > 900 ? "120px" : "60%" );
-  	/* CSS comments are safe here, but no html comments inside the Conditional Comment! */
-  	}
-  	</style>
-  	<![endif]-->
-
-
 
 </head>
 <body onLoad="Element.hide('styles'); Element.hide('subheads_body'); Element.hide('textstyle_body'); Element.hide('incidentals_body');">
 
 <div id="sizer">
-<div id="expander">
-
 
 <div class="header"><span class="headline">Manager<br/><span class="byline">by Open Campaigns</span></span>
 	<span id="search">
@@ -75,12 +62,41 @@
 
 <div id="wrapper1">
 
-<div id="wrapper2">
-<!-- This wrapper is only used for BG tiling on the right column -->
-
 <div class="outer">
 
 <div class="float-wrap">
+	 <div class="left">
+
+	<div class="container-left"> 
+
+	<!--XXXXXXXX Begin left column includes XXXXXXXX-->
+
+	<div class="textpadder">
+
+	<div class="global_nav">
+
+	<p><b><i><%=current_user.name%></i></b><br>
+	<%= link_to "Edit Account", :controller=>"user", :action=>"edit"%><br>
+	<%= link_to "Logout", :controller=>"user", :action=>"logout"%></p>
+	<b>MyPeople</b><br />
+	<ul id="cart_list">
+	<li>MyPeople: <span id='cart_items_number'><%=h current_user.cart_items.count %></span>&nbsp;<span id="cart_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></li>
+	<li><%= link_to "Show MyPeople",:controller=>"cart_items", :action=>"list" %></a></li>
+	<li><form><%= submit_to_remote "Empty", "Empty MyPeople", :url=>{:controller=>"cart_items",:action=>"destroy_all"},:confirm=>'Are you sure?',:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');" %></form></li>
+	</ul>
+	<p><%= link_to "Admin", :controller=>"admin"%></p>
+	<p>Help</p>
+	</div>
+	<div id="navigation">
+		<%= render :partial=>"campaigns/navigation" %>
+	</div>
+	</div> <!-- end .textpadder -->
+
+
+	<!--XXXXXXXX End left column includes XXXXXXXX-->
+
+	</div> <!-- end .container-left -->
+	</div> <!-- end .left -->
 
 <div class="center">
 
@@ -98,71 +114,19 @@
 
 </div> <!-- end .center -->
 
- <div class="left">
-
-<div class="container-left"> 
-
-<!--XXXXXXXX Begin left column includes XXXXXXXX-->
-
-<div class="textpadder">
-
-<div class="global_nav">
-
-<p><b><i><%=current_user.name%></i></b><br>
-<%= link_to "Edit Account", :controller=>"user", :action=>"edit"%><br>
-<%= link_to "Logout", :controller=>"user", :action=>"logout"%></p>
-<b>MyPeople</b><br />
-<ul id="cart_list">
-<li>MyPeople: <span id='cart_items_number'><%=h current_user.cart_items.count %></span>&nbsp;<span id="cart_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></li>
-<li><%= link_to "Show MyPeople",:controller=>"cart_items", :action=>"list" %></a></li>
-<li><form><%= submit_to_remote "Empty", "Empty MyPeople", :url=>{:controller=>"cart_items",:action=>"destroy_all"},:confirm=>'Are you sure?',:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');" %></form></li>
-</ul>
-<p><%= link_to "Admin", :controller=>"admin"%></p>
-<p>Help</p>
-</div>
-<div id="navigation">
-	<%= render :partial=>"campaigns/navigation" %>
-</div>
-</div> <!-- end .textpadder -->
-
-
-<!--XXXXXXXX End left column includes XXXXXXXX-->
-
-</div> <!-- end .container-left -->
-</div> <!-- end .left -->
-
-
 <br class="brclear" />
 
-
 </div> <!-- end .float-wrap -->
-
-<div class="right">
-<div class="container-right">
-
-<!--XXXXXXXX Begin right column includes XXXXXXXX-->
-
-<div class="textpadder">
-
-</div> <!-- end .textpadder -->
-
-<!--XXXXXXXX End right column includes XXXXXXXX-->
-
-</div> <!-- end .container-right -->
-</div><!-- end .right -->
 
 <br class="brclear" />
 
 </div><!-- end .outer -->
-
-</div><!-- end #wrapper2 -->
 
 </div><!-- end #wrapper1 -->
 
 <div class="footer"><p>Copyright 2005-2008 Open Campaigns.  http://www.opencampaigns.net, open.campaigns@gmail.com.</p>
 	<p>Open Campaigns Manager is released under the <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html">GNU Affero General Public License, version 3</a>.  Current running code can be downloaded <a href="http://github.com/asahopkins/ocmanager/tarball/master">here</a>.</p></div>
 
-</div><!-- end #expander -->
 </div><!-- end #sizer -->
 </body>
 </html>
