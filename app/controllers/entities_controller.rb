@@ -25,6 +25,8 @@ class EntitiesController < ApplicationController
   before_filter :get_campaign
   
   before_filter :load_entity_and_check_campaign, :except=>[:list, :new, :create, :search, :advanced_search, :search_results, :upload_file, :save_file_and_redirect, :import_from_csv, :process_csv_data, :update_cart, :show_cart, :add_tag_to_cart, :autocomplete_for_sign_in, :load_new_entity_form]
+  
+  before_filter :strip_white_space, :only=>[:create, :update, :update_partial, :update_custom, :update_name, :update_address, :update_phones, :update_faxes, :update_website, :update_skills, :self_update, :add_address, :add_phone, :add_fax]
   #before_filter :check_campaign, :only=>[:list, :new, :create, :advanced_search, :upload_file, :save_file_and_redirect, :import_from_csv, :process_csv_data]
   
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -2310,6 +2312,4 @@ private
     end
   end
   
-  
-
 end

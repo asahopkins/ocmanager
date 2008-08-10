@@ -110,6 +110,45 @@ class ApplicationController < ActionController::Base
   #   session[:cart] ||= Cart.new
   # end
   
+  def strip_white_space
+    params.each do |key,param|
+      logger.debug key.to_s
+      logger.debug param.to_s
+      if param.kind_of?(String)
+        params[key] = param.strip
+        logger.debug key.to_s+"*"
+        logger.debug params[key]+"*"
+      end
+      if param.kind_of?(Hash)
+        param.each do |new_key, new_param|
+          if new_param.kind_of?(String)
+            params[key][new_key] = new_param.strip
+            logger.debug new_key.to_s+"*"
+            logger.debug params[key][new_key]+"*"
+          end          
+          if new_param.kind_of?(Hash)
+            new_param.each do |new_key2, new_param2|
+              if new_param2.kind_of?(String)
+                params[key][new_key][new_key2] = new_param2.strip
+                logger.debug new_key2.to_s+"*"
+                logger.debug params[key][new_key][new_key2]+"*"
+              end          
+              if new_param2.kind_of?(Hash)
+                new_param2.each do |new_key3, new_param3|
+                  if new_param3.kind_of?(String)
+                    params[key][new_key][new_key2][new_key3] = new_param3.strip
+                    logger.debug new_key3.to_s+"*"
+                    logger.debug params[key][new_key][new_key2][new_key3]+"*"
+                  end          
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  
   def process_entity_params(params)
     logger.debug params
     logger.debug params.class
