@@ -1808,6 +1808,7 @@ class EntitiesController < ApplicationController
         @home_address = nil
         @work_address = nil
         (0...@row_length).each { |entry|
+          logger.debug entry.to_s
           unless row[entry].to_s==""
             logger.debug row[entry].to_s
             case field_array[entry]
@@ -2051,6 +2052,7 @@ class EntitiesController < ApplicationController
             end
           end
         }
+        logger.debug "about to build name"
         if @entity.class==Person
           if @entity.name.nil? or @entity.name.to_s==""
             unless (@entity.first_name.nil? or @entity.last_name.nil?)
@@ -2078,57 +2080,57 @@ class EntitiesController < ApplicationController
             @entity.primary_phone = @entity.phones.to_a[0][0]
           end
         end
-        if @entity.primary_email.nil?
-          unless @entity.emails.empty?
-            @entity.primary_email = @entity.emails.to_a[0][0]
-          end
-        end
+        # if @entity.primary_email.nil?
+        #   unless @entity.emails.empty?
+        #     @entity.primary_email = @entity.emails.to_a[0][0]
+        #   end
+        # end
         if @entity.class==Person
           @household = Household.new(:campaign_id=>@campaign.id)
           @household.save
           @entity.household = @household
         end
         @entity.created_by = session[:user].id
+        unless @home_address.nil?
+          @home_address.save! 
+          @entity.addresses << @home_address
+          @entity.primary_address = @home_address
+          @entity.mailing_address = @home_address
+        end
+        unless @work_address.nil?
+          @work_address.save! 
+          @entity.addresses << @work_address
+          if @home_address.nil?
+            @entity.primary_address = @work_address
+            @entity.mailing_address = @work_address
+          end
+        end
+        unless @email.nil?
+          @email.save!
+          @entity.email_addresses << @email
+          @entity.primary_email = @email
+          # @entity.save!
+        end
+        unless @work_email.nil?
+          @work_email.save!
+          @entity.email_addresses << @work_email
+          if @email.nil?
+            @entity.primary_email = @work_email
+          end      
+          # @entity.save!
+        end
+        logger.debug "about to save"
         if @entity.save
           save_counter+=1
           logger.debug "entries saved:" + save_counter.to_s
           logger.debug @entity.attributes.to_s unless @entity.nil?
-          unless @home_address.nil?
-            @home_address.save! 
-            @entity.addresses << @home_address
-            @entity.primary_address = @home_address
-            @entity.mailing_address = @home_address
-            @entity.save!
-          end
-          unless @work_address.nil?
-            @work_address.save! 
-            @entity.addresses << @work_address
-            if @home_address.nil?
-              @entity.primary_address = @work_address
-              @entity.mailing_address = @work_address
-              @entity.save!
-            end
-          end
           @entity.addresses.each {|address|
             logger.debug address.attributes.to_s
           }
-          unless @email.nil?
-            @email.save!
-            @entity.email_addresses << @email
-            @entity.primary_email = @email
-            @entity.save!
-          end
-          unless @work_email.nil?
-            @work_email.save!
-            @entity.email_addresses << @work_email
-            if @email.nil?
-              @entity.primary_email = @work_email
-              @entity.save!
-            end      
-          end
         else
-          errors << entry
-          raise "Error in line "+entry.to_s
+          # errors << entry
+          logger.debug "save failed"
+          raise "Error in entry "+@entity.name.to_s
         end
         tags = ''
         (0...@row_length).each { |entry|

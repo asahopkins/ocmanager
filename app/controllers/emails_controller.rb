@@ -21,7 +21,8 @@
 class EmailsController < ApplicationController
 
   before_filter :get_campaign
-
+  before_filter :strip_white_space
+  
   def update
     email = EmailAddress.find(params[:id])
     @entity = email.entity

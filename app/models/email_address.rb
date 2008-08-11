@@ -21,7 +21,7 @@
 class EmailAddress < ActiveRecord::Base
   belongs_to :entity
 
-  validates_uniqueness_of :label, :scope=>:entity_id #TODO: catch this error
+  # validates_uniqueness_of :label, :scope=>:entity_id #TODO: catch this error
   def valid
     !invalid
   end
