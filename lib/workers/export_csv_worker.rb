@@ -67,7 +67,7 @@ class ExportCsvWorker < BackgrounDRb::Rails
     user = User.find(args[:user_id])
     
     temp = []
-    if delete_blank_addresses
+    if delete_blank_addresses != 0
       # entities.each do |entity|
       #   @logger.debug entity.name
       # end
