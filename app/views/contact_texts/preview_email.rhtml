@@ -39,7 +39,7 @@
 			<% if @text.formatted_text %>
 			<%= @text.formatted_text %>
 			<% else %>
-			<%= blockify_h1s(BlueCloth.new(@text.text.to_s).to_html) %>
+			<%= blockify_h1s(RDiscount.new(@text.text.to_s).to_html) %>
 			<% end %>
 		</div>
 	</div>

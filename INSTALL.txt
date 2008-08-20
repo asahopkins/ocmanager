@@ -10,7 +10,7 @@ NOTE: Open Campaigns Manager runs on Rails version 1.2.6.  This version of rails
 
 Make sure that the following gems are installed:
 pdf-writer
-BlueCloth
+RDiscount
 fastercsv
 mongrel
 rubypants

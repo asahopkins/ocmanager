@@ -374,7 +374,7 @@ class ContactTextsController < ApplicationController
             end
           end
           @message.stylesheet = @stylesheet
-          @message.formatted_text = BlueCloth.new(@message.text.to_s).to_html.gsub(/<h1>/,'<div class="h1_block"><h1>').gsub(/<\/h1>/,'</h1></div>')
+          @message.formatted_text = RDiscount.new(@message.text.to_s).to_html.gsub(/<h1>/,'<div class="h1_block"><h1>').gsub(/<\/h1>/,'</h1></div>')
           @message.save! 
           flash[:notice] = "Message saved successfully."
           redirect_to :action=>"list", :params=>{:campaign_id=>@campaign.id}
