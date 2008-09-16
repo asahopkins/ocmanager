@@ -252,7 +252,9 @@ class ContactTextsController < ApplicationController
       if entity.receive_email? or entity.receive_email.nil?
         if entity.primary_email_address.to_s.strip != ""
           # addresses << entity.primary_email_address
-          sent_entities << entity.id
+          if entity.primary_email.valid
+            sent_entities << entity.id
+          end
         end
       end
     end

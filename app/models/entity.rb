@@ -123,7 +123,11 @@ class Entity < ActiveRecord::Base
 
   def primary_email_address
     unless self.primary_email_id.nil?
-      return self.primary_email.address
+      unless self.primary_email.nil?
+        return self.primary_email.address
+      else
+        return nil
+      end
     else
       return nil
     end
