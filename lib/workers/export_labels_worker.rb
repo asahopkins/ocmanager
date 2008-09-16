@@ -253,7 +253,8 @@ class ExportLabelsWorker < BackgrounDRb::Rails
     else
       # TODO: notify the user that the file didn't save correctly
     end
-    kill()
+    terminate
+    # kill()
   end
   
 end

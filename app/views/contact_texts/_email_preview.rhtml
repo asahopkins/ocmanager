@@ -31,7 +31,7 @@
 			<% if @message.formatted_text %>
 			<%= @message.formatted_text %>
 			<% else %>
-			<%= blockify_h1s(RDiscount.new(@message.text.to_s).to_html) %>
+			<%= blockify_h1s(BlueCloth.new(@message.text.to_s).to_html) %>
 			<% end %>
 		</div>
 	</div>

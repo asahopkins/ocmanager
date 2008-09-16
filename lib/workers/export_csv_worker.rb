@@ -255,7 +255,8 @@ class ExportCsvWorker < BackgrounDRb::Rails
         File.open(file_path, "wb") { |f| f.write file_data }    
       end
     end
-    kill()
+    terminate
+    # kill()
   end
   
 end

@@ -248,7 +248,8 @@ class ExportCallSheetsWorker < BackgrounDRb::Rails
       # file record not created
     end
   
-    kill()
+    terminate
+    # kill()
   end
   
 end

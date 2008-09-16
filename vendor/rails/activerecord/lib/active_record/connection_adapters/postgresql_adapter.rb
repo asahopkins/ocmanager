@@ -140,7 +140,7 @@ module ActiveRecord
 
       def query(sql, name = nil) #:nodoc:
         log(sql, name) do
-          if @async
+          if @async && @connection.respond_to?(:async_query)
             @connection.async_query(sql)
           else
             @connection.query(sql)
@@ -150,7 +150,7 @@ module ActiveRecord
 
       def execute(sql, name = nil) #:nodoc:
         log(sql, name) do
-          if @async
+          if @async && @connection.respond_to?(:async_exec)
             @connection.async_exec(sql)
           else
             @connection.exec(sql)

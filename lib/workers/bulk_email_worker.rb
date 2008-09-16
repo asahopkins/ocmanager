@@ -130,7 +130,8 @@ class BulkEmailWorker < BackgrounDRb::Rails
     #   contact_event = ContactEvent.new(:entity_id=>entity_id, :contact_text_id=>@text.id, :when_contact=>Time.now, :initiated_by=>"Campaign", :interaction=>false, :form=>"Email", :campaign_id=>@text.campaign_id)
     #   contact_event.save!
     # end
-    kill()
+    terminate
+    # kill()
   # rescue
   #   @logger.debug "needed rescuing"
   #   kill()

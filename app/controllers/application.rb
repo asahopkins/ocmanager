@@ -21,7 +21,8 @@
 require 'acl_system'
 require 'localization'
 require 'user_system'
-require 'rdiscount'
+# require 'rdiscount'
+require 'bluecloth'
 require 'memory_logging'
 
 # Filters added to this controller will be run for all controllers in the application.
