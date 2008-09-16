@@ -34,11 +34,12 @@ class ExportedFilesController < ApplicationController
     @file_pages, @files = paginate :exported_files, :per_page => 25, :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}], :order=>"created_at DESC"
     for file in @files
       key_name = "export_key_"+file.filename
+      @progress = Hash.new
       if MiddleMan[key_name.to_sym]
-        @progress = MiddleMan[key_name.to_sym].progress
-        if @progress == 101
+        @progress[file.id] = MiddleMan[key_name.to_sym].progress
+        if @progress[file.id] == 101
     		  MiddleMan.delete_worker(key_name.to_sym)
-    		  @progress = nil
+    		  @progress[file.id] = nil
   		  end
     	end
     end

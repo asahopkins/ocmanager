@@ -8,12 +8,12 @@
   </tr>
   
 <% for file in @files %>
-	<% if @progress %>
+	<% if @progress[file.id] %>
   <tr>
 	<td><%=h file.filename %></td>
 	<td><%=h file.created_at.strftime('%m/%d/%Y') %></td>
 	<td>No</td>
-    <td>Progress: <%= @progress.to_s %>%</td>
+    <td>Progress: <%= @progress[file.id].to_s %>%</td>
   </tr>
 	<% else -%>
   <tr>
