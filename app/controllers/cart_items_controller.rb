@@ -201,7 +201,7 @@ class CartItemsController < ApplicationController
     end
     filename.gsub!(/[\s\/:]+/,"_")
     
-    key_name = "export_call_sheets_key_"+filename
+    key_name = "export_key_"+filename
     MiddleMan.new_worker(:class=>:export_call_sheets_worker, :args=>{:entity_id_array=>entity_id_array, :filename=>filename, :file_path_prefix=>@@file_path_prefix, :campaign_id=>@campaign.id}, :job_key=>key_name.to_sym)
     flash[:notice] = "Call sheets are being prepared now."
     

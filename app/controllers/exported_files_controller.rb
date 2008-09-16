@@ -32,6 +32,16 @@ class ExportedFilesController < ApplicationController
   def list
     @page_title = "Exported Files"
     @file_pages, @files = paginate :exported_files, :per_page => 25, :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}], :order=>"created_at DESC"
+    for file in @files
+      key_name = "export_key_"+file.filename
+      if MiddleMan[key_name.to_sym]
+        @progress = MiddleMan[key_name.to_sym].progress
+        if @progress == 101
+    		  MiddleMan.delete_worker(key_name.to_sym)
+    		  @progress = nil
+  		  end
+    	end
+    end
   end
 
   def get

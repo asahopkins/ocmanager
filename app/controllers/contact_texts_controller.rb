@@ -422,7 +422,7 @@ class ContactTextsController < ApplicationController
     end
     filename.gsub!(/[\s\/:]+/,"_")
     
-    key_name = "export_labels_key_"+filename
+    key_name = "export_key_"+filename
     MiddleMan.new_worker(:class=>:export_labels_worker, :args=>{:text_id=>params[:id], :entity_id_array=>entity_id_array, :filename=>filename, :join_households=>@join_households, :sort_field=>sort_field, :campaign_id=>@campaign.id, :file_path_prefix=>@@file_path_prefix}, :job_key=>key_name.to_sym)
     flash[:notice] = "Labels are being prepared now."
     
@@ -448,7 +448,7 @@ class ContactTextsController < ApplicationController
     end
     filename.gsub!(/[\s\/:]+/,"_")
     
-    key_name = "export_mail_file_key_"+filename
+    key_name = "export_key_"+filename
 
     if params[:id]=="mypeople"
       MiddleMan.new_worker(:class=>:export_csv_worker, :args=>{

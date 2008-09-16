@@ -91,7 +91,7 @@ class BulkEmailWorker < BackgrounDRb::Rails
         end
 
         # @logger.debug "message delivered"
-        @progress = ((i*100.0)/num_addresses).round
+        @progress = ((i*100.0)/num_addresses).floor
         i = i+1
         if i % 50 == 0
           sleep 30
@@ -130,6 +130,7 @@ class BulkEmailWorker < BackgrounDRb::Rails
     #   contact_event = ContactEvent.new(:entity_id=>entity_id, :contact_text_id=>@text.id, :when_contact=>Time.now, :initiated_by=>"Campaign", :interaction=>false, :form=>"Email", :campaign_id=>@text.campaign_id)
     #   contact_event.save!
     # end
+    @progress = 101
     terminate
     # kill()
   # rescue

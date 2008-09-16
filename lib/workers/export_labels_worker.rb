@@ -243,7 +243,7 @@ class ExportLabelsWorker < BackgrounDRb::Rails
           add_label(row, 2, address_page[row*@cols+2], pdf)
         end
 
-        @progress = ((page+1)*100.0/pages).round
+        @progress = ((page+1)*100.0/pages).floor
         # sleep 30
         pdf.new_page unless page + 1 == pages
       end
@@ -254,6 +254,7 @@ class ExportLabelsWorker < BackgrounDRb::Rails
     else
       # TODO: notify the user that the file didn't save correctly
     end
+    @progress = 101
     terminate
     # kill()
   end

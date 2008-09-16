@@ -8,13 +8,12 @@
   </tr>
   
 <% for file in @files %>
-	<% key_name = "export_labels_key_"+file.filename
-	if MiddleMan[key_name.to_sym] %>
+	<% if @progress %>
   <tr>
 	<td><%=h file.filename %></td>
 	<td><%=h file.created_at.strftime('%m/%d/%Y') %></td>
 	<td>No</td>
-    <td>Progress: <%= MiddleMan[key_name.to_sym].progress %>%</td>
+    <td>Progress: <%= @progress.to_s %>%</td>
   </tr>
 	<% else -%>
   <tr>

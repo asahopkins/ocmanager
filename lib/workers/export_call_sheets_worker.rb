@@ -248,7 +248,7 @@ class ExportCallSheetsWorker < BackgrounDRb::Rails
       @logger.info "file record not created"
       # file record not created
     end
-  
+    @progress = 101
     terminate
     # kill()
   end
