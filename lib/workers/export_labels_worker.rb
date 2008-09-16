@@ -27,6 +27,7 @@ require 'pdf/writer'
 class ExportLabelsWorker < BackgrounDRb::Rails
   
   attr_reader :progress
+  @job_ctrl = true
   
 
   def cell_x(col)

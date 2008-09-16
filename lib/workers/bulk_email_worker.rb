@@ -25,7 +25,7 @@
 ActionMailer::Base.template_root = File.expand_path(File.dirname(__FILE__) + "/../../app/views")
 
 class BulkEmailWorker < BackgrounDRb::Rails
-  
+  @job_ctrl = true
   attr_reader :progress
   
   def do_work(args)

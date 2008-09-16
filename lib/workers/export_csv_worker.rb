@@ -28,6 +28,7 @@ class ExportCsvWorker < BackgrounDRb::Rails
   
   attr_reader :progress
   
+  @job_ctrl = true
   
   def number_to_phone(number, options = {})
     options   = options.stringify_keys
