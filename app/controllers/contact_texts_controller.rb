@@ -281,12 +281,13 @@ class ContactTextsController < ApplicationController
   
   def check_email_progress
     key_name = "bulk_email_key_"+params[:id]
-    if MiddleMan[key_name.to_sym]#.progress < 100
+    unless MiddleMan[key_name.to_sym].progress == 101
       @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
       render :update do |page|
         page.replace_html "draft_emails", render(:partial=>"draft_emails_table")
       end
     else
+      MiddleMan.delete_worker(key_name.to_sym)
       render :update do |page|
         page.redirect_to :action=>'list', :protocol=>@@protocol
       end
