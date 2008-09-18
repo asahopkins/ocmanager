@@ -258,6 +258,7 @@ class ExportCsvWorker < BackgrounDRb::Rails
     end
     @progress = 101
     terminate
+    ActiveRecord::Base.connection.disconnect!
     # kill()
   end
   
