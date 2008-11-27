@@ -86,7 +86,7 @@ module UserHelper
   end
 
   def head_helper(options = {})
-    label = l(:"#{@controller.controller_name}_#{@controller.action_name}_head")
+    label = "manager"#l(:"#{@controller.controller_name}_#{@controller.action_name}_head")
     notice = message = error = nil
     opts = DEFAULT_HEAD_OPTIONS.dup
     opts.update(options.symbolize_keys)

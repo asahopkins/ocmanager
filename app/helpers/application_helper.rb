@@ -20,7 +20,7 @@
 
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
-  include Localization
+  # include Localization
   
   def plus_minus(plus, minus, open, klass="", label="", open_flag=false)
     output = "<span id=\""+plus+"\" class=\""+klass+"\""

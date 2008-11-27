@@ -20,7 +20,7 @@ ActionController::Routing::Routes.draw do |map|
   # instead of a file named 'wsdl'
   map.connect ':controller/service.wsdl', :action => 'wsdl'
 
-  ActionController::AbstractRequest.relative_url_root = "/manager"
+  # ActionController::AbstractRequest.relative_url_root = "/manager"
 
   # Install the default route as the lowest priority.
   map.connect ':controller/:action/:id'

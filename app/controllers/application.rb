@@ -19,8 +19,8 @@
 # ---------------------------------------------------------------------------
 
 require 'acl_system'
-require 'localization'
-require 'user_system'
+# require 'localization'
+# require 'user_system'
 # require 'rdiscount'
 require 'bluecloth'
 require 'memory_logging'
@@ -29,7 +29,7 @@ require 'memory_logging'
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
   before_filter :login_required#, :only=>[]
-  include Localization
+  # include Localization
   include ACLSystem
   include MemoryLogging
   

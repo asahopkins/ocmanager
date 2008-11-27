@@ -2,4 +2,4 @@
 require "railspdf"
 #require "ActionView"
 
-ActionView::Base.register_template_handler 'rpdf', RailsPDF::PDFRender
+ActionView::Template.register_template_handler 'rpdf', RailsPDF::PDFRender
