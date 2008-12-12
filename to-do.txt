@@ -2,9 +2,8 @@ For upgrade to rails 2.2:
 will_paginate in place of pagination
 update/fix railspdf
 replace user/authentication process with restful_authentication
-
-
-
+upgrade backgroundrb to the most recent version; this will involve significant reworking of the worker tasks
+	-- once this is done, put "add to mypeople" in the background for changes > 500 (this will need to freeze out subsequent changes while it runs, due to potential conflicts)
 
 
 
