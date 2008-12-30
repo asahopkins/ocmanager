@@ -21,6 +21,8 @@ class Tag < ActiveRecord::Base
     # delete any blank tag names
     tag_names = tag_names.delete_if { |t| t.empty? }
     
+    tag_names.uniq!
+    
     return tag_names
   end
 
