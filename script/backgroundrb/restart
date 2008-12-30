@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /var/www/virtual/asahopkins.com/secure/htdocs/manager/current
+cd /home/oc/sites/manager/current
 
 if [ -a "log/backgroundrb.pid" ]; then
   pid=`cat log/backgroundrb.pid`
