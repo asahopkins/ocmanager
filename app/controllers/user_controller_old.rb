@@ -529,28 +529,6 @@ class UserController < ApplicationController
     return false
   end
   
-  # this should be defunct soon
-#    def signup
-#      return if generate_blank
-#      params['user'].delete('form')
-#      @user = User.new(params['user'])
-#      begin
-#        User.transaction(@user) do
-#          @user.new_password = true
-#          if @user.save
-#            key = @user.generate_security_token
-#            url = url_for(:action => 'welcome')
-#            url += "?user[id]=#{@user.id}&key=#{key}"
-#            UserNotify.deliver_signup(@user, params['user']['password'], url)
-#            flash['notice'] = l(:user_signup_succeeded)
-#            redirect_to :action => 'login', :protocol=>@@protocol
-#          end
-#        end
-#      rescue
-#        flash.now['message'] = l(:user_confirmation_email_error)
-#      end
-#    end  
-  #####  
 
   protected
   
