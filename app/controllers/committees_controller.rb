@@ -96,7 +96,7 @@ class CommitteesController < ApplicationController
   
   def check_campaign
     # unless params[:campaign_id]
-    #   params[:campaign_id] = session[:user].active_campaigns.first
+    #   params[:campaign_id] = current_user.active_campaigns.first
     # end
     # @campaign = Campaign.find(params[:campaign_id])
     if current_user.active_campaigns.include?(@campaign.id)

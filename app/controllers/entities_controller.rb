@@ -60,14 +60,14 @@ class EntitiesController < ApplicationController
           end
         else
           flash[:warning] = "No people or organizations tagged with '"+ @tag_name + "'.  Here is the whole list."
-          redirect_to :action=>"list", :params=>{:campaign_id=>@campaign.id,:id=>nil}, :protocol=>@@protocol
+          redirect_to :action=>"list", :params=>{:id=>nil}, :protocol=>@@protocol
         end
         cond.id === ids
       end
     end
     @count = Entity.count(:conditions=>cond.to_sql)
     # TODO: reorder using entity.sort_by_name
-    @entity_pages, @entities = paginate :entities, :per_page => 25, :order=>"last_name ASC, name ASC, first_name ASC", :conditions=>cond.to_sql, :include=>:primary_address
+    @entities = Entity.paginate :per_page => 25, :order=>"last_name ASC, name ASC, first_name ASC", :conditions=>cond.to_sql, :include=>:primary_address, :page=>params[:page]
   end
 
   def show
@@ -75,9 +75,9 @@ class EntitiesController < ApplicationController
       render :action=>"show_mobile", :layout=>"mobile"
       return
     else
-      @can_edit = session[:user].can_edit_entities?(@campaign)
-      @can_edit_groups = session[:user].edit_groups?(@campaign)
-      @can_see_financial = session[:user].can_see_financial?(@campaign)
+      @can_edit = current_user.can_edit_entities?(@campaign)
+      @can_edit_groups = current_user.edit_groups?(@campaign)
+      @can_see_financial = current_user.can_see_financial?(@campaign)
       @recent_texts = @campaign.get_recent_texts
       @recent_events = @campaign.get_recent_events
       @rsvp_pages, @rsvps = paginate :rsvps, :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["rsvps.entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event
@@ -153,10 +153,10 @@ class EntitiesController < ApplicationController
     end
 #    logger.debug cond.to_sql.to_s
     if @mobile
-      @entity_pages, @entities = paginate :entities, :include=>includes, :per_page => 10, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql
+      @entities = Entity.paginate :include=>includes, :per_page => 10, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql, :page=>params[:page]
       render :action=>"search_mobile", :layout=>"mobile"
     else
-      @entity_pages, @entities = paginate :entities, :include=>includes, :per_page => 25, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql
+      @entities = Entity.paginate :include=>includes, :per_page => 25, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql, :page=>params[:page]
       render :action=>"search_results"
     end
   end
@@ -165,25 +165,6 @@ class EntitiesController < ApplicationController
 
   end
 
-# CODE STATUS
-# type DONE
-# name DONE
-# phone DONE
-# email DONE
-# fax DONE
-# website DONE
-# time to reach DONE
-# contact flags DONE
-# voter info DONE
-# committee info DONE
-# other info DONE
-# skills and languages DONE
-# address DONE
-# tags DONE
-# volunteer interests DONE
-# contributions -- local DONE
-# contributions -- remote DONE
-# custom fields DONE
 
   def search_results
     if request.method==:post
@@ -199,7 +180,7 @@ class EntitiesController < ApplicationController
       cond = EZ::Where::Condition.new :entities
       if params[:campaign_id]
         @campaign = Campaign.find(params[:campaign_id])
-        if session[:user].active_campaigns.include?(@campaign.id)
+        if current_user.active_campaigns.include?(@campaign.id)
         else
           @campaign = nil
           render :partial=>"user/not_available"
@@ -207,7 +188,7 @@ class EntitiesController < ApplicationController
         camp = @campaign.id
         cond.campaign_id == camp
       else
-        camp = session[:user].current_campaign
+        camp = current_user.current_campaign
         cond.campaign_id == camp
       end
 
@@ -300,26 +281,6 @@ class EntitiesController < ApplicationController
         end
         address_cond.append cond_any
       end
-
-      #logger.debug address_cond.to_sql
-#      if address_cond.to_sql.to_s != ""
-        
-#        @addresses = Address.find(:all,:conditions=>address_cond.to_sql)
-#        entity_ids = []
-#        address_ids = []
-#        @addresses.each do |address|
-#          entity_ids << address.entity_id
-#          address_ids << address.id
-#        end
-#        #cond.id === entity_ids
-#        if params[:entity][:address_which]=="Primary"
-#          #cond.primary_address_id === address_ids
-#        end
-        
-#        includes << :addresses
-#        includes << :primary_address
-#        cond.append address_cond
-#      end
 
       cond.append address_cond
       
@@ -613,7 +574,7 @@ class EntitiesController < ApplicationController
       cond_languages = build_text_search(params[:entity][:language_flag], params[:entity][:languages], 'languages', :entities)
       cond.append cond_languages
             
-      if session[:user].can_see_financial?(@campaign)
+      if current_user.can_see_financial?(@campaign)
         #contributions
         if params[:local_contribution][:flag].to_s != ""
           search = params[:local_contribution][:amount].to_f
@@ -690,13 +651,13 @@ class EntitiesController < ApplicationController
             end_date = Date.new(params[:remote_contribution]['end_date(1i)'].to_i, params[:remote_contribution]['end_date(2i)'].to_i, params[:remote_contribution]['end_date(3i)'].to_i)
             local_ids = []
             @campaign.committees.each do |committee|
-              unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == ""
+              unless current_user.treasurer_info.nil? or current_user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == ""
                 treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
                 ids = []
                 if params[:remote_contribution][:flag].to_s == "Total"
-                  ids = treasurer.get_entities_by_finances_and_date(session[:user].treasurer_info[committee.id][0], session[:user].treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, false, true, true)
+                  ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, false, true, true)
                 elsif params[:remote_contribution][:flag].to_s == "One"
-                  ids = treasurer.get_entities_by_finances_and_date(session[:user].treasurer_info[committee.id][0], session[:user].treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, true, true, true)
+                  ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, true, true, true)
                 end
                 unless ids.empty?
                   treasurer_entities = TreasurerEntity.find(:all, :conditions=>["committee_id = #{committee.id} AND treasurer_id IN (:remote_ids)",{:remote_ids=>ids}])
@@ -890,51 +851,7 @@ class EntitiesController < ApplicationController
         cond.append cond_volunteer_history
       end
       
-      
-      
-#      unless custom_field_conditions.length==0
-#        part_conditions = []
-#        custom_field_conditions.each do |cf_cond|
-#          part_condition = EZ::Where::Condition.new :entities, :outer=>:or
-#          part_condition.append cond, :and
-#          part_condition.append cf_cond, :and
-#          part_conditions << part_condition
-#        end
-      
-#        final_condition = EZ::Where::Condition.new :entities, :inner=>:or
-#      
-#        final_condition.append part_conditions[0]
-#        part_conditions.delete(part_conditions[0])
-#        part_conditions.each do |part|
-#          final_condition.append part, :or
-#        end
 
-#        cond = final_condition
-#      end
-      
-
-      
-#      logger.debug "test search"
-#      logger.debug includes
-#      if includes.include?(:primary_address) or includes.include?(:addresses)
-#        group_clause << ", addresses.id"
-#      end
-      
-#      having = ["SUM(cfv_1.value) < 34", "SUM(cfv_1.value) > 3"]
-
-      logger.debug includes
-
-      # if aggregate.empty?
-      #   aggregate = nil
-      # else
-      #   aggregate = aggregate.join(", ")
-      # end
-
-      # TODO: thse next three lines should be obselete
-      # group_clause = nil
-      # session[:group_clause] = nil
-      # session[:aggregate] = nil
-      # no grouping clause at all
       
       includes.uniq!
       session[:includes] = includes
@@ -943,38 +860,19 @@ class EntitiesController < ApplicationController
       logger.debug session[:search_cond].to_sql
       session[:joins] = joins
 
-      @count = Entity.count('entities.id', :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
+      @entities = Entity.paginate :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :page=>params[:page]
+      @count = @entities.total_entries
+      # @count = Entity.count('entities.id', :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
       if @count == 1
         entity = Entity.find(:first, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
         redirect_to :action=>"show", :id=>entity.id, :protocol=>@@protocol
         return
       end
-      @entity_pages, @entities = paginate :entities, :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins
-      
-#      @entities.each do |entity|
-#        logger.debug entity.name
-#      end
-      
-      #logger.debug "about to do count"
-      
-      #@count = Entity.count('id', :joins=>joins, :conditions=>cond.to_sql, :include=>includes, :group=>"entities.last_name")
-      
-      
-      #logger.debug "about to do pagination"
-            
-      #@entity_pages, @entities = paginate :entities, :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :group=>"entities.last_name"
-      
-      # if @count == 1
-      #   redirect_to :action=>"show", :id=>@entities.first.id, :protocol=>@@protocol
-      #   return
-      # end
-      # 
-      # @entity_pages, @entities = paginate_collection @entities, :per_page => 25, :page=>params[:page]
       
     else
       if params[:campaign_id]
         @campaign = Campaign.find(params[:campaign_id])
-        if session[:user].active_campaigns.include?(@campaign.id)
+        if current_user.active_campaigns.include?(@campaign.id)
         else
           @campaign = nil
           render :partial=>"user/not_available"
@@ -988,112 +886,17 @@ class EntitiesController < ApplicationController
       joins = session[:joins]
       # aggregate = session[:aggregate]
       
-      @count = Entity.count('entities.id', :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
+      @entities = Entity.paginate :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :page=>params[:page]
+      @count = @entities.total_entries
       if @count == 1
         entity = Entity.find(:first, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
         redirect_to :action=>"show", :id=>entity.id, :protocol=>@@protocol
         return
       end
-      @entity_pages, @entities = paginate :entities, :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins
-
-      # @entities = Entity.find(:all, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :group=>group_clause, :aggregate=>aggregate)
-      # @count = @entities.length
-      # if @count == 1
-      #   redirect_to :action=>"show", :id=>@entities.first.id, :protocol=>@@protocol
-      #   return
-      # end
-      # @entity_pages, @entities = paginate_collection @entities, :per_page => 25, :page=>params[:page]
-
-#      @count = Entity.count('id', :conditions=>session[:search_cond].to_sql, :include=>includes)
-#      @entity_pages, @entities = paginate :entities, :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>session[:search_cond].to_sql, :include=>includes, :joins=>session[:joins]
     end
   end
 
-#   # this shouldn't get called any more
-#   def update_cart
-#     @cart = find_cart
-#     @big_change = false
-#     @single_change = false
-#     if params[:id].nil?
-#       if params[:tag_name]
-#         tag = Tag.find_by_name_and_campaign_id(params[:tag_name],params[:campaign_id])
-#         unless tag.nil?
-#           entity_ids = []
-#           tag.taggings.each do |tagging|
-#             entity_ids << tagging.taggable_id
-#           end
-#           if params[:cart] == "Add"
-#             @cart.add(entity_ids)
-#           elsif params[:cart] == "Intersect"
-#             @cart.intersect_with(entity_ids)
-#           elsif params[:cart] == "Remove"
-#             @cart.remove(entity_ids)
-#           end
-#         end
-#       else
-#         logger.debug "from search"
-#         if params[:cart] == "Empty"
-#           @cart.empty!
-#         else 
-#           includes = session[:includes]
-#           session[:search_cond] ||= EZ::Where::Condition.new
-#           logger.debug session[:search_cond].to_sql
-#           cond = session[:search_cond]
-#           group_clause = session[:group_clause]
-#           joins = session[:joins]
-#           aggregate = session[:aggregate]
-# 
-#           entities = Entity.find(:all, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :group=>group_clause, :aggregate=>aggregate)
-#           if params[:cart] == "Add"
-#             @cart.add(entities)
-#           elsif params[:cart] == "Intersect"
-#             @cart.intersect_with(entities)
-#           elsif params[:cart] == "Remove"
-#             @cart.remove(entities)
-#           end
-#         end
-#       end
-#     else
-#       @id = params[:id]
-#       logger.debug "single entity"
-#       if params[:cart] == "Add"
-#         @cart.add(params[:id])
-#       elsif params[:cart] == "Remove"
-#         @cart.remove(params[:id])
-#       end
-#     end
-#     @reload_cart = params[:reload_cart]
-#     # THIS IS WHERE THE CALL TO AN RJS VIEW GOES
-# #    if params[:reload_cart]
-# #      logger.debug params[:reload_cart]
-# #      redirect_to :action=>:show_cart
-# #    else
-# #      render_text @cart.number
-# #    end
-#   end
-# 
-#   # this shouldn't get called any more
-#   def show_cart
-#     @campaigns = Campaign.find(:all,:conditions=>["id IN (?)",session[:user].active_campaigns])
-#     @groups = []
-#     @campaigns.each do |campaign|
-#       @groups << campaign.groups
-#     end
-#     @groups.flatten!
-#     @page_title = "MyPeople"
-#     #@entity_pages, @entities = paginate :entities, :per_page => 10, :order=>"last_name, name, first_name ASC", :conditions=>["campaign_id = :campaign",{:campaign=>@campaign.id}]
-#     @cart = find_cart
-#     items = @cart.items
-#     # logger.debug items
-#     cond = EZ::Where::Condition.new :entities
-#     if @cart.number > 0
-#       cond.clause(:id) === items
-#     else
-#       cond.append ' FALSE '
-#     end
-#     #logger.debug cond.to_sql
-#     @entity_pages, @entities = paginate :entities, :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>:primary_address
-#   end
+
 
   def new
     @entity = Entity.new
@@ -1146,7 +949,7 @@ class EntitiesController < ApplicationController
       elsif params[:entity][:type]=="OutsideCommittee"
          @entity = OutsideCommittee.new(params[:entity])
       end
-      @entity.created_by = session[:user].id
+      @entity.created_by = current_user.id
       #address
       @address = Address.new(params[:address])
       @address.entity = @entity
@@ -1353,10 +1156,10 @@ class EntitiesController < ApplicationController
     end
     if @entity.update_attributes(params[:entity])
       #flash[:notice] = 'Entity was successfully updated.'
-      render :partial => params[:partial], :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+      render :partial => params[:partial], :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
     else
       flash[:warning] = 'There was an error saving the new values.'
-      render :partial => params[:partial], :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+      render :partial => params[:partial], :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
     end
   end
 
@@ -1380,8 +1183,8 @@ class EntitiesController < ApplicationController
         field_value.update_attributes(params[:entity][field_id.to_s])
       end
       }
-    @entity.update_attributes({:updated_by=>session[:user].id})
-    render :partial => params[:partial], :locals=>{:entity=>@entity, :can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    @entity.update_attributes({:updated_by=>current_user.id})
+    render :partial => params[:partial], :locals=>{:entity=>@entity, :can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def update_name
@@ -1397,7 +1200,7 @@ class EntitiesController < ApplicationController
     end
     params[:entity].delete(:class)
     @entity.update_attributes(params[:entity])
-    render :partial=>"name", :locals=>{:entity=>@entity, :can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"name", :locals=>{:entity=>@entity, :can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def update_address
@@ -1416,7 +1219,7 @@ class EntitiesController < ApplicationController
       @address.update_attributes(params[:address])
       @entity.save!
     end
-    render :partial=>"addresses", :locals=>{:entity=>@entity, :can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"addresses", :locals=>{:entity=>@entity, :can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def delete_address
@@ -1437,7 +1240,7 @@ class EntitiesController < ApplicationController
       end
       @entity.save!
     end
-    render :partial=>"addresses", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"addresses", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def add_address
@@ -1463,9 +1266,9 @@ class EntitiesController < ApplicationController
       end
       @entity.save!
     end
-    render :partial=>"addresses", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"addresses", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   rescue
-    render :partial=>"addresses", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"addresses", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def update_phones
@@ -1479,7 +1282,7 @@ class EntitiesController < ApplicationController
       @entity.primary_phone = new_label
     end
     @entity.save  
-    render :partial=>"phones", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"phones", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def add_phone
@@ -1489,7 +1292,7 @@ class EntitiesController < ApplicationController
       @entity.primary_phone = new_label
     end
     @entity.save  
-    render :partial=>"phones", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"phones", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
   
   def delete_phone
@@ -1502,7 +1305,7 @@ class EntitiesController < ApplicationController
       end
     end
     @entity.save
-    render :partial=>"phones", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"phones", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def update_faxes
@@ -1516,7 +1319,7 @@ class EntitiesController < ApplicationController
       @entity.primary_fax = new_label
     end
     @entity.save  
-    render :partial=>"faxes", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"faxes", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def add_fax
@@ -1526,7 +1329,7 @@ class EntitiesController < ApplicationController
       @entity.primary_fax = new_label
     end
     @entity.save  
-    render :partial=>"faxes", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"faxes", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
   
   def delete_fax
@@ -1539,7 +1342,7 @@ class EntitiesController < ApplicationController
       end
     end
     @entity.save
-    render :partial=>"faxes", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"faxes", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def update_website
@@ -1547,7 +1350,7 @@ class EntitiesController < ApplicationController
       @entity.website = params[:entity][:website]
       @entity.save
     end
-    render :partial=>"website", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"website", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def update_skills
@@ -1564,10 +1367,10 @@ class EntitiesController < ApplicationController
     end
     if @entity.update_attributes(params[:entity])
       #flash[:notice] = 'Entity was successfully updated.'
-      render :partial=>"skills_and_interests", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+      render :partial=>"skills_and_interests", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
     else
       flash[:warning] = 'There was an error saving the new values.'
-      render :partial=>"skills_and_interests", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)} #, :protocol=>@@protocol
+      render :partial=>"skills_and_interests", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)} #, :protocol=>@@protocol
     end    
   end
 
@@ -1666,7 +1469,7 @@ class EntitiesController < ApplicationController
       end
     end
     @entity = @page_entity
-    render :partial=>"household_box", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"household_box", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
   
   def remove_from_household
@@ -1677,7 +1480,7 @@ class EntitiesController < ApplicationController
       @entity.save
     end
     @entity = @page_entity
-    render :partial=>"household_box", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"household_box", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def household_search
@@ -1690,7 +1493,7 @@ class EntitiesController < ApplicationController
     end
     cond = EZ::Where::Condition.new :entities
     @campaign = Campaign.find(params[:campaign_id])
-    if session[:user].active_campaigns.include?(@campaign.id)
+    if current_user.active_campaigns.include?(@campaign.id)
     else
       @campaign = nil
       render :partial=>"user/not_available"
@@ -1700,7 +1503,7 @@ class EntitiesController < ApplicationController
     cond.name.nocase =~ search
     cond.type == "Person"
     @entities = Entity.find(:all,:conditions=>cond.to_sql,:limit=>8)
-    render :partial=>"household_search_results", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"household_search_results", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   # # this shouldn't be used any more
@@ -2090,7 +1893,7 @@ class EntitiesController < ApplicationController
           @household.save
           @entity.household = @household
         end
-        @entity.created_by = session[:user].id
+        @entity.created_by = current_user.id
         unless @home_address.nil?
           @home_address.save! 
           @entity.addresses << @home_address
@@ -2293,7 +2096,7 @@ private
     # @campaign = @entity.campaign
     if current_user.active_campaigns.include?(@campaign.id) and @campaign.id == @entity.campaign_id
       unless params[:entity].nil?
-        params[:entity][:updated_by]=session[:user].id
+        params[:entity][:updated_by]=current_user.id
       end
     else
       @entity = nil
@@ -2304,7 +2107,7 @@ private
   
   def check_campaign
     # unless params[:campaign_id]
-    #   params[:campaign_id] = session[:user].active_campaigns.first
+    #   params[:campaign_id] = current_user.active_campaigns.first
     # end
     # @campaign = Campaign.find(params[:campaign_id])    
     if current_user.active_campaigns.include?(@campaign.id)

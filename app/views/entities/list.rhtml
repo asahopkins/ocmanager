@@ -43,10 +43,10 @@
 </div>
 
 <div id="entities_list">
-	<% session[:user].manager?(@campaign) ? can_delete = true : can_delete = false%>
+	<% current_user.manager?(@campaign) ? can_delete = true : can_delete = false%>
 	<% for entity in @entities %>
 	<%= render :partial=>"list_line", :locals=>{:entity=>entity, :can_delete=>can_delete} %>
 	<% end %>
 </div>
 <br class="brclear"/>
-<%= pagination_links @entity_pages, :params=>{:campaign_id=>@campaign.id} %>
+<%= will_paginate @entities %>

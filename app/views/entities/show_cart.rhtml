@@ -24,7 +24,7 @@
 <!-- Tag MyPeople -->
 <p><%= form_remote_tag :url=>{:controller=>"entities", :action=>"add_tag_to_cart"} %><%= submit_tag "Add tag to MyPeople:" %> <%= text_field "entity", "tag",:size=>10 %> (put multiple word tags "in quotes")</form></p>
 <!-- Add MyPeople to a Group (new or existing) -->
-<% if session[:user].edit_groups?(@campaigns) %>
+<% if current_user.edit_groups?(@campaigns) %>
 <p><%= form_remote_tag :url=>{:controller=>"groups", :action=>"add_cart_to_group"} %><%= submit_tag "Add MyPeople to Group:" %> <%= select "group", "id", @groups.collect { |g| [g.name, g.id] } %> in role: <%= text_field "group", "role",:size=>10,:value=>"Member" %> </form></p>
 <% end %></p>
 &nbsp;<br />

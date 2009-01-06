@@ -27,16 +27,16 @@
 </div>
 <div id="entities_list">
 	<% unless @campaign.nil? %>
-		<% session[:user].manager?(@campaign) ? can_delete = true : can_delete = false%>
+		<% current_user.manager?(@campaign) ? can_delete = true : can_delete = false%>
 	<% end %>
 	<% for entity in @entities %>
 		<% if @campaign.nil? %>
-			<% session[:user].manager?(entity.campaign) ? can_delete = true : can_delete = false%>
+			<% current_user.manager?(entity.campaign) ? can_delete = true : can_delete = false%>
 		<% end %>
 		<%= render :partial=>"list_line", :locals=>{:entity=>entity, :can_delete=>can_delete} %>
 	<% end %>
 </div>
 <br class="brclear"/>
-<%= pagination_links @entity_pages %> 
+<%= will_paginate @entities %> 
 <br class="brclear" />
 <p><b>Search conditions:</b> <%= to_where_statement(session[:search_cond].to_sql) %></p>

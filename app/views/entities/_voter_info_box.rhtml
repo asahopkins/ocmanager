@@ -31,7 +31,7 @@ end
 </div>
 <% if can_edit -%>
 <div id="form_voter_info" style="display:none;">
-	<!-- if session[:user].role(campaign) >=4, show "no allowed to edit", else -->
+	<!-- if current_user.role(campaign).rank >=4, show "no allowed to edit", else -->
 	<%= form_remote_tag :update=>"voter_info_box", :url=>{:action=>"update_partial", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id,:partial=>"voter_info_box"}}, :loading=>"Element.show('voter_info_box_indic')", :complete=>"Element.hide('voter_info_box_indic')"%>
 		<dl>
 	<dt>Party</dt> <dd><%= select "entity", "registered_party", ["Democratic", "Decline to State", "Republican", "Green", "Peace & Freedom", "Natural Law","American Independent"], { :include_blank=>true, :selected=>@entity.registered_party }%></dd>

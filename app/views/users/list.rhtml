@@ -42,7 +42,7 @@
 		</td>
   </tr>
   <% for cur in user.campaign_user_roles -%>
-  <% if session[:user].manager_campaigns.include?(cur.campaign_id) %>
+  <% if current_user.manager_campaigns.include?(cur.campaign_id) %>
   <tr>
       <td><%= cur.campaign.name %></td>
       <td><%= cur.role.name %><% if user.can_see_financial?(cur.campaign) -%>(+ finances)<% end -%></td>
@@ -56,6 +56,4 @@
   </tr>
 <% end %>
 </table>
-
-<%= link_to 'Previous page', { :page => @user_pages.current.previous } if @user_pages.current.previous %>
-<%= link_to 'Next page', { :page => @user_pages.current.next } if @user_pages.current.next %> 
+<%= will_paginate @users %>

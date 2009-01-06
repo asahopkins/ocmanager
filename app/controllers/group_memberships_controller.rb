@@ -73,7 +73,7 @@ class GroupMembershipsController < ApplicationController
   def destroy
     @user = current_user
     if params[:group_id].to_s == ""
-      render :partial=>"groups_info", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign), :can_edit_groups=>session[:user].edit_groups?(@campaign)}, :protocol=>@@protocol
+      render :partial=>"groups_info", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign), :can_edit_groups=>current_user.edit_groups?(@campaign)}, :protocol=>@@protocol
     else
       @group = Group.find(params[:group_id])
       @entity = Entity.find(params[:entity_id])

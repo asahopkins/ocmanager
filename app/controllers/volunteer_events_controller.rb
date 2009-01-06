@@ -154,7 +154,7 @@ class VolunteerEventsController < ApplicationController
         @entity.household = @household
         #name
         @entity.name = @entity.first_name+" "+@entity.last_name
-        @entity.created_by = session[:user].id
+        @entity.created_by = current_user.id
         #address
         @address = Address.new(params[:address])
         @address.entity = @entity

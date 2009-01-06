@@ -20,6 +20,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.connect '', :controller => "sessions", :action=>"new"
   map.forgot_password '/forgot_password', :controller => 'users', :action => 'forgot_password'
   map.reset_password '/reset_password/:activation_code/', :controller => 'users', :action => 'reset_password', :activation_code => nil
+  map.list_users '/users/list',:controller=>'users',:action=>'list'
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
 
   map.resource :session

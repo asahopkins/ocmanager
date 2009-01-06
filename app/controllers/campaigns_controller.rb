@@ -59,7 +59,7 @@ class CampaignsController < ApplicationController
     current_user.current_campaign = params[:campaign_id]
     current_user.save
     redirect_back_or_default(:controller=>'campaigns', :action=>'start_here')
-    # @campaigns = session[:user].active_campaigns
+    # @campaigns = current_user.active_campaigns
     # logger.debug @campaigns
     # if @campaigns.length==1
     #   redirect_to :controller=>"entities", :action=>"list", :params=>{:campaign_id=>@campaigns[0]}, :protocol=>@@protocol

@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  layout  'user'
   # Be sure to include AuthenticationSystem in Application Controller instead
   # include AuthenticatedSystem
   
@@ -128,8 +129,42 @@ class UsersController < ApplicationController
   # smart -- make sure you check that the visitor is authorized to do so, that they
   # supply their old password along with a new one to update it, etc.
 
+  def name
+    "Users"
+  end 
+
+  def list
+    page = params[:page] || 1
+    @cur_array = Array.new
+    @user_array = Array.new
+    for comm_id in current_user.manager_campaigns
+      @cur_array << CampaignUserRole.find(:all,:conditions=>["campaign_id = :comm",{:comm=>comm_id}])
+    end
+    @cur_array.flatten!
+    @cur_array.each {|cur|
+      @user_array << cur.user
+      }
+    @user_array.uniq!
+    @user_array.sort! do |a, b|
+      if (a.logged_in_at and b.logged_in_at)
+        b.logged_in_at <=> a.logged_in_at
+      else
+        if a.logged_in_at
+          -1
+        elsif b.logged_in_at
+          1
+        else
+          a.name <=> b.name
+        end
+      end
+    end
+    @users = paginate_collection @user_array, :per_page => 10, :page=>page
+    render(:layout => 'layouts/manager')
+  end
+
 protected
   def find_user
     @user = User.find(params[:id])
   end
+    
 end

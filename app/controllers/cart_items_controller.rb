@@ -34,8 +34,9 @@ class CartItemsController < ApplicationController
 
   def list
     @page_title = "MyPeople"
-    @mypeople = CartItem.find(:all, :include=>:entity, :conditions=>['user_id=:user',{:user=>current_user.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC")
-    @cart_item_pages, @cart_items = paginate_collection @mypeople, :per_page => 25, :page=>params[:page]
+    # @mypeople = CartItem.find(:all, :include=>:entity, :conditions=>['user_id=:user',{:user=>current_user.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC")
+    # @cart_items = paginate_collection @mypeople, :per_page => 25, :page=>params[:page]
+    @cart_items = CartItem.paginate :include=>:entity, :conditions=>['user_id=:user',{:user=>current_user.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC", :per_page => 25, :page=>params[:page]
     @groups = @campaign.groups
     @campaign_events = @campaign.campaign_events
   end

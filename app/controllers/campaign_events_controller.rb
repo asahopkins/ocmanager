@@ -35,7 +35,7 @@ class CampaignEventsController < ApplicationController
       entities = @campaign_event.rsvp_entities      
     end
     logger.debug entities
-    @entity_pages, @entities = paginate_collection entities, :per_page=>25, :page=>params[:page]
+    @entities = paginate_collection entities, :per_page=>25, :page=>params[:page]
   end
 
   def new

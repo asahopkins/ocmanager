@@ -34,12 +34,12 @@
 	<dl>
 		<% if @campaign.from_emails 
 			emails = @campaign.from_emails
-			unless emails.include?(session[:user].email)
-				emails << session[:user].email
+			unless emails.include?(current_user.email)
+				emails << current_user.email
 			end %>
 		<dt>From:</dt><dd><%= select :contact_text, :sender, emails, {:selected=>@message.sender} %></dd>
 		<% else %>
-		<dt>From:</dt><dd><%= session[:user].email %><%= hidden_field :contact_text, :sender, :value=>session[:user].email %></dd>
+		<dt>From:</dt><dd><%= current_user.email %><%= hidden_field :contact_text, :sender, :value=>current_user.email %></dd>
 		<% end %>
 		<dt>Subject:</dt><dd><%= text_field :contact_text, :subject, :value=>@message.subject %></dd>
 	</dl>

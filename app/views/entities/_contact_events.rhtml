@@ -25,7 +25,7 @@
 	<%= form_remote_tag :url=>{:controller=>"contact_events", :action=>"create", :params=>{:id=>@entity.id, :campaign_id=>@campaign.id}}, :loading=>"Element.show('new_contact_event_indic')" %>
 	<dl>
 		<dt>Date</dt><dd><%= date_select :contact_event, :when_contact, :order=>[:month, :day, :year] %></dd>
-		<dt>Contact with</dt><dd><%= text_field :contact_event, :initiated_by, :value=>session[:user].name %></dd>
+		<dt>Contact with</dt><dd><%= text_field :contact_event, :initiated_by, :value=>current_user.name %></dd>
 		<dt>Form</dt><dd><%= select :contact_event, :form, ["Phone", "Email", "Mail", "In person"]%></dd>
 		<dt>Interaction?</dt><dd><%= select :contact_event, :interaction, [["No","false"],["Yes","true"]] %></dd>
 		<dt>Letter/Script</dt><dd><%= select :contact_event, :contact_text_id, @recent_texts.collect{|t| [cut_to_length(t.label,25)+" (#{t.class.to_s})", t.id]}, {:include_blank=>true} %></dd>

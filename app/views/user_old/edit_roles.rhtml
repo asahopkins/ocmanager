@@ -37,7 +37,7 @@
     <option value="<%= Role.inactive_id %>" <%= role_hash[8]%>>Inactive</option>
       </select>&nbsp;&nbsp;User can see and edit finances?&nbsp;<%= check_box_tag "user_campaign[financial][#{campaign.id}]", 1, @user.can_see_financial?(campaign) %></p>
 <% end -%>
-<%= hidden_field 'cur', 'updated_by', :value=>session[:user].id %>
+<%= hidden_field 'cur', 'updated_by', :value=>current_user.id %>
 <%= submit_tag 'Save' %> &nbsp; <%= link_to '(Cancel)', :action => 'list' %>
 </form>
 

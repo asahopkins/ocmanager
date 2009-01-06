@@ -1,7 +1,6 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
-  # Be sure to include AuthenticationSystem in Application Controller instead
-  # include AuthenticatedSystem
+  layout  'user'
 
   before_filter :login_required, :except=>[:new, :create, :destroy]
 
@@ -42,10 +41,16 @@ class SessionsController < ApplicationController
     redirect_to :action => 'new'
   end
 
+  def name
+    "Users"
+  end 
+
 protected
   # Track failed login attempts
   def note_failed_signin
     flash[:error] = "Couldn't log you in as '#{params[:login]}'"
     logger.warn "Failed login for '#{params[:login]}' from #{request.remote_ip} at #{Time.now.utc}"
   end
+
+
 end

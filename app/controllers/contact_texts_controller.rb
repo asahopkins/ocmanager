@@ -138,9 +138,9 @@ class ContactTextsController < ApplicationController
     params[:contact_text].delete(:invitation)
     if params[:id]
       @text = ContactText.find(params[:id])
-      if session[:user].active_campaigns.include?(@campaign.id) and @text.campaign_id == @campaign.id
+      if current_user.active_campaigns.include?(@campaign.id) and @text.campaign_id == @campaign.id
         unless params[:entity].nil?
-          params[:contact_text][:updated_by]=session[:user].id
+          params[:contact_text][:updated_by]=current_user.id
         end
       else
         @text = nil
@@ -541,10 +541,10 @@ class ContactTextsController < ApplicationController
     # 
     # if @entities.length > 0
     #   if @text.nil?
-    #     file_data = "Mail merge file for MyPeople, created for #{session[:user].name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
+    #     file_data = "Mail merge file for MyPeople, created for #{current_user.name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
     #   else
     #     already_recorded = @text.recipients
-    #     file_data = "Mail merge file for letter #{@text.label}, created for #{session[:user].name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
+    #     file_data = "Mail merge file for letter #{@text.label}, created for #{current_user.name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
     #   end
     #   labels = ["Household ID", "Title", "First name", "Middle name", "Last name", "Suffix", "Full name", "Address line 1", "Address line 2", "City", "State", "ZIP", "ZIP+4", "Primary Phone", "Number", "Primary Email", "Address"]
     #   row_size = labels.length
@@ -618,22 +618,22 @@ class ContactTextsController < ApplicationController
     #     end
     #     if params[:mail_merge] and params[:mail_merge][:total_financial_box].to_i == 1
     #       value = nil
-    #       unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[total_committee.id].nil?  or total_committee.treasurer_api_url.to_s == ""
+    #       unless current_user.treasurer_info.nil? or current_user.treasurer_info[total_committee.id].nil?  or total_committee.treasurer_api_url.to_s == ""
     #         treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>total_committee.id}])
     #         unless treasurer_entity.nil?
     #           treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,total_committee.treasurer_api_url)
-    #           value = treasurer.get_transaction_values_by_date(session[:user].treasurer_info[total_committee.id][0], session[:user].treasurer_info[total_committee.id][1], total_committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
+    #           value = treasurer.get_transaction_values_by_date(current_user.treasurer_info[total_committee.id][0], current_user.treasurer_info[total_committee.id][1], total_committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
     #         end
     #       end
     #       fields << value
     #     end
     #     if params[:mail_merge] and params[:mail_merge][:latest_financial_box].to_i == 1
     #       value = nil
-    #       unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[latest_committee.id].nil?  or latest_committee.treasurer_api_url.to_s == ""
+    #       unless current_user.treasurer_info.nil? or current_user.treasurer_info[latest_committee.id].nil?  or latest_committee.treasurer_api_url.to_s == ""
     #         treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>latest_committee.id}])
     #         unless treasurer_entity.nil?
     #           treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,latest_committee.treasurer_api_url)
-    #           value = treasurer.get_transaction_values_by_date(session[:user].treasurer_info[latest_committee.id][0], session[:user].treasurer_info[latest_committee.id][1], latest_committee.treasurer_id, treasurer_entity.treasurer_id, DateTime.now, DateTime.now, true, true)
+    #           value = treasurer.get_transaction_values_by_date(current_user.treasurer_info[latest_committee.id][0], current_user.treasurer_info[latest_committee.id][1], latest_committee.treasurer_id, treasurer_entity.treasurer_id, DateTime.now, DateTime.now, true, true)
     #         end
     #       end
     #       fields << value
@@ -647,9 +647,9 @@ class ContactTextsController < ApplicationController
     #         value = 0
     #         committees.each do |committee|
     #           treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>committee.id}])
-    #           unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == "" or treasurer_entity.nil?
+    #           unless current_user.treasurer_info.nil? or current_user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == "" or treasurer_entity.nil?
     #             treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
-    #             value = treasurer.get_transaction_values_by_date(session[:user].treasurer_info[committee.id][0], session[:user].treasurer_info[committee.id][1], committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
+    #             value = treasurer.get_transaction_values_by_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
     #             year_value += value
     #           end
     #         end
@@ -716,7 +716,7 @@ class ContactTextsController < ApplicationController
     # @campaign = @text.campaign
     if current_user.active_campaigns.include?(@campaign.id) and @campaign.id == @text.campaign_id
       unless params[:entity].nil?
-        params[:contact_text][:updated_by]=session[:user].id
+        params[:contact_text][:updated_by]=current_user.id
       end
     else
       @text = nil
@@ -728,7 +728,7 @@ class ContactTextsController < ApplicationController
   
   def check_campaign
     # unless params[:campaign_id]
-    #   params[:campaign_id] = session[:user].active_campaigns.first
+    #   params[:campaign_id] = current_user.active_campaigns.first
     # end
     # @campaign = Campaign.find(params[:campaign_id])
     if current_user.active_campaigns.include?(@campaign.id)

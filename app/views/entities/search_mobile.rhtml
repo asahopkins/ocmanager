@@ -21,14 +21,14 @@
 
 <p><%=@count.to_s%> results found</p>
 
-<%= pagination_links @entity_pages %>
+<%= will_paginate @entities %>
 <div id="entities_list">
 	<% for entity in @entities %>
 		<%= render :partial=>"list_line_mobile", :locals=>{:entity=>entity} %>
 	<% end %>
 </div>
 <br class="brclear"/>
-<%= pagination_links @entity_pages %>
+<%= will_paginate @entities %>
 
 <h3>New search</h3>
 <div id="entity_quick_search">
