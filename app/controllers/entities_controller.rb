@@ -51,23 +51,21 @@ class EntitiesController < ApplicationController
           end
         end
         cond.append person_cond
+        # TODO: reorder using entity.sort_by_name
       else
-        tagged_entities = Entity.find_tagged_with(@tag_name, @campaign.id)
-        ids = []
-        unless tagged_entities.empty?
-          tagged_entities.each do |entity|
-            ids << entity.id
-          end
+        @tag = Tag.find_by_name_and_campaign_id(@tag_name, @campaign.id)
+        if @tag
+          @entities = Entity.paginate :per_page => 25, :order=>"last_name ASC, name ASC, first_name ASC", :include=>[:primary_address,:taggings,:primary_email], :page=>params[:page], :conditions=>["taggings.tag_id = :tag",{:tag=>@tag.id}]
+          @count = @entities.total_entries
+          return
         else
-          flash[:warning] = "No people or organizations tagged with '"+ @tag_name + "'.  Here is the whole list."
+          flash[:warning] = "Tag '"+ @tag_name + "' does not exist. Here is the whole list."
           redirect_to :action=>"list", :params=>{:id=>nil}, :protocol=>@@protocol
         end
-        cond.id === ids
       end
     end
-    @count = Entity.count(:conditions=>cond.to_sql)
-    # TODO: reorder using entity.sort_by_name
     @entities = Entity.paginate :per_page => 25, :order=>"last_name ASC, name ASC, first_name ASC", :conditions=>cond.to_sql, :include=>:primary_address, :page=>params[:page]
+    @count = @entities.total_entries
   end
 
   def show
