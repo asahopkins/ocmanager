@@ -3,6 +3,8 @@ class SessionsController < ApplicationController
   # Be sure to include AuthenticationSystem in Application Controller instead
   # include AuthenticatedSystem
 
+  before_filter :login_required, :except=>[:new, :create, :destroy]
+
   # render new.rhtml
   def new
   end
@@ -21,7 +23,8 @@ class SessionsController < ApplicationController
       user.save!
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
-      redirect_back_or_default('/')
+      redirect_to :controller=>"campaigns", :action => 'select'
+      # redirect_back_or_default('/')
       flash[:notice] = "Logged in successfully"
     else
       note_failed_signin
@@ -32,9 +35,11 @@ class SessionsController < ApplicationController
   end
 
   def destroy
+    current_user.current_campaign = nil if current_user
+    current_user.save if current_user
     logout_killing_session!
     flash[:notice] = "You have been logged out."
-    redirect_back_or_default('/')
+    redirect_to :action => 'new'
   end
 
 protected

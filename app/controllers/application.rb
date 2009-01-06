@@ -18,7 +18,7 @@
 # 
 # ---------------------------------------------------------------------------
 
-require 'acl_system'
+# require 'acl_system'
 # require 'localization'
 # require 'user_system'
 # require 'rdiscount'
@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :login_required#, :only=>[]
   # include Localization
-  include ACLSystem
+  # include ACLSystem
   include MemoryLogging
   
   # helper :user

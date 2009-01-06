@@ -6,6 +6,7 @@ class UsersController < ApplicationController
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
   
+  before_filter :login_required, :except=>[:forgot_password, :reset_password_email, :reset_password, :set_password]
 
   # render new.rhtml
   def new

@@ -29,13 +29,13 @@
  	<title>Manager :: <%= controller.controller_name.camelize %> :: <%= controller.action_name.camelize %></title>
 	<% end %>
 	<% stylesheet_link_tag 'scaffold' %>
-	<% stylesheet_link_tag 'manager-piefecta' %>
-	<% stylesheet_link_tag 'manager-textstyling' %>
-	<% stylesheet_link_tag 'registers' %>
-	<% stylesheet_link_tag 'calendar' %>
-	<%= stylesheet_link_merged :base %>
-	<%= javascript_include_merged :base %>
-	
+	<%= stylesheet_link_tag 'manager-piefecta' %>
+	<%= stylesheet_link_tag 'manager-textstyling' %>
+	<%= stylesheet_link_tag 'registers' %>
+	<%= stylesheet_link_tag 'calendar' %>
+	<% #stylesheet_link_merged :base %>
+	<% #javascript_include_merged :base %>
+	<%= javascript_include_tag :defaults %>
 </head>
 <body>
 
@@ -77,7 +77,7 @@
 
 	<p><b><i><%=current_user.name%></i></b><br>
 	<%= link_to "Edit Account", :controller=>"user", :action=>"edit"%><br>
-	<%= link_to "Logout", :controller=>"user", :action=>"logout"%></p>
+	<%= link_to "Logout", :controller=>"sessions", :action=>"destroy"%></p>
 	<b>MyPeople</b><br />
 	<ul id="cart_list">
 	<li>MyPeople: <span id='cart_items_number'><%=h current_user.cart_items.count %></span>&nbsp;<span id="cart_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></li>
