@@ -30,7 +30,7 @@ class ContactEventsController < ApplicationController
     # @campaign = @entity.campaign
     @recent_texts = @campaign.get_recent_texts
     @recent_events = @campaign.get_recent_events
-    @contact_event_pages, @contact_events = paginate :contact_events, :per_page => 5, :order=>"when_contact DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @contact_events = ContactEvent.paginate :per_page => 5, :order=>"when_contact DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render :partial=>'entities/contact_events', :protocol=>@@protocol    
   end
 
@@ -70,7 +70,7 @@ class ContactEventsController < ApplicationController
     @recent_texts = @campaign.get_recent_texts
     @recent_events = @campaign.get_recent_events
 
-    @contact_event_pages, @contact_events = paginate :contact_events, :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @contact_events = ContactEvent.paginate :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}],:page=>params[:page]
     @success = true
     @protocol = @@protocol
     @notice = "Contact report created." 
@@ -119,7 +119,7 @@ class ContactEventsController < ApplicationController
       @contact_event.save!
       @recent_texts = @campaign.get_recent_texts
       @recent_events = @campaign.get_recent_events
-      @contact_event_pages, @contact_events = paginate :contact_events, :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+      @contact_events = ContactEvent.paginate :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
       @success = true
       @protocol = @@protocol
       @notice = "Contact report updated." 
@@ -135,29 +135,29 @@ class ContactEventsController < ApplicationController
     @contact_event = ContactEvent.find(params[:id])
     if @contact_event.entity_id == @entity.id
       @contact_events = @entity.contact_events.sort{|a,b| b.when_contact <=> a.when_contact} #sorted from latest to earliest
-      logger.debug @contact_events
+      # logger.debug @contact_events
       @contact_events.delete(@contact_event)
-      logger.debug @contact_events
+      # logger.debug @contact_events
       @contact_events.each do |event|
         if event.requires_followup?
-          logger.debug "followup required"
+          # logger.debug "followup required"
           @entity.update_attributes('followup_required'=>true)
           break
         end
         if event.interaction?
-          logger.debug "no followup required"
+          # logger.debug "no followup required"
           @entity.update_attributes('followup_required'=>false)
           break
         end
       end
 
-      logger.debug "about to destroy event"
+      # logger.debug "about to destroy event"
       @contact_event.destroy
 
       @all_texts = @campaign.contact_texts
       @recent_texts = @campaign.get_recent_texts
       @recent_events = @campaign.get_recent_events
-      @contact_event_pages, @contact_events = paginate :contact_events, :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+      @contact_events = ContactEvent.paginate :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
       @success = true
       @protocol = @@protocol
       @notice = "Contact report deleted." 

@@ -78,9 +78,9 @@ class EntitiesController < ApplicationController
       @can_see_financial = current_user.can_see_financial?(@campaign)
       @recent_texts = @campaign.get_recent_texts
       @recent_events = @campaign.get_recent_events
-      @rsvp_pages, @rsvps = paginate :rsvps, :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["rsvps.entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event
-      @contact_event_pages, @contact_events = paginate :contact_events, :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
-      @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+      @rsvps = Rsvp.paginate :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["rsvps.entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event, :page=>1
+      @contact_events = ContactEvent.paginate :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>1
+      @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>1
     end
   end
 

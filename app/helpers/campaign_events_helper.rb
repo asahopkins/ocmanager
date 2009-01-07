@@ -20,7 +20,7 @@
 
 module CampaignEventsHelper
   
-  def display_address(event)
+  def display_event_address(event)
     addr = ""
     unless event.nil?
       unless event.location_name.nil? or event.location_name==""

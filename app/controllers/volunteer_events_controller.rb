@@ -36,8 +36,8 @@ class VolunteerEventsController < ApplicationController
     @entity = Entity.find(params[:entity_id])
     # @campaign = @entity.campaign
     
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}] 
-    render_without_layout  
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
+    render :layout => false
   end
 
   def create

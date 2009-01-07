@@ -18,6 +18,7 @@
 # 
 # ---------------------------------------------------------------------------
 -%><h3>Contact History</h3>
+<div class="notice" id="campaigns_notice"></div>
 <div id="add_contact_event" class="add_box">
 	<a href="#" onClick="Element.show('new_contact_event'); Element.hide('add_contact_event'); return false;">Add contact report</a>
 </div>
@@ -97,7 +98,7 @@
 </div>
 <% end %>
 	<div class="contact_event_summary">
-		<%= link_to_remote "<< Later contacts", :update=>'contact_events_info', :loading=>"Element.show('contact_event_pages_indic')", :url=>{:controller=>'contact_events', :action=>'list', :params=>{ :id=>@entity.id, :page => @contact_event_pages.current.previous }} if @contact_event_pages.current.previous %>
-		<%= link_to_remote "Earlier contacts >>", :update=>'contact_events_info', :loading=>"Element.show('contact_event_pages_indic')", :url=>{:controller=>'contact_events', :action=>'list', :params=>{ :id=>@entity.id, :page => @contact_event_pages.current.next }} if @contact_event_pages.current.next %> <span id="contact_event_pages_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
+		<%= link_to_remote "<< Later contacts", :update=>'contact_events_info', :loading=>"Element.show('contact_event_pages_indic')", :url=>{:controller=>'contact_events', :action=>'list', :params=>{ :id=>@entity.id, :page => @contact_events.current_page - 1}} if @contact_events.current_page > 1 %>
+		<%= link_to_remote "Earlier contacts >>", :update=>'contact_events_info', :loading=>"Element.show('contact_event_pages_indic')", :url=>{:controller=>'contact_events', :action=>'list', :params=>{ :id=>@entity.id, :page => @contact_events.current_page + 1 }} if @contact_events.current_page < @contact_events.total_pages %> <span id="contact_event_pages_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
 	</div>
 </div>

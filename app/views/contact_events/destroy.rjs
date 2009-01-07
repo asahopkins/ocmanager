@@ -1,5 +1,5 @@
 if @success
-  page.replace_html "campaign_info", :partial=>'entities/contact_events', :protocol=>@protocol    
+  page.replace_html "contact_events_info", :partial=>'entities/contact_events', :protocol=>@protocol    
 end
 page.replace_html "campaigns_notice", @notice
 page.visual_effect :highlight, 'campaigns_notice'

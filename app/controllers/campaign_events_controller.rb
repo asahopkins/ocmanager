@@ -24,18 +24,40 @@ class CampaignEventsController < ApplicationController
   before_filter :get_campaign
 
   def list
-    @campaign_event_pages, @campaign_events = paginate :campaign_events, :per_page => 20, :order=>'start_time DESC', :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}] # TODO: allow hidden to be shown by admin
+    @campaign_events = CampaignEvent.paginate :per_page => 20, :order=>'start_time DESC', :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}],:page=>params[:page] # TODO: allow hidden to be shown by admin
   end
   
   def show
     @campaign_event = CampaignEvent.find(params[:id])
-    if params[:sort_by]
-      entities = @campaign_event.rsvp_entities(params[:sort_by])
-    else
-      entities = @campaign_event.rsvp_entities      
+    unless params[:page].to_i > 1
+      params[:page] = 1
     end
-    logger.debug entities
-    @entities = paginate_collection entities, :per_page=>25, :page=>params[:page]
+    unless params[:sort_by]
+      params[:sort_by] = "name"
+    end
+    case params[:sort_by]
+    when "name"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    when "invited"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"rsvps.invited ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
+    when "attendance"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"rsvps.attended ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
+    when "response"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"rsvps.response DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
+    when "pledge"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"     
+    when "contribution"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"     
+    else
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    end
+    # if params[:sort_by]
+    #   entities = @campaign_event.rsvp_entities(params[:sort_by])
+    # else
+    #   entities = @campaign_event.rsvp_entities      
+    # end
+    # logger.debug entities
+    # @entities = paginate_collection entities, :per_page=>25, :page=>params[:page]
   end
 
   def new

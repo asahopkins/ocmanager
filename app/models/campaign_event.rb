@@ -46,72 +46,92 @@ class CampaignEvent < ActiveRecord::Base
   end
   
   def rsvp_entities(sort = "name")
-    pledges = self.pledged_contributors
-    contribs = self.contributors
-    ents = (self.invited + self.attended + pledges + contribs).flatten.uniq
-    ents.sort! { |a,b| Entity.sort_by_name(a,b) }
-    if sort == "response"
-      ents.sort! { |a,b| Rsvp.sort_by_response(a.event_rsvp(self),b.event_rsvp(self)) }
-    elsif sort == "invited"
-      ents.sort! { |a,b| Rsvp.sort_by_invitation(a.event_rsvp(self),b.event_rsvp(self)) }
-    elsif sort == "attendance"
-      ents.sort! { |a,b| Rsvp.sort_by_attendance(a.event_rsvp(self),b.event_rsvp(self)) }
-    elsif sort == "pledge"
-      ents.sort! { |a,b| 
-        if pledges.include?(a) and pledges.include?(b)
-          b.pledge_value(self).to_i <=> a.pledge_value(self).to_i
-        elsif pledges.include?(a) and a.pledge_value(self).to_i > 0
-          -1
-        elsif pledges.include?(b) and b.pledge_value(self).to_i > 0
-          1
-        else
-          0
-        end }
-    elsif sort == "contribution"
-      ents.sort! { |a,b| 
-        if contribs.include?(a) and contribs.include?(b)
-          b.event_contribution(self).to_i <=> a.event_contribution(self).to_i
-        elsif contribs.include?(a) and a.event_contribution(self).to_i > 0
-          -1
-        elsif contribs.include?(b) and b.event_contribution(self).to_i > 0
-          1
-        else
-          0
-        end }
+    
+    if sort == "name"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
+    if sort == "invited"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"rsvps.invited ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    end
+    if sort == "attendance"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"rsvps.attended ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    end
+    if sort == "response"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"rsvps.response DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    end
+    if sort == "pledge"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)", {:event_id=>self.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    end
+    if sort == "contribution"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)", {:event_id=>self.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    end
+    
+    # pledges = self.pledged_contributors
+    # contribs = self.contributors
+    # ents = (self.invited + self.attended + pledges + contribs).flatten.uniq
+    # ents.sort! { |a,b| Entity.sort_by_name(a,b) }
+    # if sort == "response"
+    #   ents.sort! { |a,b| Rsvp.sort_by_response(a.event_rsvp(self),b.event_rsvp(self)) }
+    # elsif sort == "invited"
+    #   ents.sort! { |a,b| Rsvp.sort_by_invitation(a.event_rsvp(self),b.event_rsvp(self)) }
+    # elsif sort == "attendance"
+    #   ents.sort! { |a,b| Rsvp.sort_by_attendance(a.event_rsvp(self),b.event_rsvp(self)) }
+    # elsif sort == "pledge"
+    #   ents.sort! { |a,b| 
+    #     if pledges.include?(a) and pledges.include?(b)
+    #       b.pledge_value(self).to_i <=> a.pledge_value(self).to_i
+    #     elsif pledges.include?(a) and a.pledge_value(self).to_i > 0
+    #       -1
+    #     elsif pledges.include?(b) and b.pledge_value(self).to_i > 0
+    #       1
+    #     else
+    #       0
+    #     end }
+    # elsif sort == "contribution"
+    #   ents.sort! { |a,b| 
+    #     if contribs.include?(a) and contribs.include?(b)
+    #       b.event_contribution(self).to_i <=> a.event_contribution(self).to_i
+    #     elsif contribs.include?(a) and a.event_contribution(self).to_i > 0
+    #       -1
+    #     elsif contribs.include?(b) and b.event_contribution(self).to_i > 0
+    #       1
+    #     else
+    #       0
+    #     end }
+    # end
     ents
   end
 
   # returns an array of entities who have been invited to the event
   def invited
-    tmp = []
     # sorted_rsvps = self.rsvps.sort { |a,b| a.response <=> b.response }
-    r = rsvps.find(:all,:conditions=>["invited = :true",{:true=>true}])
-    r.each do |rsvp|
-      tmp << rsvp.entity
-    end
-    tmp.uniq
+    ents = Entity.find :all, :include=>[:rsvps],:conditions=>["rsvps.invited = :true AND rsvps.campaign_event_id = :self",{:true=>true, :self=>self.id}]
+  end
+
+  # returns a count of the entities who have been invited to the event
+  def invited_count
+    # sorted_rsvps = self.rsvps.sort { |a,b| a.response <=> b.response }
+    count = Entity.count 'entities.id', :include=>[:rsvps],:conditions=>["rsvps.invited = :true AND rsvps.campaign_event_id = :self",{:true=>true, :self=>self.id}]
   end
 
   # returns an array of entities who have RSVPed "Yes" to the event
   def attending
-    tmp = []
-    r = rsvps.find(:all,:conditions=>["response = :yes",{:yes=>"Yes"}])
-    r.each do |rsvp|
-      tmp << rsvp.entity
-    end
-    tmp.uniq
+    ents = Entity.find :all, :include=>[:rsvps],:conditions=>["rsvps.response = :yes AND rsvps.campaign_event_id = :self",{:yes=>"Yes", :self=>self.id}]
+  end
+
+  # returns a count of the entities who have RSVPed "Yes" to the event
+  def attending_count
+    ents = Entity.count 'entities.id', :include=>[:rsvps],:conditions=>["rsvps.response = :yes AND rsvps.campaign_event_id = :self",{:yes=>"Yes", :self=>self.id}]
   end
 
   # returns an array of entities who attended the event
   def attended
-    tmp = []
-    # sorted_rsvps = self.rsvps.sort { |a,b| a.response <=> b.response }
-    r = rsvps.find(:all,:conditions=>["attended = :true",{:true=>true}])
-    r.each do |rsvp|
-      tmp << rsvp.entity
-    end
-    tmp.uniq
+    ents = Entity.find :all, :include=>[:rsvps],:conditions=>["rsvps.attended = :true AND rsvps.campaign_event_id = :self",{:true=>true, :self=>self.id}]
+  end
+
+  # returns a count of the entities who attended the event
+  def attended_count
+    ents = Entity.count 'entities.id', :include=>[:rsvps],:conditions=>["rsvps.attended = :true AND rsvps.campaign_event_id = :self",{:true=>true, :self=>self.id}]
   end
 
   def contributors(threshold = 0)

@@ -64,12 +64,12 @@
 		<% unless @entity.created_by.nil?
 			creator = User.find(@entity.created_by)
 		 	unless creator.nil? %>
-		Record created by <%= creator.firstname+" "+creator.lastname %> on <%= @entity.created_at.strftime('%b %d, %Y') %><br />
+		Record created by <%= creator.name %> on <%= @entity.created_at.strftime('%b %d, %Y') %><br />
 		<% end end %>
 		<% unless @entity.updated_by.nil? 
 			updater = User.find(@entity.updated_by)
 			unless updater.nil?%>
-		Record last updated by <%= updater.firstname+" "+updater.lastname %> on <%= @entity.updated_at.strftime('%b %d, %Y') %>
+		Record last updated by <%= updater.name %> on <%= @entity.updated_at.strftime('%b %d, %Y') %>
 		<% end end %>
 	</div>
 	<div class="column" id="household_box">
