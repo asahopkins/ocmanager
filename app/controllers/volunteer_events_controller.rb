@@ -58,7 +58,7 @@ class VolunteerEventsController < ApplicationController
     @new_event.save!
     @success = true
     @notice = "Volunteer session saved."
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render_without_layout  
   end
 
@@ -84,7 +84,7 @@ class VolunteerEventsController < ApplicationController
     else
       raise
     end
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render_without_layout  
   end
 
@@ -95,7 +95,7 @@ class VolunteerEventsController < ApplicationController
     @event.destroy
     @success = true
     @notice = "Volunteer session deleted."
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render_without_layout  
   end
   

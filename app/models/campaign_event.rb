@@ -48,22 +48,22 @@ class CampaignEvent < ActiveRecord::Base
   def rsvp_entities(sort = "name")
     
     if sort == "name"
-      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id, :campaign=>self.campaign_id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     if sort == "invited"
-      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"rsvps.invited ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id, :campaign=>self.campaign_id}], :order=>"rsvps.invited ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     if sort == "attendance"
-      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"rsvps.attended ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id, :campaign=>self.campaign_id}], :order=>"rsvps.attended ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     if sort == "response"
-      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id}], :order=>"rsvps.response DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions],:conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>self.id, :campaign=>self.campaign_id}], :order=>"rsvps.response DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     if sort == "pledge"
-      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)", {:event_id=>self.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)", {:event_id=>self.id, :campaign=>self.campaign_id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     if sort == "contribution"
-      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)", {:event_id=>self.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      ents = Entity.find :all, :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)", {:event_id=>self.id, :campaign=>self.campaign_id}], :order=>"contributions.amount DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     
     # pledges = self.pledged_contributors

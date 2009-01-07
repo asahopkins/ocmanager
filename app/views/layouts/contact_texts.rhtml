@@ -29,15 +29,12 @@
  	<title>Manager :: <%= controller.controller_name.camelize %> :: <%= controller.action_name.camelize %></title>
 	<% end %>
 	<% stylesheet_link_tag 'scaffold' %>
-	<% stylesheet_link_tag 'manager-piefecta' %>
-	<% stylesheet_link_tag 'manager-textstyling' %>
-	<% stylesheet_link_tag 'registers' %>
-	<% stylesheet_link_tag 'mailer' %>
-	<%= stylesheet_link_merged :base %>
-	<%= stylesheet_link_merged :email %>
-	<%= javascript_include_merged :base %>
-	<%= javascript_include_merged :slider %>
-
+	<%= stylesheet_link_tag 'manager-piefecta' %>
+	<%= stylesheet_link_tag 'manager-textstyling' %>
+	<%= stylesheet_link_tag 'registers' %>
+	<%= stylesheet_link_tag 'mailer' %>
+	<%= javascript_include_tag :defaults %>
+	
 </head>
 <body onLoad="Element.hide('styles'); Element.hide('subheads_body'); Element.hide('textstyle_body'); Element.hide('incidentals_body');">
 

@@ -31,7 +31,7 @@ class ExportedFilesController < ApplicationController
 
   def list
     @page_title = "Exported Files"
-    @file_pages, @files = paginate :exported_files, :per_page => 25, :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}], :order=>"created_at DESC"
+    @files = ExportedFile.paginate :per_page => 25, :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}], :order=>"created_at DESC", :page=>params[:page]
     for file in @files
       key_name = "export_key_"+file.filename
       @progress = Hash.new

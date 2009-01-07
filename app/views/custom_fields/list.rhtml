@@ -39,8 +39,7 @@
 %>
 <p>You may reorder the custom fields here by dragging them with the "DRAG" icons.  This order will set the order in which they are displayed elsewhere in the application.</p>
 
-<%= link_to 'Previous page', { :page => @custom_field_pages.current.previous } if @custom_field_pages.current.previous %>
-<%= link_to 'Next page', { :page => @custom_field_pages.current.next } if @custom_field_pages.current.next %> 
+<%= will_paginate @custom_fields %> 
 
 <br />
 

@@ -29,7 +29,7 @@ class CustomFieldsController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @custom_field_pages, @custom_fields = paginate :custom_fields, :per_page => 50, :conditions=>['campaign_id=:campaign',{:campaign=>@campaign.id}], :order=>'display_order ASC'
+    @custom_fields = CustomField.paginate :per_page => 50, :conditions=>['campaign_id=:campaign',{:campaign=>@campaign.id}], :order=>'display_order ASC', :page=>params[:page]
   end
 
 #  def show

@@ -27,5 +27,5 @@
     </tr>
 <% end %>
 </table>
-<%= link_to_remote '<< Earlier', :update=>"scripts", :url=>{ :action=>"load_scripts", :params=>{:campaign_id=>@campaign.id, :page => @script_pages.current.next} } if @script_pages.current.next %> 
-<%= link_to_remote 'Later >>', :update=>"scripts", :url=>{ :action=>"load_scripts", :params=>{:campaign_id=>@campaign.id, :page => @script_pages.current.previous} } if @script_pages.current.previous %> 
+<%= link_to_remote '<< Earlier', :update=>"scripts", :url=>{ :action=>"load_scripts", :params=>{:campaign_id=>@campaign.id, :page => @scripts.current_page + 1} } if @scripts.current_page < @scripts.total_pages %> 
+<%= link_to_remote 'Later >>', :update=>"scripts", :url=>{ :action=>"load_scripts", :params=>{:campaign_id=>@campaign.id, :page => @scripts.current_page - 1} } if @scripts.current_page > 1 %> 

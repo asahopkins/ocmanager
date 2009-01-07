@@ -28,6 +28,7 @@ class CampaignEventsController < ApplicationController
   end
   
   def show
+    # TODO contribution and pledge and response ordering are variously screwed up
     @campaign_event = CampaignEvent.find(params[:id])
     unless params[:page].to_i > 1
       params[:page] = 1
@@ -37,19 +38,19 @@ class CampaignEventsController < ApplicationController
     end
     case params[:sort_by]
     when "name"
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     when "invited"
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"rsvps.invited ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"rsvps.invited ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
     when "attendance"
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"rsvps.attended ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"rsvps.attended ASC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
     when "response"
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"rsvps.response DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"rsvps.response DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"      
     when "pledge"
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"     
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"     
     when "contribution"
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"contact_events.pledge_value DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"     
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"contributions.amount DESC, contact_events.will_contribute DESC, entities.last_name ASC, entities.name ASC, entities.first_name ASC"     
     else
-      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["(contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+      @entities = Entity.paginate :per_page=>10, :page=>params[:page], :include=>[:rsvps, :contact_events, :contributions], :conditions=>["entities.campaign_id = :campaign AND (contact_events.campaign_event_id = :event_id OR rsvps.campaign_event_id = :event_id OR contributions.campaign_event_id = :event_id)",{:event_id=>@campaign_event.id, :campaign=>@campaign.id}], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     end
     # if params[:sort_by]
     #   entities = @campaign_event.rsvp_entities(params[:sort_by])

@@ -40,7 +40,7 @@ class CampaignsController < ApplicationController
   end
 
   def list
-    @campaign_pages, @campaigns = paginate :campaigns, :per_page => 10
+    @campaigns = Campaign.paginate :per_page => 10, :page=>params[:page]
   end
 
   def select

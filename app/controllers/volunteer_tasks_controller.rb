@@ -34,7 +34,7 @@ class VolunteerTasksController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @volunteer_task_pages, @volunteer_tasks = paginate :volunteer_tasks, :per_page => 50, :conditions=>['campaign_id=:campaign',{:campaign=>@campaign.id}], :order=>'display_order ASC'
+    @volunteer_tasks = VolunteerTask.paginate :per_page => 50, :conditions=>['campaign_id=:campaign',{:campaign=>@campaign.id}], :order=>'display_order ASC', :page=>params[:page]
   end
 
 #  def show

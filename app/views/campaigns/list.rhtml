@@ -38,8 +38,7 @@
 <% end %>
 </table>
 
-<%= link_to 'Previous page', { :page => @campaign_pages.current.previous } if @campaign_pages.current.previous %>
-<%= link_to 'Next page', { :page => @campaign_pages.current.next } if @campaign_pages.current.next %> 
+<%= will_paginate @campaigns %> 
 
 <br />
 

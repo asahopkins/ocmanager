@@ -30,5 +30,4 @@
 	<% end %>
 </div>
 <br class="brclear"/>
-<%= link_to 'Previous page', { :page => @entity_pages.current.previous, :params=>{:campaign_id=>@campaign.id} } if @entity_pages.current.previous %>
-<%= link_to 'Next page', { :page => @entity_pages.current.next, :params=>{:campaign_id=>@campaign.id} } if @entity_pages.current.next %> 
+<%= will_paginate @entities %>

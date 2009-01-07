@@ -27,8 +27,7 @@
 <% end %>
 </ul>
 <p>You may reorder the volunteer tasks here by dragging them with the "DRAG" icons.  This order will set the order in which they are displayed elsewhere in the application.</p>
-<%= link_to 'Previous page', { :page => @volunteer_task_pages.current.previous } if @volunteer_task_pages.current.previous %>
-<%= link_to 'Next page', { :page => @volunteer_task_pages.current.next } if @volunteer_task_pages.current.next %> 
+<%= will_paginate @volunteer_tasks %> 
 
 <br />
 

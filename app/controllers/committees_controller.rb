@@ -37,7 +37,7 @@ class CommitteesController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @committee_pages, @committees = paginate :committees, :per_page => 10, :conditions=>['campaign_id = :campaign', {:campaign=>@campaign.id}], :order=>"name"
+    @committees = Committee.paginate :per_page => 10, :conditions=>['campaign_id = :campaign', {:campaign=>@campaign.id}], :order=>"name", :page=>params[:page]
   end
 
   def show

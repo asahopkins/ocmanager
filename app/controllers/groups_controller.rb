@@ -36,14 +36,12 @@ class GroupsController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @group_pages, @groups = paginate :groups, :per_page => 25, :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}], :order=>"name"
+    @groups = Group.paginate :per_page => 25, :conditions=>["campaign_id=:campaign",{:campaign=>@campaign.id}], :order=>"name", :page=>params[:page]
   end
 
   def show
     # TODO: this sort will fail if there are multiple kind of entities represented
-    group_members = @group.entities.to_a
-    group_members = group_members.sort {|a,b| [a.last_name.to_s, a.name.to_s, a.first_name.to_s] <=> [b.last_name.to_s, b.name.to_s, b.first_name.to_s] }
-    @member_pages, @members = paginate_collection group_members, :per_page => 25, :page=>params[:page]
+    @members = Entity.paginate :include=>[:group_memberships], :conditions=>["group_memberships.group_id = :group AND entities.campaign_id = :campaign", {:group => @group.id, :campaign=>@campaign.id}], :per_page => 25, :page=>params[:page], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
     current_user.edit_groups?(@campaign) ? @can_edit = true : @can_edit = false
   end
 

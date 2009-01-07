@@ -26,5 +26,5 @@
 		<td><%= draft.label %></td><td><%= draft.updated_at %></td><td><%= link_to 'Edit', :action => 'compose', :params=>{:type=>"Letter", :id => draft, :campaign_id=>@campaign.id} %> | <%= link_to 'Mail file', :action => 'mail_file', :params=>{:id => draft, :campaign_id=>@campaign.id} %> | <%= link_to 'Labels', :action => 'prepare_labels', :params=>{:id => draft} %> | <%= link_to "Mark as sent", :action=>'mark_as_sent', :params=>{:id => draft, :campaign_id=>@campaign.id} %> </td>
     </tr>
 <% end %>
-</table><%= link_to_remote '<< Earlier', :update=>"draft_letters", :url=>{ :action=>"load_draft_letters", :params=>{:campaign_id=>@campaign.id, :page => @draft_letter_pages.current.next} } if @draft_letter_pages.current.next %> 
-<%= link_to_remote 'Later >>', :update=>"draft_letters", :url=>{ :action=>"load_draft_letters", :params=>{:campaign_id=>@campaign.id, :page => @draft_letter_pages.current.previous} } if @draft_letter_pages.current.previous %> 
+</table><%= link_to_remote '<< Earlier', :update=>"draft_letters", :url=>{ :action=>"load_draft_letters", :params=>{:campaign_id=>@campaign.id, :page => @draft_letters.current_page + 1} } if @draft_letters.current_page < @draft_letters.total_pages %> 
+<%= link_to_remote 'Later >>', :update=>"draft_letters", :url=>{ :action=>"load_draft_letters", :params=>{:campaign_id=>@campaign.id, :page => @draft_letters.current_page - 1} } if @draft_letters.current_page > 1 %> 

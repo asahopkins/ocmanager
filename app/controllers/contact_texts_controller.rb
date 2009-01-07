@@ -32,35 +32,35 @@ class ContactTextsController < ApplicationController
          :redirect_to => { :controller=>:campaigns, :action => :start_here }
 
   def list
-    @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
-    @sent_email_pages, @sent_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
-    @draft_letter_pages, @draft_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
-    @sent_letter_pages, @sent_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
-    @script_pages, @scripts = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Script\'', {:campaign=>@campaign.id}], :order=>'updated_at DESC'
+    @draft_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>1
+    @sent_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>1
+    @draft_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>1
+    @sent_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>1
+    @scripts = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Script\'', {:campaign=>@campaign.id}], :order=>'updated_at DESC', :page=>1
   end
   
   def load_draft_emails
-    @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+    @draft_emails = ContactText.paginate :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"draft_emails_table"
   end
 
   def load_sent_emails
-    @sent_email_pages, @sent_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
+    @sent_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"sent_emails_table"
   end
 
   def load_draft_letters
-    @draft_letter_pages, @draft_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+    @draft_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"draft_letters_table"
   end
 
   def load_sent_letters
-    @sent_letter_pages, @sent_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
+    @sent_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"sent_letters_table"
   end
 
   def load_scripts
-    @script_pages, @scripts = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type="Script"', {:campaign=>@campaign.id}], :order=>'updated_at DESC'
+    @scripts = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type="Script"', {:campaign=>@campaign.id}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"scripts_table"
   end
   
@@ -187,15 +187,16 @@ class ContactTextsController < ApplicationController
   
   def destroy_email
     ContactText.find(params[:id]).destroy
-    @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+    @draft_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
     # redirect_to :action => 'list', :protocol=>@@protocol
   end
   
   def show_recipient_list
-    @recipients = @text.recipients 
+    # @recipients = @text.recipients 
     # TODO: this sort will fail if there are multiple kind of entities represented
-    @recipients = @recipients.sort {|a,b| [a.last_name.to_s,a.name.to_s,a.first_name.to_s] <=> [b.last_name.to_s,b.name.to_s,b.first_name.to_s] }
-    @entity_pages, @entities = paginate_collection @recipients, :per_page=>25, :page=>params[:page]
+    # @recipients = @recipients.sort {|a,b| [a.last_name.to_s,a.name.to_s,a.first_name.to_s] <=> [b.last_name.to_s,b.name.to_s,b.first_name.to_s] }
+    @entities = Entity.paginate :include=>[:contact_events], :conditions=>["contact_events.contact_text_id = :text AND entities.campaign_id = :campaign",{:text=>@text.id, :campaign=>@campaign.id}], :per_page=>25, :page=>params[:page], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    # @entity_pages, @entities = paginate_collection @recipients, :per_page=>25, :page=>params[:page]
   end
   
   def generate_email_preview
@@ -282,7 +283,7 @@ class ContactTextsController < ApplicationController
   def check_email_progress
     key_name = "bulk_email_key_"+params[:id]
     unless MiddleMan[key_name.to_sym].progress == 101
-      @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+      @draft_emails = ContactText.paginate :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
       render :update do |page|
         page.replace_html "draft_emails", render(:partial=>"draft_emails_table")
       end
