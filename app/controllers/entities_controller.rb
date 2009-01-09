@@ -69,6 +69,7 @@ class EntitiesController < ApplicationController
   end
 
   def show
+    @page_title = "Show :: "+@entity.name
     if @mobile
       render :action=>"show_mobile", :layout=>"mobile"
       return
@@ -1022,26 +1023,24 @@ class EntitiesController < ApplicationController
   def autocomplete_for_sign_in # for volunteer sign in
     #find entities that match
     unless params[:entity][:id]
-      first = "%"+params[:entity][:first_name]+"%"
-      last = "%"+params[:entity][:last_name]+"%"
-      cond_name = EZ::Where::Condition.new :entities do
-        first_name.nocase =~ first
-        last_name.nocase =~ last
-      end
-      @entities = @campaign.entities.find(:all, :include=>:primary_address, :conditions=>cond_name.to_sql)
-      if @entities.length <= 5  and @entities.length > 0# if there are 5 or fewer, put their info on the page
-        render :update do |page|
-          page.replace_html "sign_in_right_half", :partial=>'simple_show_list_for_sign_in'
+      if params[:entity][:first_name].length >= 2 and params[:entity][:last_name].length >= 2
+        first = "%"+params[:entity][:first_name]+"%"
+        last = "%"+params[:entity][:last_name]+"%"
+        cond_name = EZ::Where::Condition.new :entities do
+          first_name.nocase =~ first
+          last_name.nocase =~ last
         end
-      else # clear the div
-        render :update do |page|
-          page.replace_html "sign_in_right_half", "&nbsp;"
+        @entities = @campaign.entities.find(:all, :include=>:primary_address, :conditions=>cond_name.to_sql)
+        if @entities.length <= 5  and @entities.length > 0# if there are 5 or fewer, put their info on the page
+          render :update do |page|
+            page.replace_html "sign_in_right_half", :partial=>'simple_show_list_for_sign_in'
+          end
+          return
         end
       end
-    else
-      render :update do |page|
-        page.replace_html "sign_in_right_half", "&nbsp;"
-      end
+    end
+    render :update do |page|
+      page.replace_html "sign_in_right_half", "&nbsp;"
     end
   end
   

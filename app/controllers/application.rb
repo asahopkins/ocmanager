@@ -98,10 +98,10 @@ class ApplicationController < ActionController::Base
     if current_user and current_user.current_campaign
       @campaign = Campaign.find(current_user.current_campaign)
     else
-      redirect_to :controller=>'account', :action=>'logout'
+      redirect_to :controller=>'sessions', :action=>'destroy'
     end
     if @campaign.nil?
-      redirect_to :controller=>'account', :action=>'logout'
+      redirect_to :controller=>'sessions', :action=>'destroy'
     end
   end
   

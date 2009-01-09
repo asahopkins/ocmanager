@@ -6,6 +6,7 @@ class SessionsController < ApplicationController
 
   # render new.rhtml
   def new
+    @page_title = "Login"
   end
 
   def create
@@ -44,6 +45,11 @@ class SessionsController < ApplicationController
   def name
     "Users"
   end 
+
+  def set_volunteer_terminal
+    session[:volunteer_sign_in] = true
+    redirect_to :controller=>"volunteer_events", :action=>"welcome"
+  end
 
 protected
   # Track failed login attempts

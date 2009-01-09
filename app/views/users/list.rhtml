@@ -36,9 +36,6 @@
       <td><u>Campaign:</u></td>
       <td><u>Role:</u></td>
       <td>
-		<% unless user.superuser? %>
-		<%= link_to '(Edit roles)', :action => 'edit_roles', :params=>{:user_id => user.id} %>
-		<% end %>&nbsp;
 		</td>
   </tr>
   <% for cur in user.campaign_user_roles -%>
@@ -46,8 +43,9 @@
   <tr>
       <td><%= cur.campaign.name %></td>
       <td><%= cur.role.name %><% if user.can_see_financial?(cur.campaign) -%>(+ finances)<% end -%></td>
-      <td>	<% unless user.superuser? %>
-	<%= link_to '(Inactivate)', {:action => 'inactivate', :params=>{:user_id => user.id, :campaign_id => cur.campaign_id}}, :confirm => 'Are you sure?' %>	<% end %>&nbsp;</td>
+      <td> <% unless user.superuser? %>
+		<%= link_to '(Edit role)', :controller=>:campaign_user_roles, :action => :edit, :params=>{:id => cur.id} %>
+		<% end %>&nbsp;</td>
   </tr>
   <% end -%>
   <% end -%>

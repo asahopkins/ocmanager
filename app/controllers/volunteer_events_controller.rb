@@ -208,37 +208,35 @@ class VolunteerEventsController < ApplicationController
   
   def autocomplete_for_sign_out
     unless params[:entity][:id]
-      first = "%"+params[:entity][:first_name]+"%"
-      last = "%"+params[:entity][:last_name]+"%"
-      cond_name = EZ::Where::Condition.new :entities do
-        first_name.nocase =~ first
-        last_name.nocase =~ last
-      end
-      cond_times = EZ::Where::Condition.new :volunteer_events do
-        end_time == :null
-        start_time! == :null
-      end
-      cond_name.append cond_times
+      if params[:entity][:first_name].length >= 1 or params[:entity][:last_name].length >= 1
+        first = "%"+params[:entity][:first_name]+"%"
+        last = "%"+params[:entity][:last_name]+"%"
+        cond_name = EZ::Where::Condition.new :entities do
+          first_name.nocase =~ first
+          last_name.nocase =~ last
+        end
+        cond_times = EZ::Where::Condition.new :volunteer_events do
+          end_time == :null
+          start_time! == :null
+        end
+        cond_name.append cond_times
       
-      @entities = @campaign.entities.find(:all, :include=>[:primary_address, :volunteer_events], :conditions=>cond_name.to_sql)
+        @entities = @campaign.entities.find(:all, :include=>[:primary_address, :volunteer_events], :conditions=>cond_name.to_sql)
 
-      @entities.each do |entity|
-        logger.debug entity.name
-        logger.debug entity.current_volunteer_session.volunteer_task
-      end
-      if @entities.length <= 5 and @entities.length > 0# if there are 5 or fewer, put their info on the page
-        render :update do |page|
-          page.replace_html "is_this_you", :partial=>'entities/simple_show_list_for_sign_out'
+        @entities.each do |entity|
+          logger.debug entity.name
+          logger.debug entity.current_volunteer_session.volunteer_task
         end
-      else # clear the div
-        render :update do |page|
-          page.replace_html "is_this_you", "&nbsp;"
+        if @entities.length <= 5 and @entities.length > 0# if there are 5 or fewer, put their info on the page
+          render :update do |page|
+            page.replace_html "is_this_you", :partial=>'entities/simple_show_list_for_sign_out'
+          end
+          return
         end
       end
-    else
-      render :update do |page|
-        page.replace_html "is_this_you", "&nbsp;"
-      end
+    end
+    render :update do |page|
+      page.replace_html "is_this_you", "&nbsp;"
     end
   end
   

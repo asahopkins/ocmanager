@@ -39,7 +39,7 @@
 
 	<h3><%= @campaign.name %></h3>
 	<%= link_to "Start over", :action => "welcome" %><br /><br /><br />
-	<%= link_to "Logout", :controller => "user", :action => "logout" %>
+	<%= link_to "Logout", :controller => "sessions", :action => "destroy" %>
 	</div> <!-- end .textpadder -->
 
 

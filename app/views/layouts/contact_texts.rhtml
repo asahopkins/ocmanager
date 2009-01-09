@@ -73,8 +73,8 @@
 	<div class="global_nav">
 
 	<p><b><i><%=current_user.name%></i></b><br>
-	<%= link_to "Edit Account", :controller=>"user", :action=>"edit"%><br>
-	<%= link_to "Logout", :controller=>"user", :action=>"logout"%></p>
+	<%= link_to "Edit Account", :controller=>"users", :action=>"edit"%><br>
+	<%= link_to "Logout", :controller=>"sessions", :action=>"destroy"%></p>
 	<b>MyPeople</b><br />
 	<ul id="cart_list">
 	<li>MyPeople: <span id='cart_items_number'><%=h current_user.cart_items.count %></span>&nbsp;<span id="cart_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></li>

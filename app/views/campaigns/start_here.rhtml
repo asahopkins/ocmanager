@@ -34,7 +34,7 @@
 	<li>View the <%= link_to "Volunteer Calendar", :controller => "volunteer_events", :action => "calendar" %></li>
 	<% if current_user.manager?(@campaign) %>
 	<li>View the list of <%= link_to "current volunteers", :controller => "volunteer_events", :action => "list_current" %></li>
-	<li>Turn this computer into a <%= form_tag :controller=>"user", :action=>"set_volunteer_terminal"%>
+	<li>Turn this computer into a <%= form_tag :controller=>"sessions", :action=>"set_volunteer_terminal"%>
 		<%= submit_tag "Volunteer Sign-In Terminal"%>
 	</form></li><% end -%>
 </ul>

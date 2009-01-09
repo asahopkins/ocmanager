@@ -139,32 +139,32 @@ class User < ActiveRecord::Base
   end
 
 
-  def treasurer_login(comm_id)
-    logger.debug self.treasurer_info.class.to_s
-    t_i = self.treasurer_info
-    if t_i.nil?
-      return nil
-    end
-    array = self.treasurer_info[comm_id]
-    unless array.nil?
-      return array[0]
-    else
-      return nil
-    end
-  end
-
-  def treasurer_token(comm_id)
-    t_i = self.treasurer_info
-    if t_i.nil?
-      return nil
-    end
-    array = self.treasurer_info[comm_id]
-    unless array.nil?
-      return array[1]
-    else
-      return nil
-    end
-  end
+  # def treasurer_login(comm_id)
+  #   logger.debug self.treasurer_info.class.to_s
+  #   t_i = self.treasurer_info
+  #   if t_i.nil?
+  #     return nil
+  #   end
+  #   array = self.treasurer_info[comm_id]
+  #   unless array.nil?
+  #     return array[0]
+  #   else
+  #     return nil
+  #   end
+  # end
+  # 
+  # def treasurer_token(comm_id)
+  #   t_i = self.treasurer_info
+  #   if t_i.nil?
+  #     return nil
+  #   end
+  #   array = self.treasurer_info[comm_id]
+  #   unless array.nil?
+  #     return array[1]
+  #   else
+  #     return nil
+  #   end
+  # end
 
   def superuser?
     self.roles.each {|role| 

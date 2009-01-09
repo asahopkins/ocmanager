@@ -1,4 +1,4 @@
-# ---------------------------------------------------------------------------
+<% # ---------------------------------------------------------------------------
 # 
 # Open Campaigns Manager
 # Copyright (C) 2008 Asa S. Hopkins, Open Campaigns
@@ -17,9 +17,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # 
 # ---------------------------------------------------------------------------
-
-class CampaignUserRole < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :campaign
-  belongs_to :role  
-end
+-%><div class="user_edit">
+  <% hidden_field_tag 'campaign_roles' %>
+  <table>
+  <% for campaign in @campaigns %>
+     <tr><td><%= campaign.name %></td>
+         <td><select id="campaign_user_role_<%=campaign.id%>" name="user_campaign[role][<%=campaign.id%>]">
+             <%= options_for_select [["No Access","0"], ["Manager",Role.manager_id], ["Edit All",Role.edit_all_id], ["Edit Groups",Role.edit_groups_id], ["Data Entry",Role.dataentry_id], ["Read Only", Role.readonly_id], ["Sign In", Role.sign_in_id], ["Inactive", Role.inactive_id]]%></select>&nbsp;User can see and edit finances?&nbsp;<%= check_box_tag "user_campaign[financial][#{campaign.id}]", 1, false %>
+        </td></tr>
+  <% end %>
+  </table>
+  
+</div>

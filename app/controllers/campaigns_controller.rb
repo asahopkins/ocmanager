@@ -53,12 +53,13 @@ class CampaignsController < ApplicationController
     unless request.post?
       if @mobile 
         render :action=>"select", :layout=>"mobile"
-      end      
+      end
+      render(:layout => 'layouts/user')
       return
     end
     current_user.current_campaign = params[:campaign_id]
     current_user.save
-    redirect_back_or_default(:controller=>'campaigns', :action=>'start_here')
+    redirect_to :controller=>'campaigns', :action=>'start_here'
     # @campaigns = current_user.active_campaigns
     # logger.debug @campaigns
     # if @campaigns.length==1

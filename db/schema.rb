@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090106000506) do
+ActiveRecord::Schema.define(:version => 20090108170743) do
 
   create_table "addresses", :force => true do |t|
     t.integer  "entity_id",               :default => 0,  :null => false
@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
   end
 
   add_index "campaign_events", ["campaign_id"], :name => "campaign_events_campaign_id_index"
+  add_index "campaign_events", ["recipient_committee_id"], :name => "index_campaign_events_on_recipient_committee_id"
 
   create_table "campaign_user_roles", :force => true do |t|
     t.integer "user_id",     :default => 0,     :null => false
@@ -114,6 +115,9 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
   add_index "contact_events", ["campaign_event_id"], :name => "contact_events_campaign_event_id_index"
   add_index "contact_events", ["contact_text_id"], :name => "contact_events_contact_text_id_index"
   add_index "contact_events", ["entity_id"], :name => "contact_events_entity_id_index"
+  add_index "contact_events", ["pledge_value"], :name => "index_contact_events_on_pledge_value"
+  add_index "contact_events", ["when_volunteer", "will_volunteer"], :name => "contact_events_will_volunteer_when_volunteer_index"
+  add_index "contact_events", ["will_contribute"], :name => "index_contact_events_on_will_contribute"
 
   create_table "contact_texts", :force => true do |t|
     t.integer  "stylesheet_id"
@@ -130,6 +134,7 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
     t.integer  "campaign_event_id"
   end
 
+  add_index "contact_texts", ["campaign_event_id"], :name => "index_contact_texts_on_campaign_event_id"
   add_index "contact_texts", ["campaign_id"], :name => "contact_texts_campaign_id_index"
 
   create_table "contributions", :force => true do |t|
@@ -144,6 +149,7 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
     t.string   "import_transaction_id"
   end
 
+  add_index "contributions", ["campaign_event_id"], :name => "index_contributions_on_campaign_event_id"
   add_index "contributions", ["entity_id"], :name => "contributions_entity_id_index"
 
   create_table "custom_field_values", :force => true do |t|
@@ -169,6 +175,7 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
   end
 
   add_index "custom_fields", ["campaign_id"], :name => "custom_fields_campaign_id_index"
+  add_index "custom_fields", ["display_order"], :name => "index_custom_fields_on_display_order"
 
   create_table "email_addresses", :force => true do |t|
     t.integer  "entity_id"
@@ -231,7 +238,9 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
   end
 
   add_index "entities", ["campaign_id"], :name => "entities_campaign_id_index"
+  add_index "entities", ["first_name", "last_name", "name"], :name => "entities_sort_name_index"
   add_index "entities", ["household_id"], :name => "entities_household_id_index"
+  add_index "entities", ["name"], :name => "index_entities_on_name"
   add_index "entities", ["primary_address_id"], :name => "entities_primary_address_id_index"
   add_index "entities", ["primary_email_id"], :name => "entities_primary_email_id_index"
   add_index "entities", ["type"], :name => "entities_type_index"
@@ -255,6 +264,8 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
     t.integer  "updated_by"
   end
 
+  add_index "exported_files", ["campaign_id"], :name => "index_exported_files_on_campaign_id"
+
   create_table "group_field_values", :force => true do |t|
     t.integer  "group_membership_id"
     t.integer  "group_field_id"
@@ -262,6 +273,9 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
     t.datetime "created_at",          :null => false
     t.datetime "updated_at"
   end
+
+  add_index "group_field_values", ["group_field_id"], :name => "index_group_field_values_on_group_field_id"
+  add_index "group_field_values", ["group_membership_id"], :name => "index_group_field_values_on_group_membership_id"
 
   create_table "group_fields", :force => true do |t|
     t.integer  "group_id"
@@ -272,6 +286,8 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
     t.text     "select_options"
     t.boolean  "hidden"
   end
+
+  add_index "group_fields", ["group_id"], :name => "index_group_fields_on_group_id"
 
   create_table "group_memberships", :force => true do |t|
     t.integer  "group_id"
@@ -336,6 +352,9 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
     t.boolean "invited",           :default => false
     t.boolean "attended",          :default => false
   end
+
+  add_index "rsvps", ["campaign_event_id", "entity_id"], :name => "rsvps_entity_id_campaign_event_id_index", :unique => true
+  add_index "rsvps", ["campaign_event_id"], :name => "index_rsvps_on_campaign_event_id"
 
   create_table "sessions", :force => true do |t|
     t.string   "session_id"
@@ -465,5 +484,6 @@ ActiveRecord::Schema.define(:version => 20090106000506) do
   end
 
   add_index "volunteer_tasks", ["campaign_id"], :name => "volunteer_tasks_campaign_id_index"
+  add_index "volunteer_tasks", ["display_order"], :name => "index_volunteer_tasks_on_display_order"
 
 end

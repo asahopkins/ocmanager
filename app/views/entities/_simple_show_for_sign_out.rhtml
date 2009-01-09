@@ -20,7 +20,7 @@
 -%><div class="simple_entity_show">
 <b><%=h @entity.name %></b><br />
 <%= @entity.primary_address.line_1.to_s+"<br />" unless @entity.primary_address.line_1.to_s == ""%><br />
-Today I did: <%= @vol_session.volunteer_task.name %> for <%= display_duration(@vol_session.current_duration) %>
+Today you did: <%= @vol_session.volunteer_task.name %> for <%= display_duration(@vol_session.current_duration) %>
 <br />
 <br />
 <%= link_to "Sorry, this isn't me.", :controller=>"volunteer_events", :action=>"sign_out_form" %><br /><br />

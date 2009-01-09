@@ -1,0 +1,33 @@
+campaign_name: Test campaign 2
+campaign_email:  test@example.com
+
+# MUST BE a well-formed email address
+admin_user_email: admin@example.com
+
+# Preferably the name of a real person
+admin_user_name: test user
+
+# MUST BE at least 6 characters
+admin_user_password: passwd
+
+# if this path exists, the application will assume it is running on the REMOTE host
+server_trigger_file: /home/oc
+
+# the absolute path to the exported_files folder on each server
+remote_download_path: /home/you/sites/manager/current/exported_files/
+local_download_path: /Users/you/Sites/ocmanager/exported_files/
+
+# protocols need to be either http:// or https://
+remote_protocol: http://
+local_protocol: http://
+
+# email server:
+server_name: www.yoursite.com
+# address that bounced emails will be directed to
+bounce_email_address: bounces@yousite.com
+bounce_email_passwd: passwd
+
+# email sent to users by the application will be "from" this address
+admin_email_from: you@yoursite.com
+# links in email sent to users will use this root for links
+app_url: localhost:3010/manager
