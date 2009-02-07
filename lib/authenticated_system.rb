@@ -32,7 +32,13 @@ module AuthenticatedSystem
     #  end
     #
     def authorized?(action = action_name, resource = nil)
-      logged_in?
+      logger.debug action
+      logger.debug controller_name
+      if logged_in? and !current_user.prohibited?(controller_name, action, session[:volunteer_sign_in])
+        return true
+      else
+        return false
+      end
     end
 
     # Filter method to enforce a login requirement.
@@ -65,7 +71,8 @@ module AuthenticatedSystem
       respond_to do |format|
         format.html do
           store_location
-          redirect_to new_session_path
+          # redirect_to new_session_path
+          render :partial=>"users/not_available"
         end
         # format.any doesn't work in rails version < http://dev.rubyonrails.org/changeset/8987
         # Add any other API formats here.  (Some browsers, notably IE6, send Accept: */* and trigger 

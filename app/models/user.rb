@@ -206,6 +206,95 @@ class User < ActiveRecord::Base
     end
     return base
   end
+  
+  # Return true/false if User is authorized for resource.
+  def prohibited?(controller, action, vol_sign_in = false) # pass in campaign_id
+    logger.debug "controller: "+controller.to_s
+    logger.debug "action: "+action.to_s
+    resource = "%s/%s" % [ controller, action ]
+    # resources where nil campaign_id is OK: 
+    open_to_all = ["users/forgot_password", "users/reset_password_email", "users/reset_password", "users/set_password", "users/activate", "sessions/new", "sessions/create", "sessions/destroy"]
+    no_id = ["user/welcome",'campaigns/select']
+    if open_to_all.include?(resource)
+      logger.debug "open to all"
+      return false
+    elsif no_id.include?(resource)
+      logger.debug "no id"
+      return false
+    elsif self.highest_role==1 # TODO: this should be cached, probably
+        return false
+    else
+      logger.debug "checking permissions"
+      self.reload unless self.current_campaign
+      cur = CampaignUserRole.find(:first, :conditions=>["user_id = :user AND campaign_id = :comm",{:user=>self.id, :comm=>self.current_campaign}]) # TODO: cache this
+      role = cur.role # TODO: cache this
+      ####
+      rank = cur.role.rank
+      financial = cur.financial
+      if vol_sign_in # boolean
+        rank = 7
+      end
+      logger.debug "rank = "+rank.to_s
+      case rank
+      when 1
+        return false
+      when 2 #Manager
+        if ['group_fields'].include?(controller) or ['campaigns/new', 'campaigns/create','campaigns/destroy','admin/update_permissions'].include?(resource)
+          return true
+        else
+          return false
+        end
+      when 3 # Edit All
+        if ['admin','custom_fields', 'group_fields'].include?(controller) or ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
+          return true
+        else
+          return false
+        end
+      when 4 # Edit Groups
+        logger.debug "edit groups"
+        logger.debug financial
+        if ['admin','custom_fields', 'group_fields'].include?(controller) or  ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'entities/load_treasurer_summaries', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
+          return true
+        elsif ( !financial and ['entities/update_contribution', 'entities/create_contribution'].include?(resource))
+            return true
+        else
+          return false
+        end
+      when 5 # Basic Edit (Data Entry)
+        if ['admin', 'custom_fields', 'group_fields'].include?(controller) or  ['campaigns/new', 'campaigns/create', 'campaigns/edit', 'campaigns/update','campaigns/destroy', 'committees/new', 'committees/create', 'committees/edit', 'committees/update', 'committees/destroy', 'groups/new', 'groups/edit', 'groups/update', 'groups/create', 'groups/remove_member', 'groups/add_cart_to_group', 'groups/destroy', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'volunteer_tasks/new', 'volunteer_tasks/create', 'volunteer_tasks/edit', 'volunteer_tasks/update', 'volunteer_tasks/destroy', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/destroy', 'entities/load_treasurer_summaries', 'entities/add_to_group', 'entities/remove_from_group', 'campaign_events/new', 'campaign_events/create', 'campaign_events/edit', 'campaign_events/update', 'campaign_events/hide'].include?(resource)
+          return true
+        elsif ( !financial and ['entities/update_contribution', 'entities/create_contribution'].include?(resource))
+            return true
+        else
+          return false
+        end
+      when 6 # Read Only # TODO: ?? allow readonly folks to fill MyPeople, or no?
+        # TODO: should be able to access user/edit to change password
+        if ['admin', 'committees','custom_fields', 'group_fields'].include?(controller) or ['edit', 'update', 'new', 'create','destroy'].include?(action) or ['backend/update_entity_from_struct', 'backend/create_entity_from_struct', 'groups/remove_member', 'groups/add_cart_to_group', 'user/edit_roles', 'user/update_roles', 'user/delete', 'user/restore_deleted', 'user/inactivate', 'entities/upload_file', 'entities/save_and_redirect', 'entities/import_from_csv', 'entities/process_csv_data', 'entities/load_treasurer_summaries', 'entities/update_contribution', 'entities/create_contribution', 'entities/add_to_group', 'entities/remove_from_group', 'entities/add_tag_to_cart', 'entities/add_to_household', 'entities/remove_from_household', 'entities/household_search', 'entities/update_partial','entities/update_custom', 'entities/update_name', 'entities/update_address', 'entities/delete_address', 'entities/add_address', 'entities/update_phones', 'entities/add_phone', 'entities/delete_phone', 'entities/update_faxes', 'entities/add_fax', 'entities/delete_fax', 'entities/update_emails', 'entities/add_email', 'entities/delete_email', 'entities/update_website', 'entities/update_skills', 'campaign_events/hide'].include?(resource)
+          return true
+        else
+          return false
+        end
+      when 7 # Sign In
+        if ['volunteer_events/sign_out', 'volunteer_events/autocomplete_for_sign_out', 'volunteer_events/sign_out_form', 'volunteer_events/sign_in_form', 'volunteer_events/welcome', 'volunteer_events/sign_in', 'entities/autocomplete_for_sign_in', 'entities/simple_show_for_sign_in', 'entities/simple_show_for_sign_out', 'entities/simple_self_edit', 'entities/self_update'].include?(resource)
+          return false
+        else
+          return true
+        end
+      when 8 # Inactive
+        if ['admin', 'backend', 'campaigns', 'committees', 'custom_fields', 'entities', 'group_fields', 'groups', 'user', 'volunteeer_tasks', 'campaign_events', 'contact_events', 'volunteer_events', 'contact_texts', 'cart_items'].include?(controller)
+          return true
+        else
+          return false
+        end
+      end
+      return true
+
+      ####
+#      return (prohibition_strings.include?(resource) or prohibited_controllers.include?(controller) or prohibited_actions.include?(action))
+    end
+    
+  end
 
   protected
     
