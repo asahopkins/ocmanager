@@ -1,11 +1,6 @@
 For upgrade to rails 2.2:
-update/fix railspdf
-replace user/authentication process with restful_authentication
-	partly done -- need to handle user creation, editting, etc (login works)
 upgrade backgroundrb to the most recent version; this will involve significant reworking of the worker tasks
 	-- once this is done, put "add to mypeople" in the background for changes > 500 (this will need to freeze out subsequent changes while it runs, due to potential conflicts)
-
-
 
 
 *** TO DO ***
