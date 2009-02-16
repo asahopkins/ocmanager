@@ -21,7 +21,7 @@ class UserMailer < ActionMailer::Base
     def setup_email(user)
       @recipients  = "#{user.email}"
       @from        = "#{ADMIN_EMAIL}"
-      @subject     = "[localhost:3010] "
+      @subject     = "[Manager] "
       @sent_on     = Time.now
       @body[:user] = user
     end

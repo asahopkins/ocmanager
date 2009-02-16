@@ -47,7 +47,6 @@ class ApplicationController < ActionController::Base
   
   # helper :user
   # model  :user
-  # model  :cart
   # model  :contact_text
   # model  :email
   # model  :stylesheet
@@ -125,10 +124,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # def find_cart
-  #   session[:cart] ||= Cart.new
-  # end
-  
   def strip_white_space
     params.each do |key,param|
       logger.debug key.to_s
