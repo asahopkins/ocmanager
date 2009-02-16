@@ -129,7 +129,7 @@ class UsersController < ApplicationController
       @user.activation_code = nil
       @user.save!
       flash[:notice] = "Password set! Please sign in to continue."
-      redirect_to '/login'
+      redirect_to :controller=>'sessions', :action=>'new'
     else
       if !@user.errors.empty?
         flash[:error] = @user.errors.full_messages.to_s
