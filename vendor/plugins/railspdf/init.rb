@@ -1,5 +1,3 @@
-# Include hook code here
-require "railspdf"
-#require "ActionView"
+require 'railspdf'
 
 ActionView::Template.register_template_handler 'rpdf', RailsPDF::PDFRender
