@@ -114,9 +114,6 @@
 		<%= plus_minus("financial_plus", "financial_minus", "financial_info", "entity_subhead", "Financial Summaries") %>
 	</div>
 	<div id="financial_info" style="display:none;" class="more_info_block">
-		<!--<div id="remote_finances"><span id="loading_treasurer" style="display:none;"><%= image_tag "indicator.gif"%></span>
-			<span class="financial_committee_name"><%= link_to_remote "Load financial information from <i>Treasurer</i>",:update=>"remote_finances", :url=>{:action=>"load_treasurer_summaries", :params=>{:id=>@entity.id}}, :loading=>"Element.show('loading_treasurer')" %></span>
-		</div> -->
 		<%= render :partial=>'other_contributions', :locals=>{:entity=>@entity, :can_edit=>@can_edit}%>
 	</div>
 </div>

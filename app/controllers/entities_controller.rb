@@ -643,43 +643,43 @@ class EntitiesController < ApplicationController
         end
                 
        # remote contributions (Treasurer)
-        if params[:remote_contribution]
-          if params[:remote_contribution][:flag].to_s != ""
-            search = params[:remote_contribution][:value].to_f
-            start_date = Date.new(params[:remote_contribution]['start_date(1i)'].to_i, params[:remote_contribution]['start_date(2i)'].to_i, params[:remote_contribution]['start_date(3i)'].to_i)
-            end_date = Date.new(params[:remote_contribution]['end_date(1i)'].to_i, params[:remote_contribution]['end_date(2i)'].to_i, params[:remote_contribution]['end_date(3i)'].to_i)
-            local_ids = []
-            @campaign.committees.each do |committee|
-              unless current_user.treasurer_info.nil? or current_user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == ""
-                treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
-                ids = []
-                if params[:remote_contribution][:flag].to_s == "Total"
-                  ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, false, true, true)
-                elsif params[:remote_contribution][:flag].to_s == "One"
-                  ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, true, true, true)
-                end
-                unless ids.empty?
-                  treasurer_entities = TreasurerEntity.find(:all, :conditions=>["committee_id = #{committee.id} AND treasurer_id IN (:remote_ids)",{:remote_ids=>ids}])
-                  treasurer_entities.each do |te|
-                    local_ids << te.entity_id
-                  end
-                end
-              else
-                #no search, doesn't have any treasurer login info
-              end
-            end
-            if local_ids.length > 0
-              cond_remote_contributions = EZ::Where::Condition.new :entities do
-                id === local_ids
-              end
-            else
-              cond_contributions = EZ::Where::Condition.new :entities do
-                id == -1
-              end                          
-            end
-            cond.append cond_remote_contributions
-          end
-        end
+        # if params[:remote_contribution]
+        #     if params[:remote_contribution][:flag].to_s != ""
+        #       search = params[:remote_contribution][:value].to_f
+        #       start_date = Date.new(params[:remote_contribution]['start_date(1i)'].to_i, params[:remote_contribution]['start_date(2i)'].to_i, params[:remote_contribution]['start_date(3i)'].to_i)
+        #       end_date = Date.new(params[:remote_contribution]['end_date(1i)'].to_i, params[:remote_contribution]['end_date(2i)'].to_i, params[:remote_contribution]['end_date(3i)'].to_i)
+        #       local_ids = []
+        #       @campaign.committees.each do |committee|
+        #         unless current_user.treasurer_info.nil? or current_user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == ""
+        #           treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
+        #           ids = []
+        #           if params[:remote_contribution][:flag].to_s == "Total"
+        #             ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, false, true, true)
+        #           elsif params[:remote_contribution][:flag].to_s == "One"
+        #             ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, true, true, true)
+        #           end
+        #           unless ids.empty?
+        #             treasurer_entities = TreasurerEntity.find(:all, :conditions=>["committee_id = #{committee.id} AND treasurer_id IN (:remote_ids)",{:remote_ids=>ids}])
+        #             treasurer_entities.each do |te|
+        #               local_ids << te.entity_id
+        #             end
+        #           end
+        #         else
+        #           #no search, doesn't have any treasurer login info
+        #         end
+        #       end
+        #       if local_ids.length > 0
+        #         cond_remote_contributions = EZ::Where::Condition.new :entities do
+        #           id === local_ids
+        #         end
+        #       else
+        #         cond_contributions = EZ::Where::Condition.new :entities do
+        #           id == -1
+        #         end                          
+        #       end
+        #       cond.append cond_remote_contributions
+        #     end
+          # end
       end
       #custom_fields
       @campaign.custom_fields.each do |field|
@@ -2004,17 +2004,17 @@ class EntitiesController < ApplicationController
 
     # notify Treasurer of deletion if it has TreasurerEntities
     # Treasurer should then remove its Manager_ID (and reset manager_update flags correctly)
-    treasurer_entities = @ent.treasurer_entities
-    if treasurer_entities
-      treasurer_entities.each do |te|
-        committee = te.committee
-        treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
-        begin
-          acknowledged = treasurer.notify_of_deletion(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1],committee.treasurer_id,te.treasurer_id)
-        rescue
-        end
-      end
-    end
+    # treasurer_entities = @ent.treasurer_entities
+    # if treasurer_entities
+    #   treasurer_entities.each do |te|
+    #     committee = te.committee
+    #     treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
+    #     begin
+    #       acknowledged = treasurer.notify_of_deletion(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1],committee.treasurer_id,te.treasurer_id)
+    #     rescue
+    #     end
+    #   end
+    # end
 
     campaign_id = @ent.campaign_id
     @ent.volunteer_interests = []
