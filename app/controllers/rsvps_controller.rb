@@ -50,7 +50,7 @@ class RsvpsController < ApplicationController
     @notice = "RSVP recorded."       
     @protocol = @@protocol
     @recent_events = @campaign.get_recent_events
-    @rsvp_pages, @rsvps = paginate :rsvps, :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event
+    @rsvps = Rsvp.paginate :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event, :page=>params[:page]
   # TODO: what to do if the RSVP doesn't save
   # rescue
     # @success = false
@@ -64,7 +64,7 @@ class RsvpsController < ApplicationController
   
   def list
     @recent_events = @campaign.get_recent_events
-    @rsvp_pages, @rsvps = paginate :rsvps, :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event
+    @rsvps = Rsvp.paginate :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event, :page=>params[:page]
     render :partial=>'entities/event_rsvps', :protocol=>@@protocol    
   end
 

@@ -18,6 +18,7 @@
 # 
 # ---------------------------------------------------------------------------
 -%><h3>Events</h3>
+<div class="notice" id="rsvps_notice"></div>
 <div id="add_rsvp" class="add_box">
 	<a href="#" onClick="Element.show('new_rsvp'); Element.hide('add_rsvp'); return false;">Add or edit event invitation or RSVP</a>
 </div>
@@ -52,7 +53,7 @@
 	</div>	
 	<% end -%>
 	<div class="contact_event_summary">
-		<%= link_to_remote "<< Later events", :update=>'events_info', :loading=>"Element.show('new_rsvp_page_indic')", :url=>{:controller=>'rsvps', :action=>'list', :params=>{ :entity_id=>@entity.id, :page => @rsvp_pages.current.previous }} if @rsvp_pages.current.previous %>
-		<%= link_to_remote "Earlier events >>", :update=>'events_info', :loading=>"Element.show('new_rsvp_page_indic')", :url=>{:controller=>'rsvps', :action=>'list', :params=>{ :entity_id=>@entity.id, :page => @rsvp_pages.current.next }} if @rsvp_pages.current.next %> <span id="new_rsvp_page_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
+		<%= link_to_remote "<< Later events", :update=>'events_info', :loading=>"Element.show('new_rsvp_page_indic')", :url=>{:controller=>'rsvps', :action=>'list', :params=>{ :entity_id=>@entity.id, :page => @rsvps.current_page - 1 }} if @rsvps.current_page > 1 %>
+		<%= link_to_remote "Earlier events >>", :update=>'events_info', :loading=>"Element.show('new_rsvp_page_indic')", :url=>{:controller=>'rsvps', :action=>'list', :params=>{ :entity_id=>@entity.id, :page => @rsvps.current_page + 1 }} if @rsvps.current_page < @rsvps.total_pages %> <span id="new_rsvp_page_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
 	</div>
 </div>

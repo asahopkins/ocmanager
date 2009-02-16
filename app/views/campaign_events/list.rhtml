@@ -33,12 +33,12 @@
     <td><%= link_to cut_to_length(h(campaign_event.name), 35), :action => 'show', :id => campaign_event %></td>
     <td><%=h campaign_event.date.strftime('%B %d, %Y') %></td>
     <td><%=h cut_to_length(h(campaign_event.location_name), 35) %></td>
-    <td><%= campaign_event.invited.length %></td>
-    <td><%= campaign_event.attended.length %></td>
+    <td><%= campaign_event.invited_count %></td>
+    <td><%= campaign_event.attended_count %></td>
   </tr>
 <% end %>
 </table>
-<%= pagination_links @campaign_event_pages %>
+<%= will_paginate @campaign_events %>
 
 <br />
 

@@ -33,7 +33,7 @@ class EmailsController < ApplicationController
       @entity.primary_email = email
       @entity.save!
     end
-    render :partial=>"entities/emails", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"entities/emails", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
 
   def create
@@ -45,7 +45,7 @@ class EmailsController < ApplicationController
       @entity.primary_email = email
       @entity.save
     end
-    render :partial=>"entities/emails", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol    
+    render :partial=>"entities/emails", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol    
   end
 
   def destroy
@@ -61,7 +61,7 @@ class EmailsController < ApplicationController
       end
       @entity.save!
     end
-    render :partial=>"entities/emails", :locals=>{:can_edit=>session[:user].can_edit_entities?(@campaign)}#, :protocol=>@@protocol
+    render :partial=>"entities/emails", :locals=>{:can_edit=>current_user.can_edit_entities?(@campaign)}#, :protocol=>@@protocol
   end
     
 end

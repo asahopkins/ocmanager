@@ -32,35 +32,35 @@ class ContactTextsController < ApplicationController
          :redirect_to => { :controller=>:campaigns, :action => :start_here }
 
   def list
-    @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
-    @sent_email_pages, @sent_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
-    @draft_letter_pages, @draft_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
-    @sent_letter_pages, @sent_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
-    @script_pages, @scripts = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Script\'', {:campaign=>@campaign.id}], :order=>'updated_at DESC'
+    @draft_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>1
+    @sent_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>1
+    @draft_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>1
+    @sent_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>1
+    @scripts = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Script\'', {:campaign=>@campaign.id}], :order=>'updated_at DESC', :page=>1
   end
   
   def load_draft_emails
-    @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+    @draft_emails = ContactText.paginate :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"draft_emails_table"
   end
 
   def load_sent_emails
-    @sent_email_pages, @sent_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
+    @sent_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"sent_emails_table"
   end
 
   def load_draft_letters
-    @draft_letter_pages, @draft_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+    @draft_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"draft_letters_table"
   end
 
   def load_sent_letters
-    @sent_letter_pages, @sent_letters = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC'
+    @sent_letters = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Letter\' AND complete = :true', {:campaign=>@campaign.id, :true=>true}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"sent_letters_table"
   end
 
   def load_scripts
-    @script_pages, @scripts = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type="Script"', {:campaign=>@campaign.id}], :order=>'updated_at DESC'
+    @scripts = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type="Script"', {:campaign=>@campaign.id}], :order=>'updated_at DESC', :page=>params[:page]
     render :partial=>"scripts_table"
   end
   
@@ -138,9 +138,9 @@ class ContactTextsController < ApplicationController
     params[:contact_text].delete(:invitation)
     if params[:id]
       @text = ContactText.find(params[:id])
-      if session[:user].active_campaigns.include?(@campaign.id) and @text.campaign_id == @campaign.id
+      if current_user.active_campaigns.include?(@campaign.id) and @text.campaign_id == @campaign.id
         unless params[:entity].nil?
-          params[:contact_text][:updated_by]=session[:user].id
+          params[:contact_text][:updated_by]=current_user.id
         end
       else
         @text = nil
@@ -187,15 +187,16 @@ class ContactTextsController < ApplicationController
   
   def destroy_email
     ContactText.find(params[:id]).destroy
-    @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+    @draft_emails = ContactText.paginate :per_page => 5, :conditions=>['campaign_id = :campaign AND type=\'Email\' AND (complete = :false OR complete IS NULL)', {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
     # redirect_to :action => 'list', :protocol=>@@protocol
   end
   
   def show_recipient_list
-    @recipients = @text.recipients 
+    # @recipients = @text.recipients 
     # TODO: this sort will fail if there are multiple kind of entities represented
-    @recipients = @recipients.sort {|a,b| [a.last_name.to_s,a.name.to_s,a.first_name.to_s] <=> [b.last_name.to_s,b.name.to_s,b.first_name.to_s] }
-    @entity_pages, @entities = paginate_collection @recipients, :per_page=>25, :page=>params[:page]
+    # @recipients = @recipients.sort {|a,b| [a.last_name.to_s,a.name.to_s,a.first_name.to_s] <=> [b.last_name.to_s,b.name.to_s,b.first_name.to_s] }
+    @entities = Entity.paginate :include=>[:contact_events], :conditions=>["contact_events.contact_text_id = :text AND entities.campaign_id = :campaign",{:text=>@text.id, :campaign=>@campaign.id}], :per_page=>25, :page=>params[:page], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    # @entity_pages, @entities = paginate_collection @recipients, :per_page=>25, :page=>params[:page]
   end
   
   def generate_email_preview
@@ -282,7 +283,7 @@ class ContactTextsController < ApplicationController
   def check_email_progress
     key_name = "bulk_email_key_"+params[:id]
     unless MiddleMan[key_name.to_sym].progress == 101
-      @draft_email_pages, @draft_emails = paginate :contact_texts, :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC'
+      @draft_emails = ContactText.paginate :per_page => 5, :conditions=>["campaign_id = :campaign AND type='Email' AND (complete = :false OR complete IS NULL)", {:campaign=>@campaign.id, :false=>false}], :order=>'updated_at DESC', :page=>params[:page]
       render :update do |page|
         page.replace_html "draft_emails", render(:partial=>"draft_emails_table")
       end
@@ -541,10 +542,10 @@ class ContactTextsController < ApplicationController
     # 
     # if @entities.length > 0
     #   if @text.nil?
-    #     file_data = "Mail merge file for MyPeople, created for #{session[:user].name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
+    #     file_data = "Mail merge file for MyPeople, created for #{current_user.name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
     #   else
     #     already_recorded = @text.recipients
-    #     file_data = "Mail merge file for letter #{@text.label}, created for #{session[:user].name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
+    #     file_data = "Mail merge file for letter #{@text.label}, created for #{current_user.name} on #{Time.now.strftime('%m/%d/%Y')}:\n"
     #   end
     #   labels = ["Household ID", "Title", "First name", "Middle name", "Last name", "Suffix", "Full name", "Address line 1", "Address line 2", "City", "State", "ZIP", "ZIP+4", "Primary Phone", "Number", "Primary Email", "Address"]
     #   row_size = labels.length
@@ -618,22 +619,22 @@ class ContactTextsController < ApplicationController
     #     end
     #     if params[:mail_merge] and params[:mail_merge][:total_financial_box].to_i == 1
     #       value = nil
-    #       unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[total_committee.id].nil?  or total_committee.treasurer_api_url.to_s == ""
+    #       unless current_user.treasurer_info.nil? or current_user.treasurer_info[total_committee.id].nil?  or total_committee.treasurer_api_url.to_s == ""
     #         treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>total_committee.id}])
     #         unless treasurer_entity.nil?
     #           treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,total_committee.treasurer_api_url)
-    #           value = treasurer.get_transaction_values_by_date(session[:user].treasurer_info[total_committee.id][0], session[:user].treasurer_info[total_committee.id][1], total_committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
+    #           value = treasurer.get_transaction_values_by_date(current_user.treasurer_info[total_committee.id][0], current_user.treasurer_info[total_committee.id][1], total_committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
     #         end
     #       end
     #       fields << value
     #     end
     #     if params[:mail_merge] and params[:mail_merge][:latest_financial_box].to_i == 1
     #       value = nil
-    #       unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[latest_committee.id].nil?  or latest_committee.treasurer_api_url.to_s == ""
+    #       unless current_user.treasurer_info.nil? or current_user.treasurer_info[latest_committee.id].nil?  or latest_committee.treasurer_api_url.to_s == ""
     #         treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>latest_committee.id}])
     #         unless treasurer_entity.nil?
     #           treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,latest_committee.treasurer_api_url)
-    #           value = treasurer.get_transaction_values_by_date(session[:user].treasurer_info[latest_committee.id][0], session[:user].treasurer_info[latest_committee.id][1], latest_committee.treasurer_id, treasurer_entity.treasurer_id, DateTime.now, DateTime.now, true, true)
+    #           value = treasurer.get_transaction_values_by_date(current_user.treasurer_info[latest_committee.id][0], current_user.treasurer_info[latest_committee.id][1], latest_committee.treasurer_id, treasurer_entity.treasurer_id, DateTime.now, DateTime.now, true, true)
     #         end
     #       end
     #       fields << value
@@ -647,9 +648,9 @@ class ContactTextsController < ApplicationController
     #         value = 0
     #         committees.each do |committee|
     #           treasurer_entity = TreasurerEntity.find(:first,:conditions=>["entity_id=:entity AND committee_id=:committee",{:entity=>entity.id,:committee=>committee.id}])
-    #           unless session[:user].treasurer_info.nil? or session[:user].treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == "" or treasurer_entity.nil?
+    #           unless current_user.treasurer_info.nil? or current_user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == "" or treasurer_entity.nil?
     #             treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
-    #             value = treasurer.get_transaction_values_by_date(session[:user].treasurer_info[committee.id][0], session[:user].treasurer_info[committee.id][1], committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
+    #             value = treasurer.get_transaction_values_by_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, treasurer_entity.treasurer_id, start_date, end_date, false, true)
     #             year_value += value
     #           end
     #         end
@@ -716,7 +717,7 @@ class ContactTextsController < ApplicationController
     # @campaign = @text.campaign
     if current_user.active_campaigns.include?(@campaign.id) and @campaign.id == @text.campaign_id
       unless params[:entity].nil?
-        params[:contact_text][:updated_by]=session[:user].id
+        params[:contact_text][:updated_by]=current_user.id
       end
     else
       @text = nil
@@ -728,7 +729,7 @@ class ContactTextsController < ApplicationController
   
   def check_campaign
     # unless params[:campaign_id]
-    #   params[:campaign_id] = session[:user].active_campaigns.first
+    #   params[:campaign_id] = current_user.active_campaigns.first
     # end
     # @campaign = Campaign.find(params[:campaign_id])
     if current_user.active_campaigns.include?(@campaign.id)

@@ -23,7 +23,7 @@ class AdminController < ApplicationController
   before_filter :get_campaign
   
   def index
-    @campaigns = Campaign.find(:all,:conditions=>["id IN (:ids)",{:ids=>session[:user].manager_campaigns}])
+    @campaigns = Campaign.find(:all,:conditions=>["id IN (:ids)",{:ids=>current_user.manager_campaigns}])
   end
 
   def configuration

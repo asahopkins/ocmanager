@@ -3,6 +3,9 @@ class Tag < ActiveRecord::Base
   
   belongs_to :campaign
 
+  # requires that "name" is more than one character
+  validates_length_of :name, :minimum=>2
+
   def self.parse(list)
     tag_names = []
 

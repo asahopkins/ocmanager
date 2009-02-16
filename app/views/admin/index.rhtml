@@ -21,8 +21,8 @@
 
 <h3>Users</h3>
 <ul>
-     <li><%= link_to "List users", :controller=>"user", :action=>"list"%></li>
-     <li><%= link_to "Create new user", :controller=>"user", :action=>"new"%></li>
+     <li><%= link_to "List users", :controller=>"users", :action=>"list"%></li>
+     <li><%= link_to "Create new user", :controller=>"users", :action=>"new"%></li>
 </ul>
 
 <h3>Campaigns</h3>
@@ -34,7 +34,7 @@
 <% end -%>
 </ul>
 
-<% if session[:user].superuser? -%>
+<% if current_user.superuser? -%>
 <h3>Update permissions</h3>
 <%= form_tag :action=>"update_permissions" %>
 <%= submit_tag 'Update permissions' %>

@@ -21,5 +21,5 @@
 class CampaignUserRole < ActiveRecord::Base
   belongs_to :user
   belongs_to :campaign
-  belongs_to :role
+  belongs_to :role  
 end

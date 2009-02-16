@@ -65,6 +65,6 @@
 </div>
 <% end %>
 <div class="volunteer_event_summary">
-	<%= link_to_remote "<< Later sessions", :url=>{:controller=>'volunteer_events', :action=>'list', :params=>{ :entity_id=>@entity.id, :campaign_id=>@campaign.id, :page => @volunteer_event_pages.current.previous }} if @volunteer_event_pages.current.previous %>
-	<%= link_to_remote "Earlier sessions >>", :url=>{:controller=>'volunteer_events', :action=>'list', :params=>{ :entity_id=>@entity.id, :campaign_id=>@campaign.id, :page => @volunteer_event_pages.current.next }} if @volunteer_event_pages.current.next %>
+	<%= link_to_remote "<< Later sessions", :loading=>"Element.show('volunteer_event_pages_indic')", :url=>{:controller=>'volunteer_events', :action=>'list', :params=>{ :entity_id=>@entity.id, :campaign_id=>@campaign.id, :page => (@volunteer_events.current_page - 1) }} if @volunteer_events.current_page > 1 %>
+	<%= link_to_remote "Earlier sessions >>", :loading=>"Element.show('volunteer_event_pages_indic')", :url=>{:controller=>'volunteer_events', :action=>'list', :params=>{ :entity_id=>@entity.id, :campaign_id=>@campaign.id, :page => (@volunteer_events.current_page + 1) }} if @volunteer_events.current_page < @volunteer_events.total_pages %> <span id="volunteer_event_pages_indic" style="display:none;"><%= image_tag 'indicator.gif' %></span>
 </div>

@@ -40,7 +40,7 @@ class CampaignsController < ApplicationController
   end
 
   def list
-    @campaign_pages, @campaigns = paginate :campaigns, :per_page => 10
+    @campaigns = Campaign.paginate :per_page => 10, :page=>params[:page]
   end
 
   def select
@@ -53,13 +53,14 @@ class CampaignsController < ApplicationController
     unless request.post?
       if @mobile 
         render :action=>"select", :layout=>"mobile"
-      end      
+      end
+      render(:layout => 'layouts/user')
       return
     end
     current_user.current_campaign = params[:campaign_id]
     current_user.save
-    redirect_back_or_default(:controller=>'campaigns', :action=>'start_here')
-    # @campaigns = session[:user].active_campaigns
+    redirect_to :controller=>'campaigns', :action=>'start_here'
+    # @campaigns = current_user.active_campaigns
     # logger.debug @campaigns
     # if @campaigns.length==1
     #   redirect_to :controller=>"entities", :action=>"list", :params=>{:campaign_id=>@campaigns[0]}, :protocol=>@@protocol

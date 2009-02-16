@@ -27,5 +27,5 @@
     </tr>
 <% end %>
 </table>
-<%= link_to_remote '<< Earlier', :update=>"sent_letters", :url=>{ :action=>"load_sent_letters", :params=>{:campaign_id=>@campaign.id, :page => @sent_letter_pages.current.next} } if @sent_letter_pages.current.next %> 
-<%= link_to_remote 'Later >>', :update=>"sent_letters", :url=>{ :action=>"load_sent_letters", :params=>{:campaign_id=>@campaign.id, :page => @sent_letter_pages.current.previous} } if @sent_letter_pages.current.previous %> 
+<%= link_to_remote '<< Earlier', :update=>"sent_letters", :url=>{ :action=>"load_sent_letters", :params=>{:campaign_id=>@campaign.id, :page => @sent_letters.current_page + 1} } if @sent_letters.current_page < @sent_letters.total_pages %> 
+<%= link_to_remote 'Later >>', :update=>"sent_letters", :url=>{ :action=>"load_sent_letters", :params=>{:campaign_id=>@campaign.id, :page => @sent_letters.current_page - 1} } if @sent_letters.current_page > 1 %> 

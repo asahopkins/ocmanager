@@ -30,5 +30,4 @@
 	<%= render :partial=>"group_line",:locals=>{:entity=>member,:can_remove=>@can_edit,:group=>@group} %>
 <% end %>
 
-<p><%= link_to '<< Previous page', { :page => @member_pages.current.previous } if @member_pages.current.previous %> 
-<%= link_to 'Next page >>', { :page => @member_pages.current.next } if @member_pages.current.next %></p>
+<%= will_paginate @members %>

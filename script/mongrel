@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/boot'
+require 'commands/servers/base'
+require 'active_support'
+require 'fileutils'
+
+require_library_or_gem 'mongrel'
+
+unless defined?(Mongrel)
+  puts "PROBLEM: Mongrel is not available on your system (or not in your path)"
+  exit 1
+end
+
+defaults = {
+ "-p" => "3010" ,
+ "-e" => "development" ,
+ "--prefix" => "/manager",
+ }
+
+defaults.merge!(Hash[*ARGV])
+args = ["start"] + defaults.to_a.flatten
+
+puts "=> Ctrl-C to shutdown server"
+tail_thread = tail(Pathname.new("#{File.expand_path(RAILS_ROOT)}/log/#{RAILS_ENV}.log").cleanpath)
+
+trap(:INT) { exit }
+
+begin
+  silence_warnings { ARGV = args }
+  load("mongrel_rails")
+ensure
+  tail_thread.kill if tail_thread
+  puts 'Exiting'
+end

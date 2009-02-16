@@ -37,7 +37,7 @@ class CommitteesController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @committee_pages, @committees = paginate :committees, :per_page => 10, :conditions=>['campaign_id = :campaign', {:campaign=>@campaign.id}], :order=>"name"
+    @committees = Committee.paginate :per_page => 10, :conditions=>['campaign_id = :campaign', {:campaign=>@campaign.id}], :order=>"name", :page=>params[:page]
   end
 
   def show
@@ -96,7 +96,7 @@ class CommitteesController < ApplicationController
   
   def check_campaign
     # unless params[:campaign_id]
-    #   params[:campaign_id] = session[:user].active_campaigns.first
+    #   params[:campaign_id] = current_user.active_campaigns.first
     # end
     # @campaign = Campaign.find(params[:campaign_id])
     if current_user.active_campaigns.include?(@campaign.id)

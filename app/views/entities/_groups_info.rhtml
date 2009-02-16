@@ -41,8 +41,10 @@ end
 <% end -%>
 <% if can_edit_groups 
 	possible_groups = []
+	entity_groups = @entity.groups
+	logger.info entity_groups.length
 	@campaign.groups.each do |group| 
-		unless @entity.groups.include?(group) 
+		unless entity_groups.include?(group) 
 			possible_groups << group
  		end end %>
 <% if possible_groups.length > 0 -%>

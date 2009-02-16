@@ -31,7 +31,7 @@ class GroupFieldsController < ApplicationController
          :redirect_to => { :action => :list }
 
   def list
-    @group_field_pages, @group_fields = paginate :group_fields, :per_page => 10
+    @group_fields = GroupField.paginate :per_page => 10, :page=>params[:page]
   end
 
   def show

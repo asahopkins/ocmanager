@@ -21,7 +21,7 @@
 <h3><%=h @campaign_event.date.strftime('%B %d, %Y') %><span id="indicator" style="display:none"><%= image_tag 'indicator.gif' %></span></h3>
 
 <p><b>Location:</b><br />
-	<%= display_address(@campaign_event) %>
+	<%= display_event_address(@campaign_event) %>
 	</p>
 
 <p><b>Website:</b> <%= link_to h(@campaign_event.website), h(@campaign_event.website) %></p>
@@ -64,4 +64,4 @@
 	<% end %>
 </div>
 <br class="brclear"/>
-<%= pagination_links @entity_pages %>
+<%= will_paginate @entities %>

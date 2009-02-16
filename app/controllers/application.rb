@@ -18,9 +18,9 @@
 # 
 # ---------------------------------------------------------------------------
 
-require 'acl_system'
-require 'localization'
-require 'user_system'
+# require 'acl_system'
+# require 'localization'
+# require 'user_system'
 # require 'rdiscount'
 require 'bluecloth'
 require 'memory_logging'
@@ -28,12 +28,24 @@ require 'memory_logging'
 # Filters added to this controller will be run for all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
+  include AuthenticatedSystem
+  helper :all # include all helpers, all the time
+
+  # See ActionController::RequestForgeryProtection for details
+  # Uncomment the :secret if you're not using the cookie session store
+  protect_from_forgery # :secret => '5033a1fef429baef6bc61053d19ac924'
+  
+  # See ActionController::Base for details 
+  # Uncomment this to filter the contents of submitted sensitive data parameters
+  # from your application log (in this case, all fields with names like "password"). 
+  filter_parameter_logging :password
+
   before_filter :login_required#, :only=>[]
-  include Localization
-  include ACLSystem
+  # include Localization
+  # include ACLSystem
   include MemoryLogging
   
-  helper :user
+  # helper :user
   # model  :user
   # model  :cart
   # model  :contact_text
@@ -69,21 +81,27 @@ class ApplicationController < ActionController::Base
     default_options = {:per_page=>10, :page=>1}
     options = default_options.merge options
     
-    pages = Paginator.new self, collection.size, options[:per_page], options[:page]
-    first = pages.current.offset
-    last = [first+options[:per_page], collection.size].min
-    slice = collection[first...last]
-    return [pages, slice]
+    new_collect = WillPaginate::Collection.create(options[:page],options[:per_page]) do |pager|
+      pager.replace collection[pager.offset, pager.per_page].to_a
+      pager.total_entries = collection.size
+    end
+    return new_collect
+    
+    # pages = Paginator.new self, collection.size, options[:per_page], options[:page]
+    # first = pages.current.offset
+    # last = [first+options[:per_page], collection.size].min
+    # slice = collection[first...last]
+    # return [pages, slice]
   end
   
   def get_campaign
     if current_user and current_user.current_campaign
       @campaign = Campaign.find(current_user.current_campaign)
     else
-      redirect_to :controller=>'account', :action=>'logout'
+      redirect_to :controller=>'sessions', :action=>'destroy'
     end
     if @campaign.nil?
-      redirect_to :controller=>'account', :action=>'logout'
+      redirect_to :controller=>'sessions', :action=>'destroy'
     end
   end
   

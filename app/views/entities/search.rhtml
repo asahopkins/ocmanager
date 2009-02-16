@@ -31,11 +31,11 @@
 
 <div id="entities_list">
 	<% unless @campaign.nil? %>
-		<% session[:user].manager?(@campaign) ? can_delete = true : can_delete = false%>
+		<% current_user.manager?(@campaign) ? can_delete = true : can_delete = false%>
 	<% end %>
 	<% for entity in @entities %>
 		<% if @campaign.nil? %>
-			<% session[:user].manager?(entity.campaign) ? can_delete = true : can_delete = false%>
+			<% current_user.manager?(entity.campaign) ? can_delete = true : can_delete = false%>
 		<% end %>
 		<%= render :partial=>"list_line", :locals=>{:entity=>entity, :can_delete=>can_delete} %>
 	<% end %>

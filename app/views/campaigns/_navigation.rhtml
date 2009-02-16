@@ -25,7 +25,7 @@
 	<br />
 	<%= link_to "Start Page", :controller=>"campaigns", :action=>"start_here"%><br />
 	<br />
-	<% if session[:user].can_edit_entities?(@campaign) %>
+	<% if current_user.can_edit_entities?(@campaign) %>
 	<%= link_to "New Person/Organization", :controller=>"entities", :action=>"new"%><br /><% end -%>
 	<%= link_to "View All", :controller=>"entities", :action=>"list", :params=>{:id=>nil}%><br />
 <br />

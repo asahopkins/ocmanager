@@ -38,5 +38,5 @@
     </tr>
 <% end %>
 </table>
-<%= link_to_remote '<< Earlier', :update=>"draft_emails", :url=>{ :action=>"load_draft_emails", :params=>{:campaign_id=>@campaign.id, :page => @draft_email_pages.current.next} } if @draft_email_pages.current.next %> 
-<%= link_to_remote 'Later >>', :update=>"draft_emails", :url=>{ :action=>"load_draft_emails", :params=>{:campaign_id=>@campaign.id, :page => @draft_email_pages.current.previous} } if @draft_email_pages.current.previous %> 
+<%= link_to_remote '<< Earlier', :update=>"draft_emails", :url=>{ :action=>"load_draft_emails", :params=>{:campaign_id=>@campaign.id, :page => @draft_emails.current_page + 1} } if @draft_emails.current_page < @draft_emails.total_pages %> 
+<%= link_to_remote 'Later >>', :update=>"draft_emails", :url=>{ :action=>"load_draft_emails", :params=>{:campaign_id=>@campaign.id, :page => @draft_emails.current_page - 1} } if @draft_emails.current_page > 1 %> 

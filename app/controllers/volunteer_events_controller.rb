@@ -36,8 +36,8 @@ class VolunteerEventsController < ApplicationController
     @entity = Entity.find(params[:entity_id])
     # @campaign = @entity.campaign
     
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}] 
-    render_without_layout  
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
+    render :layout => false
   end
 
   def create
@@ -58,7 +58,7 @@ class VolunteerEventsController < ApplicationController
     @new_event.save!
     @success = true
     @notice = "Volunteer session saved."
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render_without_layout  
   end
 
@@ -84,7 +84,7 @@ class VolunteerEventsController < ApplicationController
     else
       raise
     end
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render_without_layout  
   end
 
@@ -95,7 +95,7 @@ class VolunteerEventsController < ApplicationController
     @event.destroy
     @success = true
     @notice = "Volunteer session deleted."
-    @volunteer_event_pages, @volunteer_events = paginate :volunteer_events, :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}]
+    @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
     render_without_layout  
   end
   
@@ -154,7 +154,7 @@ class VolunteerEventsController < ApplicationController
         @entity.household = @household
         #name
         @entity.name = @entity.first_name+" "+@entity.last_name
-        @entity.created_by = session[:user].id
+        @entity.created_by = current_user.id
         #address
         @address = Address.new(params[:address])
         @address.entity = @entity
@@ -208,37 +208,35 @@ class VolunteerEventsController < ApplicationController
   
   def autocomplete_for_sign_out
     unless params[:entity][:id]
-      first = "%"+params[:entity][:first_name]+"%"
-      last = "%"+params[:entity][:last_name]+"%"
-      cond_name = EZ::Where::Condition.new :entities do
-        first_name.nocase =~ first
-        last_name.nocase =~ last
-      end
-      cond_times = EZ::Where::Condition.new :volunteer_events do
-        end_time == :null
-        start_time! == :null
-      end
-      cond_name.append cond_times
+      if params[:entity][:first_name].length >= 1 or params[:entity][:last_name].length >= 1
+        first = "%"+params[:entity][:first_name]+"%"
+        last = "%"+params[:entity][:last_name]+"%"
+        cond_name = EZ::Where::Condition.new :entities do
+          first_name.nocase =~ first
+          last_name.nocase =~ last
+        end
+        cond_times = EZ::Where::Condition.new :volunteer_events do
+          end_time == :null
+          start_time! == :null
+        end
+        cond_name.append cond_times
       
-      @entities = @campaign.entities.find(:all, :include=>[:primary_address, :volunteer_events], :conditions=>cond_name.to_sql)
+        @entities = @campaign.entities.find(:all, :include=>[:primary_address, :volunteer_events], :conditions=>cond_name.to_sql)
 
-      @entities.each do |entity|
-        logger.debug entity.name
-        logger.debug entity.current_volunteer_session.volunteer_task
-      end
-      if @entities.length <= 5 and @entities.length > 0# if there are 5 or fewer, put their info on the page
-        render :update do |page|
-          page.replace_html "is_this_you", :partial=>'entities/simple_show_list_for_sign_out'
+        @entities.each do |entity|
+          logger.debug entity.name
+          logger.debug entity.current_volunteer_session.volunteer_task
         end
-      else # clear the div
-        render :update do |page|
-          page.replace_html "is_this_you", "&nbsp;"
+        if @entities.length <= 5 and @entities.length > 0# if there are 5 or fewer, put their info on the page
+          render :update do |page|
+            page.replace_html "is_this_you", :partial=>'entities/simple_show_list_for_sign_out'
+          end
+          return
         end
       end
-    else
-      render :update do |page|
-        page.replace_html "is_this_you", "&nbsp;"
-      end
+    end
+    render :update do |page|
+      page.replace_html "is_this_you", "&nbsp;"
     end
   end
   

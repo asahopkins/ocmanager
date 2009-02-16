@@ -5,7 +5,7 @@
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '1.2.3'
+# RAILS_GEM_VERSION = '1.2.6'
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -27,6 +27,16 @@ Rails::Initializer.run do |config|
   # =======
   # Settings in config/environments/* take precedence those specified here
   
+  # Specify gems that this application depends on. 
+  # They can then be installed with "rake gems:install" on new installations.
+  # You have to specify the :lib option for libraries, where the Gem name (sqlite3-ruby) differs from the file itself (sqlite3)
+  # config.gem "bj"
+  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
+  # config.gem "sqlite3-ruby", :lib => "sqlite3"
+  # config.gem "aws-s3", :lib => "aws/s3"
+  config.gem "rubyist-aasm", :lib => "aasm", :source => "http://gems.github.com"
+  config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => 'http://gems.github.com'
+  
   # Skip frameworks you're not going to use
   # config.frameworks -= [ :action_web_service, :action_mailer ]
 
@@ -39,7 +49,16 @@ Rails::Initializer.run do |config|
 
   # Use the database for sessions instead of the file system
   # (create the session table with 'rake create_sessions_table')
-  config.action_controller.session_store = :active_record_store
+  # config.action_controller.session_store = :active_record_store
+  config.action_controller.session = {
+    :session_key => '_manager_session',
+    :secret      => '109cd2c583e1735a3d3cc16de9934963a49bb0f1e2204a43179cc6c10cf08f5c5ebdb1461512b26daa22d4b398cd3becc83004b83edffe4dad186dfd64cfb2b3'
+  }
+
+  # Activate observers that should always be running
+  # Please note that observers generated using script/generate observer need to have an _observer suffix
+  # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
+  config.active_record.observers = :user_observer
 
   # Enable page/fragment caching by setting a file-based store
   # (remember to create the caching directory and make it readable to the application)
@@ -56,6 +75,9 @@ Rails::Initializer.run do |config|
   config.active_record.schema_format = :ruby
 
   # See Rails::Configuration for more options
+  
+  config.action_controller.relative_url_root="/manager"
+  
 end
 
 # Add new inflection rules using the following format 
@@ -69,12 +91,12 @@ end
 
 # Include your application configuration below
 
-require 'email_config'
-require 'server_config'
+# require 'email_config'
+# require 'server_config'
 ActionController::Base.session_options[:session_key] = '_manager'
-require 'environments/localization_environment'
-require 'localization'
-Localization::load_localized_strings
+# require 'environments/localization_environment'
+# require 'localization'
+# Localization::load_localized_strings
 require 'environments/user_environment'
 require 'memory_logging'
 require 'pdf/writer'
