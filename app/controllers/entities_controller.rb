@@ -111,6 +111,17 @@ class EntitiesController < ApplicationController
         cond_search = EZ::Where::Condition.new :entities do
           name.nocase =~ search
         end
+        if search.split.length == 2
+          # session[:search_params][:entity][:first_name] = params[:search][:content].split[0]
+          search1 = content.split[0]+"%"
+          # session[:search_params][:entity][:last_name] = params[:search][:content].split[1]
+          search2 = content.split[1]+"%"
+          cond_search2 = EZ::Where::Condition.new :entities do
+            any_of(:first_name,:nickname).nocase =~ search1
+            last_name.nocase =~ search2
+          end
+          cond_search.append cond_search2.to_sql, :or
+        end
       elsif params[:search][:field]=="Address"
         session[:search_params][:entity][:address_any_field_flag] = "Includes"
         session[:search_params][:entity][:address_any_field] = params[:search][:content]
@@ -214,7 +225,11 @@ class EntitiesController < ApplicationController
       end
       if params[:entity][:first_name].to_s != ""
         search = params[:entity][:first_name].gsub(/[*]/,'%')
-        cond.first_name.nocase =~ search
+        cond_name = EZ::Where::Condition.new :entities, :inner=>:or do
+          first_name.nocase =~ search
+          nickname.nocase =~ search
+        end
+        cond.append cond_name
       end
       if params[:entity][:middle_name].to_s != ""
         search = params[:entity][:middle_name].gsub(/[*]/,'%')
@@ -228,6 +243,32 @@ class EntitiesController < ApplicationController
         search = params[:entity][:name].gsub(/[*]/,'%')
         cond.name.nocase =~ search
       end
+      if params[:entity][:name].to_s != ""
+        search = params[:entity][:name].gsub(/[*]/,'%')
+        cond_search = EZ::Where::Condition.new :entities do
+          name.nocase =~ search
+        end
+        if search.split.length == 2
+          # session[:search_params][:entity][:first_name] = params[:search][:content].split[0]
+          search1 = content.split[0]+"%"
+          # session[:search_params][:entity][:last_name] = params[:search][:content].split[1]
+          search2 = content.split[1]+"%"
+          cond_search2 = EZ::Where::Condition.new :entities do
+            any_of(:first_name,:nickname).nocase =~ search1
+            last_name.nocase =~ search2
+          end
+          cond_search.append cond_search2.to_sql, :or
+        end
+        cond.append cond_search
+      end
+      # if params[:entity][:nickname].to_s != ""
+      #   search = params[:entity][:nickname].gsub(/[*]/,'%')
+      #   cond_name = EZ::Where::Condition.new :entities, :inner=>:or do
+      #     first_name.nocase =~ search
+      #     nickname.nocase =~ search
+      #   end
+      #   cond.append cond_name
+      # end
       
       #address
       if params[:entity][:address_which]=="All"
