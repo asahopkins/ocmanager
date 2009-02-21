@@ -59,7 +59,7 @@ class VolunteerEventsController < ApplicationController
     @success = true
     @notice = "Volunteer session saved."
     @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
-    render_without_layout  
+    render :layout => false
   end
 
   def update
@@ -85,7 +85,7 @@ class VolunteerEventsController < ApplicationController
       raise
     end
     @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
-    render_without_layout  
+    render :layout => false
   end
 
   def destroy
@@ -96,7 +96,7 @@ class VolunteerEventsController < ApplicationController
     @success = true
     @notice = "Volunteer session deleted."
     @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>params[:page]
-    render_without_layout  
+    render :layout => false
   end
   
   def welcome # get
