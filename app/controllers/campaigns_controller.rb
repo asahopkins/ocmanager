@@ -91,7 +91,7 @@ class CampaignsController < ApplicationController
     @superusers = User.find(:all,:include=>:campaign_user_roles, :conditions=>["campaign_user_roles.role_id = :super_role", {:super_role=>Role.superuser_id}])
     if @campaign.save
       @superusers.each do |user|
-        api_token = user.class.hashed(user.salted_password + Time.now.to_i.to_s + rand.to_s)
+        api_token = nil
         cru = CampaignUserRole.new({:user_id=>user.id,:role_id=>Role.superuser_id,:campaign_id=>@campaign.id,:created_by=>current_user.id,:api_token=>api_token})
         cru.save!
       end
