@@ -95,7 +95,9 @@ class CampaignsController < ApplicationController
         cru = CampaignUserRole.new({:user_id=>user.id,:role_id=>Role.superuser_id,:campaign_id=>@campaign.id,:created_by=>current_user.id,:api_token=>api_token})
         cru.save!
       end
-      Dir.mkdir(@@file_path_prefix + @campaign.id.to_s) # creates exported_files directory for this campaign
+      unless File.exist?(@@file_path_prefix + @campaign.id.to_s)
+        Dir.mkdir(@@file_path_prefix + @campaign.id.to_s) # creates exported_files directory for this campaign
+      end
       flash[:notice] = 'Campaign was successfully created.'
       redirect_to :action => 'list', :protocol=>@@protocol
     else

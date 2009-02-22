@@ -35,8 +35,7 @@
   <tr>
       <td><u>Campaign:</u></td>
       <td><u>Role:</u></td>
-      <td>
-		</td>
+      <td><% if current_user.superuser? and !user.superuser? %><%= link_to '(Add campaign)', :controller=>:campaign_user_roles, :action => :new, :params=>{:user_id => user.id} %><% end %></td>
   </tr>
   <% for cur in user.campaign_user_roles -%>
   <% if current_user.manager_campaigns.include?(cur.campaign_id) %>

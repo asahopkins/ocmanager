@@ -1,6 +1,6 @@
 class CampaignUserRolesController < ApplicationController
   layout 'manager'
-  before_filter :get_campaign
+  before_filter :get_campaign#, :except=>[:new, :create]
   
   # GET /campaign_user_roles
   # GET /campaign_user_roles.xml
@@ -24,16 +24,40 @@ class CampaignUserRolesController < ApplicationController
   #   end
   # end
   # 
-  # # GET /campaign_user_roles/new
-  # # GET /campaign_user_roles/new.xml
-  # def new
-  #   @campaign_user_role = CampaignUserRole.new
-  # 
-  #   respond_to do |format|
-  #     format.html # new.html.erb
-  #     format.xml  { render :xml => @campaign_user_role }
-  #   end
-  # end
+  # GET /campaign_user_roles/new
+  # GET /campaign_user_roles/new.xml
+  def new
+    @campaign_user_role = CampaignUserRole.new
+    @user = User.find(params[:user_id])
+    @roles = Role.find(:all, :conditions=>"roles.rank != 1").sort {|a,b| a.rank <=> b.rank}
+    campaigns = Campaign.find(:all)
+    c_ids = []
+    campaigns.each do |c|
+      c_ids << c.id
+    end
+    @campaigns = []
+    uc = @user.campaigns
+    uc_ids = []
+    uc.each do |c|
+      uc_ids << c.id
+    end
+    c_ids.each do |c_id|
+      if current_user.manager_campaigns.include?(c_id)
+        unless uc_ids.include?(c_id)
+          @campaigns << Campaign.find(c_id)
+        end
+      end
+    end
+    if @campaigns.length == 0
+      flash[:notice] = "User already has a role for every campaign."
+      redirect_to :controller=>'users', :action=>'list'
+      return
+    end
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @campaign_user_role }
+    end
+  end
 
   # GET /campaign_user_roles/1/edit
   def edit
@@ -51,20 +75,20 @@ class CampaignUserRolesController < ApplicationController
 
   # POST /campaign_user_roles
   # POST /campaign_user_roles.xml
-  # def create
-  #   @campaign_user_role = CampaignUserRole.new(params[:campaign_user_role])
-  # 
-  #   respond_to do |format|
-  #     if @campaign_user_role.save
-  #       flash[:notice] = 'CampaignUserRole was successfully created.'
-  #       format.html { redirect_to(@campaign_user_role) }
-  #       format.xml  { render :xml => @campaign_user_role, :status => :created, :location => @campaign_user_role }
-  #     else
-  #       format.html { render :action => "new" }
-  #       format.xml  { render :xml => @campaign_user_role.errors, :status => :unprocessable_entity }
-  #     end
-  #   end
-  # end
+  def create
+    @campaign_user_role = CampaignUserRole.new(params[:campaign_user_role])
+  
+    respond_to do |format|
+      if @campaign_user_role.save
+        flash[:notice] = 'CampaignUserRole was successfully created.'
+        format.html { redirect_to(:controller=>'users',:action=>'list') }
+        format.xml  { render :xml => @campaign_user_role, :status => :created, :location => @campaign_user_role }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @campaign_user_role.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
 
   # PUT /campaign_user_roles/1
   # PUT /campaign_user_roles/1.xml

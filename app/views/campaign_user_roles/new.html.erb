@@ -1,0 +1,17 @@
+<h2>Editing user: <%= @user.name %></h2>
+<% form_for(@campaign_user_role) do |f| %>
+  <%= f.error_messages %>
+
+<p><b>Campaign: </b><%= select :campaign_user_role, :campaign_id, @campaigns.collect {|c| [c.name, c.id]} %></p>
+<p><b>Role: </b><%= select :campaign_user_role, :role_id, @roles.collect {|r| [r.name, r.id]} %></p>
+	
+<p><b>Can edit financial:</b> <%= check_box :campaign_user_role, :financial %></p>
+<%= hidden_field :campaign_user_role, :updated_by, :value=>current_user.id%>
+<%= hidden_field :campaign_user_role, :user_id, :value=>@user.id%>
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @campaign_user_role %> |
+<%= link_to 'Back', campaign_user_roles_path %>

@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
       # reset_session
       self.current_user = user
       user.activation_code = nil
-      # user.logged_in_at = Time.now
+      user.logged_in_at = Time.now
       user.save!
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
