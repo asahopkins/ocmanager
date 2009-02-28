@@ -42,7 +42,7 @@
 	<span class="left_30"><% unless cart_item.entity.primary_address.nil? -%><%=h cart_item.entity.primary_address.line_1%>, <%=h cart_item.entity.primary_address.city%><%end -%>&nbsp;</span>
 	<span class="left_12"><%=number_to_phone(cart_item.entity.primary_phone_number)%>&nbsp;</span>
 	<span class="left_23"><%= link_to_email(cart_item.entity.primary_email_address)%>&nbsp;</span>
-	<span class="right_13"><%= link_to_remote "(Remove)", :url=>{:action=>"destroy", :params=>{:id=>cart_item}}, :method=>"post" ,:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');"%></span></div>
+	<span class="right_13"><%= link_to_remote image_tag("mp_minus.png"), :url=>{:action=>"destroy", :params=>{:id=>cart_item}}, :method=>"post" ,:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');"%></span></div>
 	<% end %>
 </div>
 <br class="brclear"/>

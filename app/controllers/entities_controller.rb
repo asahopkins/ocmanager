@@ -56,6 +56,7 @@ class EntitiesController < ApplicationController
         @tag = Tag.find_by_name_and_campaign_id(@tag_name, @campaign.id)
         if @tag
           @entities = Entity.paginate :per_page => 25, :order=>"last_name ASC, name ASC, first_name ASC", :include=>[:primary_address,:taggings,:primary_email], :page=>params[:page], :conditions=>["taggings.tag_id = :tag",{:tag=>@tag.id}]
+          @in_mypeople = build_in_mypeople @entities
           @count = @entities.total_entries
           return
         else
@@ -65,6 +66,7 @@ class EntitiesController < ApplicationController
       end
     end
     @entities = Entity.paginate :per_page => 25, :order=>"last_name ASC, name ASC, first_name ASC", :conditions=>cond.to_sql, :include=>:primary_address, :page=>params[:page]
+    @in_mypeople = build_in_mypeople @entities
     @count = @entities.total_entries
   end
 
@@ -164,9 +166,11 @@ class EntitiesController < ApplicationController
 #    logger.debug cond.to_sql.to_s
     if @mobile
       @entities = Entity.paginate :include=>includes, :per_page => 10, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql, :page=>params[:page]
+      @in_mypeople = build_in_mypeople @entities
       render :action=>"search_mobile", :layout=>"mobile"
     else
       @entities = Entity.paginate :include=>includes, :per_page => 25, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql, :page=>params[:page]
+      @in_mypeople = build_in_mypeople @entities
       render :action=>"search_results"
     end
   end
@@ -908,7 +912,7 @@ class EntitiesController < ApplicationController
         redirect_to :action=>"show", :id=>entity.id, :protocol=>@@protocol
         return
       end
-      
+      @in_mypeople = build_in_mypeople @entities      
     else
       if params[:campaign_id]
         @campaign = Campaign.find(params[:campaign_id])
@@ -933,6 +937,7 @@ class EntitiesController < ApplicationController
         redirect_to :action=>"show", :id=>entity.id, :protocol=>@@protocol
         return
       end
+      @in_mypeople = build_in_mypeople @entities
     end
   end
 

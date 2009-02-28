@@ -124,6 +124,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def build_in_mypeople(entities)
+    ent_ids = []
+     entities.each do |ent|
+       ent_ids<<ent.id
+     end
+     in_mypeople = []
+     cis = current_user.cart_items.find(:all,:conditions=>["entity_id IN (:ent_ids)",{:ent_ids=>ent_ids}])
+     cis.each do |ci|
+       in_mypeople<<ci.entity_id
+     end
+     return in_mypeople
+  end
+
   def strip_white_space
     params.each do |key,param|
       logger.debug key.to_s

@@ -59,6 +59,7 @@ class CampaignEventsController < ApplicationController
     # end
     # logger.debug entities
     # @entities = paginate_collection entities, :per_page=>25, :page=>params[:page]
+    @in_mypeople = build_in_mypeople @entities
   end
 
   def new

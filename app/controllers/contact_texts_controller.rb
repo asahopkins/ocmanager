@@ -196,6 +196,7 @@ class ContactTextsController < ApplicationController
     # TODO: this sort will fail if there are multiple kind of entities represented
     # @recipients = @recipients.sort {|a,b| [a.last_name.to_s,a.name.to_s,a.first_name.to_s] <=> [b.last_name.to_s,b.name.to_s,b.first_name.to_s] }
     @entities = Entity.paginate :include=>[:contact_events], :conditions=>["contact_events.contact_text_id = :text AND entities.campaign_id = :campaign",{:text=>@text.id, :campaign=>@campaign.id}], :per_page=>25, :page=>params[:page], :order=>"entities.last_name ASC, entities.name ASC, entities.first_name ASC"
+    @in_mypeople = build_in_mypeople @entities
     # @entity_pages, @entities = paginate_collection @recipients, :per_page=>25, :page=>params[:page]
   end
   

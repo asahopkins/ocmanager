@@ -26,7 +26,7 @@
 	<span class="left_8"><%=h entity.event_attendance(@campaign_event).to_s %>&nbsp;</span>
 	<span class="left_8"><%= number_to_currency(entity.pledge_value(@campaign_event)) %>&nbsp;</span>
 	<span class="left_8"><%= number_to_currency(entity.event_contribution(@campaign_event)) %>&nbsp;</span>	
-	<span class="right_13"><%= link_to_remote "Add to MyPeople", :url=>{:controller=>"cart_items",:action=>"create", :params=>{:entity_id=>entity.id}}, :method=>"post", :loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');"%>
+	<span class="right_13"><span id="mp_flag_<%=entity.id.to_s%>"><%= render :partial=>"cart_items/mp_flag", :locals=>{:entity=>entity}%></span>
 	<%= link_to_remote "(Remove from event)", :url=>{ :controller=>"rsvps", :action => 'destroy', :params=>{:campaign_event_id=>@campaign_event.id, :entity_id=>entity.id, :referring_page=>"event_show"} }, :confirm => 'Are you sure?  This will remove all record tying this person to this event.', :method=>"post", :loading=>"Element.show('indicator');", :complete=>"Element.hide('indicator');" %>
 	</span>
 </div>

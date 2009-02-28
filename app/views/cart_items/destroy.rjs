@@ -1,3 +1,7 @@
 page.replace_html 'cart_items_number', current_user.cart_items.count
 page.visual_effect :highlight, 'cart_list'
-page.remove "cart_line_#{@cart_item_id}"
+if @cart_item_id
+  page.remove "cart_line_#{@cart_item_id}"
+elsif @entity
+  page.replace_html "mp_flag_#{@entity.id}", :partial=>"mp_flag", :locals=>{:entity=>@entity}
+end

@@ -1,2 +1,3 @@
 page.replace_html 'cart_items_number', current_user.cart_items.count
 page.visual_effect :highlight, 'cart_list'
+page.replace_html "mp_flag_#{@entity.id}", :partial=>"mp_flag", :locals=>{:entity=>@entity}

@@ -43,12 +43,24 @@ class CartItemsController < ApplicationController
 
   def create
     CartItem.add(params[:entity_id].to_i, current_user.id)
+    @entity = Entity.find(params[:entity_id])
+    @in_mypeople = [@entity.id]
   #rescue
   end
 
   def destroy
-    @cart_item_id = params[:id]
-    CartItem.find(params[:id]).destroy
+    if params[:id]
+      @cart_item_id = params[:id]
+      ci = CartItem.find(@cart_item_id)
+    elsif params[:entity_id]
+      ci = current_user.cart_items.find_by_entity_id(params[:entity_id])
+      # @cart_item_id = ci.id
+      @entity = Entity.find(params[:entity_id])
+      @in_mypeople = []
+    end
+    if ci
+      ci.destroy
+    end
   end
 
   def destroy_all
