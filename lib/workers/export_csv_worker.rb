@@ -232,7 +232,8 @@ class ExportCsvWorker < BackgrounDRb::Rails
       unless text.nil?     
         missed_contact_events = []
         entities.each do |entity|
-          if already_recorded.empty? or !already_recorded.include?(entity)
+          ce = ContactEvent.find(:first,:conditions=>["entity_id = :ent AND contact_text_id = :text",{:ent=>entity.id,:text=>text.id}])
+          if already_recorded.empty? or !ce
             contact_event = ContactEvent.new(:entity_id=>entity.id, :contact_text_id=>text.id, :when_contact=>Time.now, :initiated_by=>"Campaign", :interaction=>false, :form=>"Letter", :campaign_id=>text.campaign_id)
             contact_event.save!
           end
