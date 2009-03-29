@@ -31,6 +31,8 @@
 	<li>State</li>
 	<li>ZIP</li>
 	<li>ZIP+4</li>
+	<li>Primary phone number</li>
+	<li>Primary email address</li>
 </ol></p>
 <%= form_tag :action=>"download_mail_file", :params=>{:id=>@text.id, :campaign_id=>@campaign.id} %>
 <p><b>File name:</b> <%= text_field "mail_merge", "filename", :value=>"Please enter a file name",:maxlength=>28 %> (Limit 28 characters. Please don't use weird characters in naming your file.)</p>

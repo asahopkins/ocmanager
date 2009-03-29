@@ -108,7 +108,7 @@ class ExportCsvWorker < BackgrounDRb::Rails
           @event = CampaignEvent.find(text.campaign_event_id)
         end
       end
-      labels = ["Household ID", "Title", "First name", "Middle name", "Last name", "Suffix", "Full name", "Address line 1", "Address line 2", "City", "State", "ZIP", "ZIP+4", "Primary Phone", "Number", "Primary Email", "Address"]
+      labels = ["Household ID", "Title", "First name", "Middle name", "Last name", "Suffix", "Full name", "Address line 1", "Address line 2", "City", "State", "ZIP", "ZIP+4", "Primary Phone Label", "Phone Number", "Primary Email Label", "Email Address"]
       row_size = labels.length
       #@logger.debug params[:mail_merge][:total_financial_box]
       #@logger.debug params[:mail_merge][:latest_financial_box]
