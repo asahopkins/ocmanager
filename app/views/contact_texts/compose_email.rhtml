@@ -22,7 +22,7 @@
 	<div class="margins"><%= link_to "Back to Email/Letter/Script list",:controller=>"contact_texts",:action=>"list", :params=>{:campaign_id=>@campaign.id} %></div>
 	<% unless @message.complete? or @show_only %>
 	<h3>To send a plain text email, <%= link_to "click here", :action=>"compose", :params=>{:id=>@id,:type=>"PlainEmail"} %>.</h3>
-	<%= form_tag({:controller=>"contact_texts", :action=>"send_or_save_email",:params=>{:campaign_id=>@campaign.id}},{:id=>'message_form'},{}) %>
+	<%= form_tag({:controller=>"contact_texts", :action=>"send_or_save_email",:params=>{:campaign_id=>@campaign.id}},:id=>'message_form') %>
 <!--<form id="message_form" action="/contact_texts/send_or_save_email" method="post"> -->
 	<%= hidden_field :contact_text, :campaign_id, :value=>@campaign.id %>
 	<%= hidden_field :contact_text, :id, :value=>@id %>
