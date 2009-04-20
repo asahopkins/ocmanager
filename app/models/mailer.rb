@@ -57,12 +57,21 @@ class Mailer < ActionMailer::Base
     @body["casual_name"] = casual_name
    end
 
-  def perform_delivery_sendmail(mail)
-    mail.ready_to_send
-    IO.popen("/usr/sbin/sendmail -i -t -f #{BOUNCE_ADDRESS}","w+") do |sm| 
-      sm.print(mail.encoded.gsub(/\r/, ''))
-      sm.flush
-    end
-  end
+  #  def perform_delivery_sendmail(mail)
+  #    sendmail_args = sendmail_settings[:arguments]
+  #    sendmail_args += " -f \"#{mail['return-path']}\"" if mail['return-path']
+  #    IO.popen("#{sendmail_settings[:location]} #{sendmail_args}","w+") do |sm|
+  #      sm.print(mail.encoded.gsub(/\r/, ''))
+  #      sm.flush
+  #    end
+  #  end
+  # 
+  # def perform_delivery_sendmail(mail)
+  #   mail.ready_to_send
+  #   IO.popen("/usr/sbin/sendmail -i -t -f #{BOUNCE_ADDRESS}","w+") do |sm| 
+  #     sm.print(mail.encoded.gsub(/\r/, ''))
+  #     sm.flush
+  #   end
+  # end
      
 end
