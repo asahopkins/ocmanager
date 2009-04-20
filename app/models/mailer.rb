@@ -22,27 +22,46 @@ class Mailer < ActionMailer::Base
   include DRbUndumped
 
   def message(message, stylesheet, address, casual_name = "CASUALNAME", sent_at = Time.now)
+    logger.debug "in mailer"
+    recipients      address
+    subject         message.subject
+    from            message.sender
+    # content_type    "multipart/alternative"
+
     campaign_name = message.campaign.name
-    # logger.debug "in mailer"
-    @subject    = message.subject
+
+    @body["message"] = message
+    @body["address"] = address
+    @body["campaign_name"] = campaign_name
+    @body["casual_name"] = casual_name
+    @body["stylesheet"] = stylesheet
+
+    # part :content_type => "text/html", :body => render_message("message", :message=>message, :stylesheet=>stylesheet, :address=>address, :campaign_name=>campaign_name, :casual_name=>casual_name)
+    
+    # part "text/plain" do |p|
+      # p.body = render_message("message_plain", :message=>message, :address=>address, :campaign_name=>campaign_name, :casual_name=>casual_name)
+      # p.transfer_encoding = "base64"
+    # end
+    
+     # @subject    = message.subject
     # logger.debug "in mailer 2"
 #    @body["message"] = message
 #    logger.debug "in mailer 3"
 #    @body["stylesheet"] = stylesheet
     #logger.debug "in mailer 4"
-    @recipients = address
+    # @recipients = address
     # logger.debug "in mailer 5"
-    @from       = message.sender
+    # @from       = message.sender
     # logger.debug "in mailer 6"
-    @sent_on    = sent_at
+    # @sent_on    = sent_at
     # logger.debug "in mailer 7"
     #@bcc        = addresses
-    @content_type = "multipart/alternative"
+    # @content_type = "multipart/alternative"
     # logger.debug "in mailer 8"
-    part :content_type=>"text/plain", :body=>render_message("message_plain", {:message=>message, :address=>address, :campaign_name=>campaign_name, :casual_name=>casual_name})
-    # logger.debug "in mailer 9"
-    part :content_type=>"text/html", :body=>render_message("message", {:message=>message, :stylesheet=>stylesheet, :address=>address, :campaign_name=>campaign_name, :casual_name=>casual_name})
-    # logger.debug "in mailer 10"      
+    # part :content_type=>"text/plain", :body=>render_message("message_plain", {:message=>message, :address=>address, :campaign_name=>campaign_name, :casual_name=>casual_name})
+    #  # logger.debug "in mailer 9"
+    #  part :content_type=>"text/html", :body=>render_message("message", {:text=>message.formatted_text, :stylesheet=>stylesheet, :address=>address, :campaign_name=>campaign_name, :casual_name=>casual_name})
+     # logger.debug "in mailer 10"      
   end
 
   def plaintext_message(message, address, casual_name = "CASUALNAME", sent_at = Time.now)
