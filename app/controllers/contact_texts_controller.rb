@@ -240,9 +240,9 @@ class ContactTextsController < ApplicationController
     logger.debug "message created"
     Mailer.deliver(email)
     logger.debug "message delivered"
-    render_text "Test message sent."
+    render :text=>"Test message sent."
   rescue
-    render_text "<b>Error sending text message.</b>"
+    render :text=>"<b>Error sending text message.</b>"
   end
   
   def send_email_to_cart
