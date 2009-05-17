@@ -90,8 +90,8 @@ class EntitiesController < ApplicationController
   def search
     if request.method==:post
       includes = [:primary_address]
-      session[:search_params] = Hash.new
-      session[:search_params][:entity] = Hash.new
+      # session[:search_params] = Hash.new
+      # session[:search_params][:entity] = Hash.new
       content = params[:search][:content].to_s.gsub(/[*]/,'%')
       if content == params[:search][:content]
         search = "%"+content+"%"
@@ -109,7 +109,7 @@ class EntitiesController < ApplicationController
         end
       end
       if params[:search][:field]=="Name"
-        session[:search_params][:entity][:name] = params[:search][:content]
+        # session[:search_params][:entity][:name] = params[:search][:content]
         cond_search = EZ::Where::Condition.new :entities do
           name.nocase =~ search
         end
@@ -125,22 +125,22 @@ class EntitiesController < ApplicationController
           cond_search.append cond_search2.to_sql, :or
         end
       elsif params[:search][:field]=="Address"
-        session[:search_params][:entity][:address_any_field_flag] = "Includes"
-        session[:search_params][:entity][:address_any_field] = params[:search][:content]
+        # session[:search_params][:entity][:address_any_field_flag] = "Includes"
+        # session[:search_params][:entity][:address_any_field] = params[:search][:content]
         cond_search = EZ::Where::Condition.new :addresses do
           any_of(:line_1, :line_2, :city, :state, :zip).nocase =~ search
         end
       elsif params[:search][:field]=="Phone"
-        session[:search_params][:entity][:phone_number_flag] = "Includes"
-        session[:search_params][:entity][:phone_number] = params[:search][:content]
+        # session[:search_params][:entity][:phone_number_flag] = "Includes"
+        # session[:search_params][:entity][:phone_number] = params[:search][:content]
         search = "%"+to_numbers(content)+"%"
         #logger.debug search
         cond_search = EZ::Where::Condition.new :entities do
           phones =~ search
         end
       elsif params[:search][:field]=="Email"
-        session[:search_params][:entity][:email_address_flag] = "Includes"
-        session[:search_params][:entity][:email_address] = params[:search][:content]
+        # session[:search_params][:entity][:email_address_flag] = "Includes"
+        # session[:search_params][:entity][:email_address] = params[:search][:content]
         search = "%"+params[:search][:content].to_s+"%"
         cond_search = EZ::Where::Condition.new :email_addresses do
           address.nocase =~ search
@@ -151,25 +151,33 @@ class EntitiesController < ApplicationController
       end
 
       cond.append cond_search
-      session[:includes] = includes
-      session[:search_cond] = cond
+      search = Search.new
+      search.cond = cond.to_sql
+      search.includes = includes
+      search.joins = ""
+      search.user_id = current_user.id
+      search.campaign_id = @campaign.id
+      search.save
+      
+      session[:search_id] = search.id
     else
-      cond = session[:search_cond]
+      search = Search.find(session[:search_id])
+      # cond = search.cond
     end
-    @count = Entity.count('id',:include=>includes, :conditions=>cond.to_sql)
+    @count = Entity.count('id',:include=>search.includes, :conditions=>search.cond)
 
     if @count == 1
-      @entity = Entity.find(:first,:include=>includes, :conditions=>cond.to_sql)
+      @entity = Entity.find(:first,:include=>search.includes, :conditions=>search.cond)
       redirect_to :action=>"show", :id=>@entity.id, :protocol=>@@protocol
       return
     end
 #    logger.debug cond.to_sql.to_s
     if @mobile
-      @entities = Entity.paginate :include=>includes, :per_page => 10, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql, :page=>params[:page]
+      @entities = Entity.paginate :include=>search.includes, :per_page => 10, :order=>"last_name, name, first_name ASC", :conditions=>cond, :page=>params[:page]
       @in_mypeople = build_in_mypeople @entities
       render :action=>"search_mobile", :layout=>"mobile"
     else
-      @entities = Entity.paginate :include=>includes, :per_page => 25, :order=>"last_name, name, first_name ASC", :conditions=>cond.to_sql, :page=>params[:page]
+      @entities = Entity.paginate :include=>search.includes, :per_page => 25, :order=>"last_name, name, first_name ASC", :conditions=>cond, :page=>params[:page]
       @in_mypeople = build_in_mypeople @entities
       render :action=>"search_results"
     end
@@ -182,9 +190,9 @@ class EntitiesController < ApplicationController
 
   def search_results
     if request.method==:post
-      session[:search_params] = Hash.new
-      session[:search_params][:entity] = params[:entity]
-      session[:search_params][:custom_field] = params[:custom_field]
+      # session[:search_params] = Hash.new
+      # session[:search_params][:entity] = params[:entity]
+      # session[:search_params][:custom_field] = params[:custom_field]
       #logger.debug params[:entity]
       
       includes = [:primary_address]
@@ -896,14 +904,26 @@ class EntitiesController < ApplicationController
       end
       
 
+      # includes is an Array
+      # joins is a string
+      # cond -- store .to_sql, which is then an Array
       
       includes.uniq!
-      session[:includes] = includes
+      
+      search = Search.new
+      search.cond = cond.to_sql
+      search.includes = includes
+      search.joins = joins
+      search.user_id = current_user.id
+      search.campaign_id = @campaign.id
+      search.save
+      @search_cond = cond
+      session[:search_id] = search.id
 
-      session[:search_cond] = cond
-      logger.debug session[:search_cond].to_sql
-      session[:joins] = joins
-
+      # session[:search_cond] = cond
+      #  logger.debug session[:search_cond].to_sql
+      #  session[:joins] = joins
+ 
       @entities = Entity.paginate :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :page=>params[:page]
       @count = @entities.total_entries
       # @count = Entity.count('entities.id', :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
@@ -922,18 +942,22 @@ class EntitiesController < ApplicationController
           render :partial=>"user/not_available"
         end
       end
-      includes = session[:includes]
-      session[:search_cond] ||= EZ::Where::Condition.new
-      logger.debug session[:search_cond].to_sql
-      cond = session[:search_cond]
+      search = Search.find(session[:search_id])
+      includes = search.includes
+      cond = search.cond
+      joins = search.joins
+      @search_cond = cond
+      # session[:search_cond] ||= EZ::Where::Condition.new
+      # logger.debug session[:search_cond].to_sql
+      # cond = session[:search_cond]
       # group_clause = session[:group_clause]
-      joins = session[:joins]
+      # joins = session[:joins]
       # aggregate = session[:aggregate]
       
-      @entities = Entity.paginate :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins, :page=>params[:page]
+      @entities = Entity.paginate :per_page => 25, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond, :include=>includes, :joins=>joins, :page=>params[:page]
       @count = @entities.total_entries
       if @count == 1
-        entity = Entity.find(:first, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
+        entity = Entity.find(:first, :order=>"entities.last_name, entities.name, entities.first_name ASC", :conditions=>cond, :include=>includes, :joins=>joins)
         redirect_to :action=>"show", :id=>entity.id, :protocol=>@@protocol
         return
       end

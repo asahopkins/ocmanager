@@ -30,6 +30,8 @@ class Campaign < ActiveRecord::Base
   has_many :contact_texts
   has_many :contact_events
   
+  has_many :searches
+  
   has_many :stylesheets
   
   serialize :from_emails, Array

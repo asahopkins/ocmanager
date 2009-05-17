@@ -52,7 +52,7 @@ Rails::Initializer.run do |config|
   # config.action_controller.session_store = :active_record_store
   config.action_controller.session = {
     :session_key => '_manager_session',
-    :secret      => '109cd2c583e1735a3d3cc16de9934963a49bb0f1e2204a43179cc6c10cf08f5c5ebdb1461512b26daa22d4b398cd3becc83004b83edffe4dad186dfd64cfb2b3'
+    :secret      => '109cd2c583e1735a3d3cc16de9934963a49bb0f1e2204a43179cc6c10cf08f5c5ebdb1461512b26daa22d4b398cd3becc83004b83edffe4dad186dfd64cfb2b2'
   }
 
   # Activate observers that should always be running

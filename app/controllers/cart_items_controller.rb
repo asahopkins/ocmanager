@@ -117,15 +117,14 @@ class CartItemsController < ApplicationController
       current_user.empty_cart
     else 
       # logger.debug "from search"
-      includes = session[:includes]
-      session[:search_cond] ||= EZ::Where::Condition.new
-      logger.debug session[:search_cond].to_sql
-      cond = session[:search_cond]
+      search = Search.find(session[:search_id])
+      includes = search.includes
+      cond = search.cond
       # group_clause = session[:group_clause]
-      joins = session[:joins]
+      joins = search.joins
       # aggregate = session[:aggregate]
 
-      entities = Entity.find(:all, :conditions=>cond.to_sql, :include=>includes, :joins=>joins)
+      entities = Entity.find(:all, :conditions=>cond, :include=>includes, :joins=>joins)
       entity_ids = []
       entities.each do |entity|
         entity_ids << entity.id

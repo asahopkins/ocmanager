@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090108170743) do
+ActiveRecord::Schema.define(:version => 20090517230145) do
 
   create_table "addresses", :force => true do |t|
     t.integer  "entity_id",               :default => 0,  :null => false
@@ -355,6 +355,16 @@ ActiveRecord::Schema.define(:version => 20090108170743) do
 
   add_index "rsvps", ["campaign_event_id", "entity_id"], :name => "rsvps_entity_id_campaign_event_id_index", :unique => true
   add_index "rsvps", ["campaign_event_id"], :name => "index_rsvps_on_campaign_event_id"
+
+  create_table "searches", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "campaign_id"
+    t.text     "cond"
+    t.text     "includes"
+    t.string   "joins"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "sessions", :force => true do |t|
     t.string   "session_id"

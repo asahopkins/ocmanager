@@ -39,4 +39,4 @@
 <br class="brclear"/>
 <%= will_paginate @entities %> 
 <br class="brclear" />
-<p><b>Search conditions:</b> <%= to_where_statement(session[:search_cond].to_sql) %></p>
+<p><b>Search conditions:</b> <%= to_where_statement(@search_cond) %></p>

@@ -7,6 +7,8 @@ class User < ActiveRecord::Base
   
   has_many :cart_items, :dependent=>:destroy
   has_many :entities, :through=>:cart_items, :include=>:primary_address
+  
+  has_many :searches
 
   include Authentication
   include Authentication::ByPassword
