@@ -248,7 +248,7 @@ class CartItemsController < ApplicationController
   
   def check_background_progress
     key_name = "add_tags_key_"+current_user.id.to_s
-    unless MiddleMan[key_name.to_sym].progress == 101
+    if MiddleMan[key_name.to_sym] and MiddleMan[key_name.to_sym].progress != 101
       render :update do |page|
         page.replace_html "mypeople_background", render(:text=>"MyPeople processing...")
         page.visual_effect :highlight, 'mypeople_background'
