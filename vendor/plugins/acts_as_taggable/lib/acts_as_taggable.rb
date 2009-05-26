@@ -50,7 +50,7 @@ module ActiveRecord
         end
 
         def tag_list
-          tags.collect { |tag| tag.name.include?(" ") ? "\"#{tag.name}\"" : tag.name }.join(" ")
+          tags.collect { |tag| tag.name.include?(" ") ? "\"#{tag.name}\"" : tag.name }.uniq.join(" ")
         end
       end
     end

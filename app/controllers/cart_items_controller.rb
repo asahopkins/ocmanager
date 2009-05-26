@@ -149,20 +149,46 @@ class CartItemsController < ApplicationController
   def add_tag
     @tag = params[:entity][:tag].to_s.strip
     unless @tag == ""
-      @entities = current_user.entities
-      @entities.each do |entity|
-        new_tag = Tag.find_by_name_and_campaign_id(@tag, @campaign.id)
-        if new_tag.nil? or !entity.tags.include?(new_tag)
-          tags = entity.tag_list+ ", #{@tag}"
-          logger.debug tags
-          entity.tag_with(tags, @campaign.id)
+      if current_user.cart_items.count > 50
+        key_name = "add_tags_key_"+current_user.id.to_s
+        unless MiddleMan[key_name.to_sym]
+          MiddleMan.new_worker(:class=>:add_tags_worker, :args=>{:user_id=>current_user.id, :tag_string=>@tag.to_s, :campaign_id=>@campaign.id}, :job_key=>key_name.to_sym)
+          render :update do |page|
+            page.replace_html 'flash_notice', "MyPeople are being tagged with #{@tag} in the background."
+            page.replace_html "mypeople_background", render(:text=>"MyPeople processing...")
+            page.visual_effect :highlight, 'mypeople_background'
+          end
+          expire_fragment(:controller => "campaigns", :action => "tags", :action_suffix => @campaign.id)
+          return
+        else
+          render :update do |page|
+            page.replace_html 'flash_notice', "Please wait until the previous background task is complete."
+            page.visual_effect :highlight, 'flash_notice'
+            page.visual_effect :highlight, 'mypeople_background'
+          end
         end
+      else
+        @entities = current_user.entities
+        @entities.each do |entity|
+          new_tag = Tag.find_by_name_and_campaign_id(@tag, @campaign.id)
+          existing_tags = []
+          entity.tags.each do |tag|
+            existing_tags << tag.id
+          end
+          if new_tag.nil? or !existing_tags.include?(new_tag.id)
+            tags = entity.tag_list+ ", #{@tag}"
+            logger.debug tags
+            entity.tag_with(tags, @campaign.id)
+          end
+        end
+        expire_fragment(:controller => "campaigns", :action => "tags", :action_suffix => @campaign.id)
+        render :update do |page|
+          page.replace_html 'flash_notice', "MyPeople tagged with: #{@tag}"
+          page.replace_html "mypeople_background", render(:text=>"MyPeople up to date.")
+          # page.visual_effect :fade, 'mypeople_background', :duration=>10
+        end
+        return
       end
-      expire_fragment(:controller => "campaigns", :action => "tags", :action_suffix => @campaign.id)
-      render :update do |page|
-        page.replace_html 'flash_notice', "MyPeople tagged with: #{@tag}"
-      end
-      return
     else
       render :update do |page|
         page.replace_html 'flash_notice', "Can't tag with an empty tag name."
@@ -218,6 +244,26 @@ class CartItemsController < ApplicationController
     flash[:notice] = "Call sheets are being prepared now."
     
     redirect_to :action=>"list", :protocol=>@@protocol
+  end
+  
+  def check_background_progress
+    key_name = "add_tags_key_"+current_user.id.to_s
+    unless MiddleMan[key_name.to_sym].progress == 101
+      render :update do |page|
+        page.replace_html "mypeople_background", render(:text=>"MyPeople processing...")
+        page.visual_effect :highlight, 'mypeople_background'
+      end
+    else
+      MiddleMan.delete_worker(key_name.to_sym)
+      expire_fragment(:controller => "campaigns", :action => "tags", :action_suffix => @campaign.id)
+      render :update do |page|
+        page.replace_html "mypeople_background", render(:text=>"MyPeople up to date.")
+        page.visual_effect :highlight, 'mypeople_background'
+        # page.visual_effect :fade, 'mypeople_background', :duration=>10
+        # page.replace_html "mypeople_background", render(:text=>"")
+      end
+    end
+    
   end
   
 end

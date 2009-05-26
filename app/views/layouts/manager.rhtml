@@ -84,6 +84,10 @@
 	<li><%= link_to "Show MyPeople",:controller=>"cart_items", :action=>"list" %></a></li>
 	<li><form><%= submit_to_remote "Empty", "Empty MyPeople", :url=>{:controller=>"cart_items",:action=>"destroy_all"},:confirm=>'Are you sure?',:loading=>"Element.show('cart_indicator');",:complete=>"Element.hide('cart_indicator');" %></form></li>
 	</ul>
+	<div id="mypeople_background">&nbsp;</div>
+	<% key_name = "add_tags_key_"+current_user.id.to_s
+	if MiddleMan[key_name.to_sym] -%>
+		<%= periodically_call_remote :url=>{:controller=>'cart_items',:action=>'check_background_progress'}, :frequency=>60 %><% end -%>
 	<p><%= link_to "Admin", :controller=>"admin"%></p>
 	<p>Help</p>
 
