@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /home/oc/sites/manager/current
+cd /home/oc/manager/current
 
 if [ -a "log/backgroundrb.pid" ]; then
   pid=`cat log/backgroundrb.pid`
