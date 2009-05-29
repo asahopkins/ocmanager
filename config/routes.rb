@@ -8,8 +8,8 @@ ActionController::Routing::Routes.draw do |map|
   # map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
 
-  map.connect 'mypeople',:controller=>'cart_items',:action=>'list',:id=>nil
-  map.connect 'mypeople/:action/:id',:controller=>'cart_items'
+  map.connect 'mypeople',:controller=>'cart_items',:action=>'list'#,:id=>nil
+  # map.connect 'mypeople/:action/:id',:controller=>'cart_items'
 
   map.connect 'volunteers/calendar/:year/:month', :controller=>'volunteer_events', :action=>'calendar'
   map.connect 'volunteers/:action/:id', :controller=>'volunteer_events'
