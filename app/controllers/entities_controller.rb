@@ -638,16 +638,19 @@ class EntitiesController < ApplicationController
           if params[:local_contribution][:flag].to_s == "Total"
             contrib_entities = []
             # find all contributions between these dates, for this campaign
-            contributions = Contribution.find(:all, :include=>:entity, :conditions=>["contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip}])
+            contributors = Entity.find(:all, :include=>:contributions, :conditions=>["contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip}], :group=>"entities.id", :having=>["SUM(contributions.amount) >= :total",{:total=>search}])
             # loop through them, making sums by entity
             tmp_hash = {}
-            contributions.each do |contrib|
-              tmp_hash[contrib.entity_id] = tmp_hash[contrib.entity_id].to_f + contrib.amount
-              if tmp_hash[contrib.entity_id] >= search
-                contrib_entities << contrib.entity_id
-              end
+            contributors.each do |entity|
+              contrib_entities << entity.id
             end
-            contrib_entities.uniq!
+            # contributions.each do |contrib|
+            #   tmp_hash[contrib.entity_id] = tmp_hash[contrib.entity_id].to_f + contrib.amount
+            #   if tmp_hash[contrib.entity_id] >= search
+            #     contrib_entities << contrib.entity_id
+            #   end
+            # end
+            # contrib_entities.uniq!
             # search for those entity ids
             if contrib_entities.length > 0
               cond_contributions = EZ::Where::Condition.new :entities do
