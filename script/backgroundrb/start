@@ -64,7 +64,7 @@ rescue
   CONFIG = defaults
 end            
 if CONFIG['load_rails']
-  ActiveRecord::Base.allow_concurrency = true
+  # ActiveRecord::Base.allow_concurrency = true
   require File.dirname(__FILE__) + "/../../config/environment.rb"
   #ActiveRecord::Base.establish_connection(YAML.load(ERB.new(IO.read("#{RAILS_ROOT}/#{CONFIG['database_yml']}")).result)[CONFIG['environment']])
 end

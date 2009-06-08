@@ -76,8 +76,7 @@ Rails::Initializer.run do |config|
 
   # See Rails::Configuration for more options
   
-  config.action_controller.relative_url_root="/manager"
-  
+  # config.action_controller.relative_url_root="/manager"
 end
 
 # Add new inflection rules using the following format 
@@ -91,13 +90,13 @@ end
 
 # Include your application configuration below
 
-# require 'email_config'
-# require 'server_config'
+require 'email_config'
+require 'server_config'
+
 ActionController::Base.session_options[:session_key] = '_manager'
-# require 'environments/localization_environment'
-# require 'localization'
-# Localization::load_localized_strings
-require 'environments/user_environment'
+ActionController::Base.relative_url_root = "/manager"
+
+require 'user_environment'
 require 'memory_logging'
 require 'pdf/writer'
 

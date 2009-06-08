@@ -58,7 +58,7 @@
 
 <div class="right_half">
 	<div class="column">
-		<form><%= submit_to_remote "Add", "Add to MyPeople", :url=>{:controller=>"cart_items",:action=>"create", :params=>{:entity_id=>@entity.id}}, :loading=>"Element.show('cart_form_indicator')", :complete=>"Element.hide('cart_form_indicator');" %> <span id="delete_status"><%= render :partial=>"request_delete", :locals=>{:delete=>!@entity.delete_requested,:entity=>@entity}%></span> <span id="cart_form_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></form> 
+		<form><span id="mp_flag_<%=@entity.id.to_s%>"><%= render :partial=>"cart_items/mp_flag", :locals=>{:entity=>@entity}%></span> <span id="delete_status"><%= render :partial=>"request_delete", :locals=>{:delete=>!@entity.delete_requested,:entity=>@entity}%></span> <span id="cart_form_indicator" style="display:none;"><%=image_tag "indicator.gif"%></span></form> 
 	</div>
 	<div class="column">
 		<% unless @entity.created_by.nil?

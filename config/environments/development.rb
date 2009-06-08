@@ -24,5 +24,3 @@ config.action_mailer.delivery_method = :sendmail
 
 # ActiveSupport::Deprecation.debug = true
 
-require 'email_config'
-require 'server_config'

@@ -84,6 +84,11 @@ class EntitiesController < ApplicationController
       @rsvps = Rsvp.paginate :per_page => 5, :order=>"campaign_events.start_time DESC, updated_at DESC", :conditions=>["rsvps.entity_id=:entity", {:entity=>@entity.id}], :include=>:campaign_event, :page=>1
       @contact_events = ContactEvent.paginate :per_page => 5, :order=>"when_contact DESC, updated_at DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>1
       @volunteer_events = VolunteerEvent.paginate :per_page => 5, :order=>"start_time DESC, end_time DESC", :conditions=>["entity_id=:entity", {:entity=>@entity.id}], :page=>1
+      if current_user.cart_items.find_by_entity_id(@entity.id)
+        @in_mypeople = [@entity.id]
+      else
+        @in_mypeople = []
+      end
     end
   end
 
@@ -158,11 +163,12 @@ class EntitiesController < ApplicationController
       search.user_id = current_user.id
       search.campaign_id = @campaign.id
       search.save
+      @search_cond = cond.to_sql
       
       session[:search_id] = search.id
     else
       search = Search.find(session[:search_id])
-      # cond = search.cond
+      @search_cond = search.cond
     end
     @count = Entity.count('id',:include=>search.includes, :conditions=>search.cond)
 
@@ -638,12 +644,13 @@ class EntitiesController < ApplicationController
           if params[:local_contribution][:flag].to_s == "Total"
             contrib_entities = []
             # find all contributions between these dates, for this campaign
-            contributors = Entity.find(:all, :include=>:contributions, :conditions=>["contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip}], :group=>"entities.id", :having=>["SUM(contributions.amount) >= :total",{:total=>search}])
-            # loop through them, making sums by entity
+            contributors = Entity.find_by_sql ["SELECT entities.id FROM entities JOIN contributions ON contributions.entity_id = entities.id WHERE contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip GROUP BY entities.id HAVING SUM(contributions.amount) >= :total;",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip, :total=>search}]
+            # contributors = Entity.find("entities.id", :include=>:contributions, :conditions=>["contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip}], :group=>"entities.id, entities.type, entities.campaign_id", :having=>["SUM(contributions.amount) >= :total",{:total=>search}])
             tmp_hash = {}
             contributors.each do |entity|
-              contrib_entities << entity.id
+              contrib_entities << entity.id.to_i
             end
+            # loop through them, making sums by entity
             # contributions.each do |contrib|
             #   tmp_hash[contrib.entity_id] = tmp_hash[contrib.entity_id].to_f + contrib.amount
             #   if tmp_hash[contrib.entity_id] >= search
@@ -670,20 +677,20 @@ class EntitiesController < ApplicationController
               recipient.nocase =~ recip
             end
           elsif params[:local_contribution][:flag].to_s == "Less"
-            contrib_entities = []
+            contrib_ids = Set.new
+            all_ent_ids = Set.new
             # find all contributions between these dates, for this campaign
-            contributions = Contribution.find(:all, :include=>:entity, :conditions=>["contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip}])
-            # loop through them, making sums by entity
-            tmp_hash = {}
-            contributions.each do |contrib|
-              tmp_hash[contrib.entity_id] = tmp_hash[contrib.entity_id].to_f + contrib.amount
+            contributors = Entity.find_by_sql ["SELECT entities.id FROM entities JOIN contributions ON contributions.entity_id = entities.id WHERE contributions.date > :start_date AND contributions.date < :end_date AND entities.campaign_id = :campaign AND UPPER(contributions.recipient) LIKE :recip GROUP BY entities.id HAVING SUM(contributions.amount) >= :total;",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :recip=>recip, :total=>search}]
+            contributors.each do |entity|
+              contrib_ids << entity.id.to_i
             end
-            @campaign.entities.each do |entity|
-              if tmp_hash[entity.id].nil? or tmp_hash[entity.id] < search
-                contrib_entities << entity.id
-              end
+            logger.debug contrib_ids.size
+            all_entity_ids = Entity.find_by_sql ["SELECT entities.id FROM entities WHERE entities.campaign_id = :campaign;",{:campaign=>@campaign.id}]
+            all_entity_ids.each do |entity|
+              all_ent_ids << entity.id.to_i
             end
-            # contrib_entities.uniq!
+            contrib_entities = (all_ent_ids - contrib_ids).to_a
+            logger.debug contrib_entities.length
             # search for those entity ids
             if contrib_entities.length > 0
               cond_contributions = EZ::Where::Condition.new :entities do
@@ -697,45 +704,7 @@ class EntitiesController < ApplicationController
           end
           cond.append cond_contributions
         end
-                
-       # remote contributions (Treasurer)
-        # if params[:remote_contribution]
-        #     if params[:remote_contribution][:flag].to_s != ""
-        #       search = params[:remote_contribution][:value].to_f
-        #       start_date = Date.new(params[:remote_contribution]['start_date(1i)'].to_i, params[:remote_contribution]['start_date(2i)'].to_i, params[:remote_contribution]['start_date(3i)'].to_i)
-        #       end_date = Date.new(params[:remote_contribution]['end_date(1i)'].to_i, params[:remote_contribution]['end_date(2i)'].to_i, params[:remote_contribution]['end_date(3i)'].to_i)
-        #       local_ids = []
-        #       @campaign.committees.each do |committee|
-        #         unless current_user.treasurer_info.nil? or current_user.treasurer_info[committee.id].nil?  or committee.treasurer_api_url.to_s == ""
-        #           treasurer = ActionWebService::Client::XmlRpc.new(FinancialApi,committee.treasurer_api_url)
-        #           ids = []
-        #           if params[:remote_contribution][:flag].to_s == "Total"
-        #             ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, false, true, true)
-        #           elsif params[:remote_contribution][:flag].to_s == "One"
-        #             ids = treasurer.get_entities_by_finances_and_date(current_user.treasurer_info[committee.id][0], current_user.treasurer_info[committee.id][1], committee.treasurer_id, start_date, end_date, search, true, true, true)
-        #           end
-        #           unless ids.empty?
-        #             treasurer_entities = TreasurerEntity.find(:all, :conditions=>["committee_id = #{committee.id} AND treasurer_id IN (:remote_ids)",{:remote_ids=>ids}])
-        #             treasurer_entities.each do |te|
-        #               local_ids << te.entity_id
-        #             end
-        #           end
-        #         else
-        #           #no search, doesn't have any treasurer login info
-        #         end
-        #       end
-        #       if local_ids.length > 0
-        #         cond_remote_contributions = EZ::Where::Condition.new :entities do
-        #           id === local_ids
-        #         end
-        #       else
-        #         cond_contributions = EZ::Where::Condition.new :entities do
-        #           id == -1
-        #         end                          
-        #       end
-        #       cond.append cond_remote_contributions
-        #     end
-          # end
+
       end
       #custom_fields
       @campaign.custom_fields.each do |field|
@@ -859,7 +828,7 @@ class EntitiesController < ApplicationController
       
       # VOLUNTEER HISTORY #
       if params[:volunteer_history][:flag].to_s != ""
-        time = params[:volunteer_history][:hours].to_f
+        time = params[:volunteer_history][:hours].to_f*60.0
         start_date = Date.new(params[:volunteer_history]['start_date(1i)'].to_i, params[:volunteer_history]['start_date(2i)'].to_i, params[:volunteer_history]['start_date(3i)'].to_i).to_time
         end_date = Date.new(params[:volunteer_history]['end_date(1i)'].to_i, params[:volunteer_history]['end_date(2i)'].to_i, params[:volunteer_history]['end_date(3i)'].to_i).to_time
         end_date = end_date.tomorrow.midnight
@@ -871,34 +840,24 @@ class EntitiesController < ApplicationController
           end
         end
         if tasks.size >= 1
-          volunteer_events = VolunteerEvent.find(:all, :include=>:entity, :conditions=>["volunteer_events.volunteer_task_id IN (:tasks) AND volunteer_events.start_time > :start_date AND volunteer_events.end_time < :end_date AND entities.campaign_id = :campaign",{:tasks=>tasks, :start_date=>start_date, :end_date=>end_date, :campaign=>@campaign.id}])
+          volunteers = Entity.find_by_sql ["SELECT entities.id FROM entities JOIN volunteer_events ON volunteer_events.entity_id = entities.id WHERE volunteer_events.volunteer_task_id IN (:tasks) AND volunteer_events.start_time > :start_date AND volunteer_events.end_time < :end_date AND entities.campaign_id = :campaign GROUP BY entities.id HAVING SUM(volunteer_events.duration) >= :total;",{:start_date=>start_date, :end_date=>end_date,:campaign=>@campaign.id, :tasks=>tasks, :total=>time}]
+          search_entity_ids = []
+          volunteers.each do |vol|
+            search_entity_ids << vol.id
+          end
+          search_entity_ids.uniq!
+          if search_entity_ids.length > 0
+            cond_volunteer_history = EZ::Where::Condition.new :entities do
+              id === search_entity_ids
+            end
+          else
+            cond_volunteer_history = EZ::Where::Condition.new :entities do
+              id == -1
+            end
+          end
         else
           volunteer_events = []
           flash[:warning] = "No volunteer tasks were selected for the history."
-        end
-        all_possible_entity_ids = []
-        volunteer_events.each do |event|
-          all_possible_entity_ids << event.entity_id
-        end
-        all_possible_entity_ids.uniq!
-        search_entity_ids = []
-        all_possible_entity_ids.each do |entity_id|
-          tot_time = 0
-          entity_events = volunteer_events.find_all {|event| event.entity_id == entity_id}
-          entity_events.each do |event|
-            tot_time = tot_time + event.duration.to_f/60.0
-            volunteer_events = volunteer_events - [event]
-          end
-          if tot_time >= time
-            search_entity_ids << entity_id
-          end
-        end
-        search_entity_ids.uniq!
-        if search_entity_ids.length > 0
-          cond_volunteer_history = EZ::Where::Condition.new :entities do
-            id === search_entity_ids
-          end
-        else
           cond_volunteer_history = EZ::Where::Condition.new :entities do
             id == -1
           end
@@ -920,7 +879,8 @@ class EntitiesController < ApplicationController
       search.user_id = current_user.id
       search.campaign_id = @campaign.id
       search.save
-      @search_cond = cond
+      @search_cond = cond.to_sql
+      logger.debug "@search_cond = " + @search_cond.to_s
       session[:search_id] = search.id
 
       # session[:search_cond] = cond
@@ -950,6 +910,7 @@ class EntitiesController < ApplicationController
       cond = search.cond
       joins = search.joins
       @search_cond = cond
+      logger.debug @search_cond
       # session[:search_cond] ||= EZ::Where::Condition.new
       # logger.debug session[:search_cond].to_sql
       # cond = session[:search_cond]
