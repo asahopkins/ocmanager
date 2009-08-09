@@ -26,18 +26,22 @@
 
 <p><b>Website:</b> <%= link_to h(@campaign_event.website), h(@campaign_event.website) %></p>
 <hr />
+<div class="left_half">
 <h3>Responses:</h3>
 <p><b>Invited:</b> <%= @campaign_event.invited_count %></p>
 	<p><b>RSVPed Yes:</b> <%= @campaign_event.attending_count %><br />
 	<b>RSVPed No:</b> <%= @campaign_event.not_attending_count %><br />
 	<b>RSVPed Maybe:</b> <%= @campaign_event.maybe_count %></p>
 <% if @campaign_event.date < Time.now -%><p><b>Attended:</b> <%= @campaign_event.attended_count %></p><% end -%>
-<hr />
+</div>
+<div class="right_half">
 <h3>Fundraising:</h3>
 <p><b>Event benefits:</b> <%= @campaign_event.recipient_committee_name %><br />
 	<b>Fundraising goal:</b> <%= number_to_currency(@campaign_event.goal) %></p>
 <p>Total raised: <%= number_to_currency(@campaign_event.total_contributions) %><br />
 	Total pledged: <%= number_to_currency(@campaign_event.total_pledged) %></p>
+</div>
+<br class="brclear" />
 <hr />
 
 <p><%= link_to "Edit event information", :controller=>"campaign_events",:action=>"edit",:id=>@campaign_event.id %></p>
