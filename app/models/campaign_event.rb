@@ -124,6 +124,16 @@ class CampaignEvent < ActiveRecord::Base
     ents = Entity.count 'entities.id', :include=>[:rsvps],:conditions=>["rsvps.response = :yes AND rsvps.campaign_event_id = :self",{:yes=>"Yes", :self=>self.id}]
   end
 
+  # returns a count of the entities who have RSVPed "No" to the event
+  def not_attending_count
+    ents = Entity.count 'entities.id', :include=>[:rsvps],:conditions=>["rsvps.response = :no AND rsvps.campaign_event_id = :self",{:no=>"No", :self=>self.id}]
+  end
+
+  # returns a count of the entities who have RSVPed "Maybe" to the event
+  def maybe_count
+    ents = Entity.count 'entities.id', :include=>[:rsvps],:conditions=>["rsvps.response = :maybe AND rsvps.campaign_event_id = :self",{:maybe=>"Maybe", :self=>self.id}]
+  end
+
   # returns an array of entities who attended the event
   def attended
     ents = Entity.find :all, :include=>[:rsvps],:conditions=>["rsvps.attended = :true AND rsvps.campaign_event_id = :self",{:true=>true, :self=>self.id}]
