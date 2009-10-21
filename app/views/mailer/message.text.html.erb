@@ -22,8 +22,8 @@ If you cannot read the message below, please use your email program to view it i
 <div id="OutsideBox">
 <div id="MessageBox">
 	<div id="OCMessage">
-		<%= @message.formatted_text.gsub('%%CASUALNAME%%',@casual_name) %>
+		<%= white_list @message.formatted_text.gsub('%%CASUALNAME%%',@casual_name) %>
 	</div>
 </div>
 </div>
-<p>Sent to <%= @address %> by <b><%= @campaign_name %></b> using Open Campaigns <i>Manager</i> software.</p>
+<p>Sent to <%= white_list @address %> by <b><%= white_list @campaign_name %></b> using Open Campaigns <i>Manager</i> software.</p>

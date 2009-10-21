@@ -136,6 +136,8 @@ class ContactTextsController < ApplicationController
       params[:contact_text].delete(:campaign_event_id)
     end
     params[:contact_text].delete(:invitation)
+    params[:contact_text][:text] = white_list params[:contact_text][:text] if params[:contact_text][:text]
+    params[:contact_text][:formatted_text] = white_list params[:contact_text][:formatted_text] if params[:contact_text][:formatted_text]
     if params[:id]
       @text = ContactText.find(params[:id])
       if current_user.active_campaigns.include?(@campaign.id) and @text.campaign_id == @campaign.id
@@ -379,7 +381,7 @@ class ContactTextsController < ApplicationController
             end
           end
           @message.stylesheet = @stylesheet
-          @message.formatted_text = BlueCloth.new(@message.text.to_s).to_html.gsub(/<h1>/,'<div class="h1_block"><h1>').gsub(/<\/h1>/,'</h1></div>')
+          @message.formatted_text = white_list BlueCloth.new(@message.text.to_s).to_html.gsub(/<h1>/,'<div class="h1_block"><h1>').gsub(/<\/h1>/,'</h1></div>')
           @message.save! 
           flash[:notice] = "Message saved successfully."
           redirect_to :action=>"list", :params=>{:campaign_id=>@campaign.id}

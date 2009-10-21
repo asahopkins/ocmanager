@@ -17,6 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # 
 # ---------------------------------------------------------------------------
--%><%= @message.text.gsub('%%CASUALNAME%%',@casual_name) %>
+-%><%= white_list @message.text.gsub('%%CASUALNAME%%',@casual_name) %>
 
-Sent to <%= @address %> by <%= @campaign_name %> using Open Campaigns "Manager" software.
+Sent to <%= white_list @address %> by <%= white_list @campaign_name %> using Open Campaigns "Manager" software.
