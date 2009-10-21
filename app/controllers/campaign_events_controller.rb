@@ -64,6 +64,8 @@ class CampaignEventsController < ApplicationController
 
   def new
     @campaign_event = CampaignEvent.new
+    @campaign_event.start_time = Time.now.midnight + 12.hours
+    @campaign_event.end_time = Time.now.midnight + 13.hours
   end
 
   def create

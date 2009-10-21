@@ -1095,10 +1095,6 @@ class EntitiesController < ApplicationController
       page.replace_html "is_this_you", "&nbsp;"
     end
   end
-
-  def edit
-    @entity = Entity.find(params[:id])
-  end
   
   def simple_self_edit
     @entity = Entity.find(params[:id])
