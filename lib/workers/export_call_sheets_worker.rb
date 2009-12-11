@@ -137,7 +137,7 @@ class ExportCallSheetsWorker < BackgrounDRb::Rails
         email_0_y = phone_0_y-75
         pdf.add_text(email_x,email_0_y,"<b>Email:</b>", @font_14)
         email_1_y = email_0_y-5-@font_14
-        pdf.add_text(email_x,email_1_y,"<b>#{entity.primary_email.label}:</b> "+entity.primary_email_address.to_s, @font_14)
+        pdf.add_text(email_x,email_1_y,"<b>#{entity.primary_email.label if entity.primary_email}:</b> "+entity.primary_email_address.to_s, @font_14)
         if entity.email_addresses.length > 1
           other_emails = entity.email_addresses.dup
           other_emails.delete(entity.primary_email)
