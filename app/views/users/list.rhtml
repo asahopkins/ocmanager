@@ -18,7 +18,12 @@
 # 
 # ---------------------------------------------------------------------------
 -%><h2>Listing users</h2>
-
+<% if current_user.superuser? 
+	if @single %>
+		<%= link_to 'Full user list', :controller=>:users, :action=>:list %>
+	<% else %>
+	<%= link_to 'Current campaign list', :controller=>:users, :action=>:list, :id=>"current" %>
+<% end end %>
 <table class="user_list">
   <tr>
       <td><b><u>Name</u></b></td>

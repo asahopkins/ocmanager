@@ -23,6 +23,7 @@ ActionController::Routing::Routes.draw do |map|
   map.forgot_password '/forgot_password', :controller => 'users', :action => 'forgot_password'
   map.reset_password '/reset_password/:activation_code/', :controller => 'users', :action => 'reset_password', :activation_code => nil
   map.list_users '/users/list',:controller=>'users',:action=>'list'
+  map.list_current_users '/users/list/:id',:controller=>'users',:action=>'list'
   map.new_user '/users/new',:controller=>'users',:action=>'new'
   map.new_user '/users/edit',:controller=>'users',:action=>'edit'
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }

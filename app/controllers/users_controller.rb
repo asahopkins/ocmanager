@@ -186,21 +186,51 @@ class UsersController < ApplicationController
   end 
 
   def list
+    @single = true if params[:id] == "current"
     page = params[:page] || 1
     @cur_array = Array.new
     @user_array = Array.new
-    for comm_id in current_user.manager_campaigns
-      @cur_array << CampaignUserRole.find(:all,:conditions=>["campaign_id = :comm",{:comm=>comm_id}])
+    if @single
+      @campaign = Campaign.find(current_user.current_campaign)
+      # single campaign mode
+      @cur_array << CampaignUserRole.find(:all,:conditions=>["campaign_id = :comm",{:comm=>@campaign.id}])
+      @cur_array.flatten!
+      @cur_array.each {|cur|
+        @user_array << cur.user
+        }
+      @user_array.uniq!
+      @user_array.sort! do |a, b|
+        a_inactive = 0
+        b_inactive = 0
+        a_inactive = 1 if a.inactive?(@campaign)
+        b_inactive = 1 if b.inactive?(@campaign)
+        tmp = a_inactive <=> b_inactive
+        if tmp != 0
+          tmp
+        else
+          a.name.upcase <=> b.name.upcase
+        end
+      end
+      @users = paginate_collection @user_array, :per_page => 10, :page=>page      
+    else
+      # superuser mode
+      for comm_id in current_user.manager_campaigns
+        @cur_array << CampaignUserRole.find(:all,:conditions=>["campaign_id = :comm",{:comm=>comm_id}])
+      end
+      @cur_array.flatten!
+      @cur_array.each {|cur|
+        @user_array << cur.user
+        }
+      @user_array.uniq!
+      @user_array.sort! do |a, b|
+        if b.logged_in_at and a.logged_in_at
+          b.logged_in_at <=> a.logged_in_at
+        else
+          b.updated_at <=> a.updated_at
+        end
+      end
+      @users = paginate_collection @user_array, :per_page => 10, :page=>page
     end
-    @cur_array.flatten!
-    @cur_array.each {|cur|
-      @user_array << cur.user
-      }
-    @user_array.uniq!
-    @user_array.sort! do |a, b|
-        b.updated_at <=> a.updated_at
-    end
-    @users = paginate_collection @user_array, :per_page => 10, :page=>page
     render(:layout => 'layouts/manager')
   end
 
