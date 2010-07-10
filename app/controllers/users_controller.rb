@@ -205,10 +205,14 @@ class UsersController < ApplicationController
         a_inactive = 1 if a.inactive?(@campaign)
         b_inactive = 1 if b.inactive?(@campaign)
         tmp = a_inactive <=> b_inactive
+        a.name.upcase =~ /\S*$/
+        a_lastname = $&
+        b.name.upcase =~ /\S*$/
+        b_lastname = $&
         if tmp != 0
           tmp
         else
-          a.name.upcase <=> b.name.upcase
+          a_lastname <=> b_lastname
         end
       end
       @users = paginate_collection @user_array, :per_page => 10, :page=>page      
